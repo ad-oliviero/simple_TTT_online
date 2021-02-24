@@ -1,4 +1,4 @@
-# [Simple TTT](https://github.com/TheDarkBug/simple_TTT_online) is a simple tic tac toe (as the name suggests) online.
+# [Simple TTT](https://github.com/TheDarkBug/simple_TTT) is a simple tic tac toe (as the name suggests) online.
 
 #### Made with [raylib](raylib.com) (precompiled library for windows included) and posix (or windows) sockets.
 
