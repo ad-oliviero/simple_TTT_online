@@ -5,9 +5,9 @@ build_dir = ../
 flags = -lraylib
 flags_w64 = -L lib/ $(flags) -lopengl32 -lwinmm -lgdi32 -static -lwinpthread -Wl,--subsystem,windows -lwsock32
 
-all: linux windows server
+all: linux windows
 
-linux:
+linux: server
 	gcc -O3 -W -Wall -Wextra $(flags) $(src_dir)$(files) -o $(build_dir)$(name)
 	@echo Compilation Successfull!
 

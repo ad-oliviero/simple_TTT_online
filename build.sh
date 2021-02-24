@@ -1,6 +1,6 @@
 #!/bin/bash
 cd src
-make all
+make linux
 
 if [ $? != 0 ]
 then
