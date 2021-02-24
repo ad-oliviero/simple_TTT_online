@@ -1,0 +1,2 @@
+int checkwinner();
+void endGame();
