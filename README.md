@@ -1,6 +1,6 @@
 # [Simple TTT](https://github.com/TheDarkBug/simple_TTT) is a simple tic tac toe (as the name suggests) online.
 
-#### Made with [raylib](raylib.com) (precompiled library for windows included) and posix (or windows) sockets.
+#### Made with [raylib](raylib.com) (precompiled library for windows included) and unix (or windows) sockets.
 
 #### The code used in this project is not taken from other sources and you can use it by accepting the terms of the [license](https://github.com/TheDarkBug/simple_TTT_online/blob/main/LICENSE).
 
