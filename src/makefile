@@ -2,7 +2,7 @@ name = "Tris"
 files = main.c gameplay.c gui.c shapes.c client.c
 src_dir = 
 build_dir = ../
-flags = -lraylib
+flags = -lraylib -lpthread
 flags_w64 = -L lib/ $(flags) -lopengl32 -lwinmm -lgdi32 -static -lwinpthread -Wl,--subsystem,windows -lwsock32
 
 all: linux windows

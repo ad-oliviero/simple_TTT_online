@@ -5,6 +5,7 @@
 #endif
 #include <stdio.h>
 #include <unistd.h>
+#include <pthread.h>
 #include "include/client.h"
 #include "include/gameplay.h"
 #include "include/gui.h"
@@ -39,7 +40,9 @@ int main() {
 	SetTraceLogCallback(log_level);
 	InitWindow(SCR_WIDTH, SCR_HEIGHT, PROGRAM_NAME);
 	SetTargetFPS(GetMonitorRefreshRate(0));
-	
+	/*pthread_t tid[];
+	if(pthread_create(&tid[0], NULL, clientThread, NULL) != 0) printf("Failed to create thread\n");
+	if(pthread_create(&tid[1], NULL, test, NULL) != 0) printf("Failed to create thread\n");*/
 	initHitBox();
 	// ---MAIN GAME LOOP---
 	while (!WindowShouldClose()) {
@@ -58,7 +61,7 @@ int main() {
 		if (is_game_over == 1) {
 			endGame(winner);
 		}
-		//DrawFPS(10, 10);
+		DrawFPS(10, 10);
 		matchInfo();
 		EndDrawing();
 	}
