@@ -30,6 +30,8 @@
 *.dylib
 
 # Executables
+*server*
+*Tris*
 *.exe
 *.out
 *.app
