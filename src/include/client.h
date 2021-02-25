@@ -1,2 +1,2 @@
 int client_connect();
-void client_comm();
+void* client_comm();

@@ -52,7 +52,7 @@ int main(void) {
 	send(clientfd[1], (char *) &user2, 10, 0);
 
 	// creating and joining threads
-	pthread_t tid[3];
+	pthread_t tid[2];
 	for (int i = 0; i <= 1; i++) {
 		int *arg = malloc(sizeof(*arg));
 		*arg = i;

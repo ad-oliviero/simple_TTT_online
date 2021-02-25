@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <pthread.h>
 #ifdef __linux__
 	#include <sys/socket.h>
 	#include <arpa/inet.h>
@@ -17,9 +18,9 @@ extern int winsP1;
 extern int winsP2;
 extern int winner;
 #ifdef __linux__
-int sock;			//-6108638100957931777 1.16.5 x:-16 y:73 z:76
+	int sock;
 #elif _WIN32
-unsigned int sock;
+	unsigned int sock;
 #endif
 extern int ready;
 extern char user1[10];
@@ -48,24 +49,27 @@ int client_connect() {
 	return 0;
 }
 
-void client_comm() {
-	// read game data
-	recv(sock, (char *) &is_game_over, 4, 0);
-	recv(sock, (char *) &turn, 4, 0);
-	recv(sock, (char *) &winsP1, 4, 0);
-	recv(sock, (char *) &winsP2, 4, 0);
-	recv(sock, (char *) &winner, 4, 0);
-	for (int i = 0; i < 9; i++) {
-		recv(sock, (char *) &game_grid[i], 4, 0);
-	}
+void* client_comm() {
+	while (1) {
+		// read game data
+		recv(sock, (char *) &is_game_over, 4, 0);
+		recv(sock, (char *) &turn, 4, 0);
+		recv(sock, (char *) &winsP1, 4, 0);
+		recv(sock, (char *) &winsP2, 4, 0);
+		recv(sock, (char *) &winner, 4, 0);
+		for (int i = 0; i < 9; i++) {
+			recv(sock, (char *) &game_grid[i], 4, 0);
+		}
 
-	// write events
-	send(sock, (char *) &click_position, 4, 0);
-	if (click_position != -1 || is_game_over == 1) {
-		click_position = -1;
+		// write events
+		send(sock, (char *) &click_position, 4, 0);
+		if (click_position != -1 || is_game_over == 1) {
+			click_position = -1;
+		}
+		send(sock, (char *) &ready, 4, 0);
+		if (ready == 1 && is_game_over == 0) {
+			ready = 0;
+		}
 	}
-	send(sock, (char *) &ready, 4, 0);
-	if (ready == 1 && is_game_over == 0) {
-		ready = 0;
-	}
+	pthread_exit(NULL);
 }
