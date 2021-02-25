@@ -7,8 +7,6 @@
 #elif _WIN32
 	#include <winsock2.h>
 #endif
-
-#define IP_ADDRESS	"25.64.37.243"
 #define PORT		5555
 
 extern int click_position;
@@ -24,6 +22,10 @@ int sock;			//-6108638100957931777 1.16.5 x:-16 y:73 z:76
 unsigned int sock;
 #endif
 extern int ready;
+extern char user1[10];
+extern char user2[10];
+extern char user_name[10];
+char IP_ADDRESS[60];
 
 int client_connect() {
 	#ifdef _WIN32
@@ -39,11 +41,14 @@ int client_connect() {
 
 	//Connect to remote server_id
 	if (connect(sock , (struct sockaddr *) &server_id , sizeof(server_id)) < 0) return 1;
+	listen(sock, 1);
+	send(sock, (char *) &user_name, 10, 0);
+	recv(sock, (char *) &user1, 10, 0);
+	recv(sock, (char *) &user2, 10, 0);
 	return 0;
 }
 
 void client_comm() {
-	listen(sock, 1);
 	// read game data
 	recv(sock, (char *) &is_game_over, 4, 0);
 	recv(sock, (char *) &turn, 4, 0);
@@ -56,10 +61,10 @@ void client_comm() {
 
 	// write events
 	send(sock, (char *) &click_position, 4, 0);
-	send(sock, (char *) &ready, 4, 0);
 	if (click_position != -1 || is_game_over == 1) {
 		click_position = -1;
 	}
+	send(sock, (char *) &ready, 4, 0);
 	if (ready == 1 && is_game_over == 0) {
 		ready = 0;
 	}

@@ -13,57 +13,36 @@ extern bool turn;
 extern int winsP1;
 extern int winsP2;
 extern int winner;
+extern char user1[10];
+extern char user2[10];
 
 int checkwinner() {
-	if ((game_grid[0] == game_grid[1]) && (game_grid[1] == game_grid[2])) {
-		if (game_grid[0] == 1) {
-			return 1;
-		} else if (game_grid[0] == 2) {
-			return 2;
+	// columns
+	for (int i = 0; i < 3; i++) {
+		if (game_grid[i] == game_grid[i + 3] && game_grid[i + 3] == game_grid[i + 6] && game_grid[i] != 0) {
+			is_game_over = 1;
+			return game_grid[i];
 		}
-	} else if ((game_grid[3] == game_grid[4]) && (game_grid[4] == game_grid[5])) {
-		if (game_grid[3] == 1) {
-			return 1;
-		} else if (game_grid[3] == 2) {
-			return 2;
+	}
+	// raws
+	for (int i = 0; i < 9; i += 3) {
+		if (game_grid[i] == game_grid[i + 1] && game_grid[i + 1] == game_grid[i + 2] && game_grid[i] != 0) {
+			is_game_over = 1;
+			return game_grid[i];
 		}
-	} else if ((game_grid[6] == game_grid[7]) && (game_grid[7] == game_grid[8])) {
-		if (game_grid[6] == 1) {
-			return 1;
-		} else if (game_grid[6] == 2) {
-			return 2;
-		}
-	} else if ((game_grid[0] == game_grid[3]) && (game_grid[3] == game_grid[6])) {
-		if (game_grid[0] == 1) {
-			return 1;
-		} else if (game_grid[0] == 2) {
-			return 2;
-		}
-	} else if ((game_grid[1] == game_grid[4]) && (game_grid[4] == game_grid[7])) {
-		if (game_grid[1] == 1) {
-			return 1;
-		} else if (game_grid[1] == 2) {
-			return 2;
-		}
-	} else if ((game_grid[2] == game_grid[5]) && (game_grid[5] == game_grid[8])) {
-		if (game_grid[2] == 1) {
-			return 1;
-		} else if (game_grid[2] == 2) {
-			return 2;
-		}
-	} else if ((game_grid[0] == game_grid[4]) && (game_grid[4] == game_grid[8])) {
-		if (game_grid[0] == 1) {
-			return 1;
-		} else if (game_grid[0] == 2) {
-			return 2;
-		}
-	} else if ((game_grid[2] == game_grid[4]) && (game_grid[4] == game_grid[6])) {
-		if (game_grid[2] == 1) {
-			return 1;
-		} else if (game_grid[2] == 2) {
-			return 2;
-		}
-	} else if (game_grid[0] != 0 && game_grid[1] != 0 && game_grid[2] != 0 && game_grid[3] != 0 && game_grid[4] != 0 && game_grid[5] != 0 && game_grid[6] != 0 && game_grid[7] != 0 && game_grid[8] != 0) {
+	}
+	// diagonals
+	if (game_grid[0] == game_grid[4] && game_grid[4] == game_grid[8] && game_grid[0] != 0 && game_grid[4] != 0 && game_grid[8] != 0) {
+		is_game_over = 1;
+		return game_grid[0];
+	}
+	if (game_grid[2] == game_grid[4] && game_grid[4] == game_grid[6] && game_grid[2] != 0 && game_grid[4] != 0 && game_grid[6] != 0) {
+		is_game_over = 1;
+		return game_grid[2];
+	}
+	// draw
+	if (game_grid[0] != 0 && game_grid[1] != 0 && game_grid[2] != 0 && game_grid[3] != 0 && game_grid[4] != 0 && game_grid[5] != 0 && game_grid[6] != 0 && game_grid[7] != 0 && game_grid[8] != 0) {
+		is_game_over = 1;
 		return 3;
 	}
 	return 0;
@@ -76,9 +55,9 @@ void endGame() {
 	DrawRectangleRoundedLines(restart_btn, .7f, 100, 5, RED);
 
 	if (winner == 1) {
-		DrawText("Player 1 (X) WON!", SCR_WIDTH / 3.3f, SCR_HEIGHT / 2.7f, 20, BLACK);
+		DrawText(TextFormat("%s (X) won!", user1), MeasureText(TextFormat("%s (X) won!", user1), 20), SCR_HEIGHT / 2.7f, 20, BLACK);//SCR_WIDTH / 3.3f, SCR_HEIGHT / 2.7f, 20, BLACK);
 	} else if (winner == 2) {
-		DrawText("Player 2 (O) WON!", SCR_WIDTH / 3.3f, SCR_HEIGHT / 2.7f, 20, BLACK);
+		DrawText(TextFormat("%s (O) won!", user2), MeasureText(TextFormat("%s (O) won!", user2), 20), SCR_HEIGHT / 2.7f, 20, BLACK);//SCR_WIDTH / 3.3f, SCR_HEIGHT / 2.7f, 20, BLACK);
 	} else if (winner == 3) {
 		DrawText("Draw...", SCR_WIDTH / 2.45f, SCR_HEIGHT / 2.74f, 30, BLACK);
 	}

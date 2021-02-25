@@ -28,9 +28,13 @@ int click_position = -1;
 int winner = 0;
 int ready = 0;
 int permisson;
+char user_name[10] = {0};
 void log_level(){}
+char user1[10];
+char user2[10];
 
 int main() {
+	join_window();
 	if (client_connect() > 0) return 1;
 	SetTraceLogCallback(log_level);
 	InitWindow(SCR_WIDTH, SCR_HEIGHT, PROGRAM_NAME);
@@ -54,6 +58,7 @@ int main() {
 		if (is_game_over == 1) {
 			endGame(winner);
 		}
+		//DrawFPS(10, 10);
 		matchInfo();
 		EndDrawing();
 	}

@@ -12,14 +12,11 @@ int turn = 1;
 int winsP1 = 0;
 int winsP2 = 0;
 int winner = 0;
-int game_grid[9] = {
-	0, 0, 0,
-	0, 0, 0,
-	0, 0, 0
-};
+int game_grid[9] = {0};
 int click = -1;
 int ready_check[2];
-int permisson[2];
+char user1[10];
+char user2[10];
 
 int main() {
 	struct sockaddr_in address;
@@ -32,34 +29,34 @@ int main() {
 	if (bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0) exit(EXIT_FAILURE);
 	if (listen(server_fd, 3) < 0) exit(EXIT_FAILURE);
 	if ((new_socket[0] = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0) exit(EXIT_FAILURE);
-	printf("Connecten P1!\n");
+	recv(new_socket[0], (char *) &user1, 10, 0);
+	printf("Connected %s\n", user1);
 	
 	if (listen(server_fd, 3) < 0) exit(EXIT_FAILURE);
 	if ((new_socket[1] = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0) exit(EXIT_FAILURE);
-	printf("Connecten P2!\n");
-	permisson[0] = 0;
-	permisson[1] = 1;
-	while (1) {
+	recv(new_socket[1], (char *) &user2, 10, 0);
+	printf("Connected %s\n", user2);
+	send(new_socket[0], (char *) &user1, 10, 0);
+	send(new_socket[0], (char *) &user2, 10, 0);
 
-		if (checkwinner() != 0) {
-			is_game_over = 1;
-			winner = checkwinner();
-		}
+	send(new_socket[1], (char *) &user1, 10, 0);
+	send(new_socket[1], (char *) &user2, 10, 0);
+	while (1) {
 		//send game data
 		for (int i = 0; i <= 1; i++) {
-			send(new_socket[i], &is_game_over, 4, 0);
-			send(new_socket[i], &turn, 4, 0);
-			send(new_socket[i], &winsP1, 4, 0);
-			send(new_socket[i], &winsP2, 4, 0);
-			send(new_socket[i], &winner, 4, 0);
+			winner = checkwinner();
+			send(new_socket[i], (char *) &is_game_over, 4, 0);
+			send(new_socket[i], (char *) &turn, 4, 0);
+			send(new_socket[i], (char *) &winsP1, 4, 0);
+			send(new_socket[i], (char *) &winsP2, 4, 0);
+			send(new_socket[i], (char *) &winner, 4, 0);
 			for (int j = 0; j < 9; j++) {
 				send(new_socket[i], &game_grid[j], 4, 0);
 			}
 
 			// read events
-			recv(new_socket[i], &click, 4, 0);
-			recv(new_socket[i], &ready_check[i], sizeof(ready_check), 0);
-			
+			recv(new_socket[i], (char *) &click, 4, 0);
+			//if (turn != i) click = -1;
 			if (click != -1 && game_grid[click] == 0 && is_game_over == 0 ) {
 				if (turn == 0) {
 					game_grid[click] = 2;
@@ -69,6 +66,7 @@ int main() {
 					turn = 0;
 				}
 			}
+			recv(new_socket[i], (char *) &ready_check[i], sizeof(ready_check), 0);
 		}
 		if (ready_check[0] == 1 && ready_check[1] == 1) endGame(winner);
 	}

@@ -13,71 +13,31 @@ extern int winsP1;
 extern int winsP2;
 
 int checkwinner() {
-	if ((game_grid[0] == game_grid[1]) && (game_grid[1] == game_grid[2])) {
-		if (game_grid[0] == 1) {
+	// columns
+	for (int i = 0; i < 3; i++) {
+		if (game_grid[i] == game_grid[i + 3] && game_grid[i + 3] == game_grid[i + 6] && game_grid[i] != 0) {
 			is_game_over = 1;
-			return 1;
-		} else if (game_grid[0] == 2) {
-			is_game_over = 1;
-			return 2;
+			return game_grid[i];
 		}
-	} else if ((game_grid[3] == game_grid[4]) && (game_grid[4] == game_grid[5])) {
-		if (game_grid[3] == 1) {
+	}
+	// raws
+	for (int i = 0; i < 9; i += 3) {
+		if (game_grid[i] == game_grid[i + 1] && game_grid[i + 1] == game_grid[i + 2] && game_grid[i] != 0) {
 			is_game_over = 1;
-			return 1;
-		} else if (game_grid[3] == 2) {
-			is_game_over = 1;
-			return 2;
+			return game_grid[i];
 		}
-	} else if ((game_grid[6] == game_grid[7]) && (game_grid[7] == game_grid[8])) {
-		if (game_grid[6] == 1) {
-			is_game_over = 1;
-			return 1;
-		} else if (game_grid[6] == 2) {
-			is_game_over = 1;
-			return 2;
-		}
-	} else if ((game_grid[0] == game_grid[3]) && (game_grid[3] == game_grid[6])) {
-		if (game_grid[0] == 1) {
-			is_game_over = 1;
-			return 1;
-		} else if (game_grid[0] == 2) {
-			is_game_over = 1;
-			return 2;
-		}
-	} else if ((game_grid[1] == game_grid[4]) && (game_grid[4] == game_grid[7])) {
-		if (game_grid[1] == 1) {
-			is_game_over = 1;
-			return 1;
-		} else if (game_grid[1] == 2) {
-			is_game_over = 1;
-			return 2;
-		}
-	} else if ((game_grid[2] == game_grid[5]) && (game_grid[5] == game_grid[8])) {
-		if (game_grid[2] == 1) {
-			is_game_over = 1;
-			return 1;
-		} else if (game_grid[2] == 2) {
-			is_game_over = 1;
-			return 2;
-		}
-	} else if ((game_grid[0] == game_grid[4]) && (game_grid[4] == game_grid[8])) {
-		if (game_grid[0] == 1) {
-			is_game_over = 1;
-			return 1;
-		} else if (game_grid[0] == 2) {
-			is_game_over = 1;
-			return 2;
-		}
-	} else if ((game_grid[2] == game_grid[4]) && (game_grid[4] == game_grid[6])) {
-		if (game_grid[2] == 1) {
-			is_game_over = 1;
-			return 1;
-		} else if (game_grid[2] == 2) {
-			is_game_over = 1;
-			return 2;
-		}
-	} else if (game_grid[0] != 0 && game_grid[1] != 0 && game_grid[2] != 0 && game_grid[3] != 0 && game_grid[4] != 0 && game_grid[5] != 0 && game_grid[6] != 0 && game_grid[7] != 0 && game_grid[8] != 0) {
+	}
+	// diagonals
+	if (game_grid[0] == game_grid[4] && game_grid[4] == game_grid[8] && game_grid[0] != 0 && game_grid[4] != 0 && game_grid[8] != 0) {
+		is_game_over = 1;
+		return game_grid[0];
+	}
+	if (game_grid[2] == game_grid[4] && game_grid[4] == game_grid[6] && game_grid[2] != 0 && game_grid[4] != 0 && game_grid[6] != 0) {
+		is_game_over = 1;
+		return game_grid[2];
+	}
+	// draw
+	if (game_grid[0] != 0 && game_grid[1] != 0 && game_grid[2] != 0 && game_grid[3] != 0 && game_grid[4] != 0 && game_grid[5] != 0 && game_grid[6] != 0 && game_grid[7] != 0 && game_grid[8] != 0) {
 		is_game_over = 1;
 		return 3;
 	}
@@ -91,13 +51,9 @@ void endGame(int winner) {
 		}
 		if (winner == 1) {
 			winsP1++;
-			turn = !turn;
 		} else if (winner == 2) {
 			winsP2++;
-			turn = !turn;
 		}
 		is_game_over = 0;
-		turn = !turn;
-		usleep(150000);
 	}
 }
