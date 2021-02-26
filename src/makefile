@@ -1,4 +1,4 @@
-name = "Simple TTT"
+name = "Simple_TTT"
 files = main.c gameplay.c gui.c shapes.c client.c
 src_dir = 
 build_dir = ../
