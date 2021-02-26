@@ -8,14 +8,15 @@
 #elif _WIN32
 	#include <winsock2.h>
 #endif
+#include "include/main.h"
 #define PORT		5555
 
 extern int click_position;
 extern int game_grid[9];
 extern int is_game_over;
 extern int turn;
+extern int winsP0;
 extern int winsP1;
-extern int winsP2;
 extern int winner;
 #ifdef __linux__
 	int sock;
@@ -23,9 +24,10 @@ extern int winner;
 	unsigned int sock;
 #endif
 extern int ready;
-extern char user1[10];
-extern char user2[10];
-extern char user_name[10];
+extern char user0[USERN_LENGTH];
+extern char user1[USERN_LENGTH];
+extern char user_name[USERN_LENGTH];
+int user_id = -1;
 char IP_ADDRESS[60];
 
 int client_connect() {
@@ -39,33 +41,31 @@ int client_connect() {
 	server_id.sin_family = AF_INET;
 	server_id.sin_port = htons(PORT);
 	sock = socket(AF_INET, SOCK_STREAM, 0);
-
-	//Connect to remote server_id
-	if (connect(sock , (struct sockaddr *) &server_id , sizeof(server_id)) < 0) return 1;
-	listen(sock, 1);
-	send(sock, (char *) &user_name, 10, 0);
-	recv(sock, (char *) &user1, 10, 0);
-	recv(sock, (char *) &user2, 10, 0);
+	if (connect(sock, (struct sockaddr *) &server_id, sizeof(server_id)) < 0) return 1;
 	return 0;
 }
 
 void* client_comm() {
+	listen(sock, 1);
+	send(sock, (char *) &user_name, sizeof(user_name), 0);
+	recv(sock, (char *) &user0, sizeof(user0), 0);
+	recv(sock, (char *) &user1, sizeof(user1), 0);
+	recv(sock, (char *) &user_id, 4, 0);
 	while (1) {
 		// read game data
 		recv(sock, (char *) &is_game_over, 4, 0);
 		recv(sock, (char *) &turn, 4, 0);
+		recv(sock, (char *) &winsP0, 4, 0);
 		recv(sock, (char *) &winsP1, 4, 0);
-		recv(sock, (char *) &winsP2, 4, 0);
 		recv(sock, (char *) &winner, 4, 0);
 		for (int i = 0; i < 9; i++) {
 			recv(sock, (char *) &game_grid[i], 4, 0);
 		}
 
 		// write events
+		if (turn != user_id) click_position = -1; // set click only if it's client's turn
 		send(sock, (char *) &click_position, 4, 0);
-		if (click_position != -1 || is_game_over == 1) {
-			click_position = -1;
-		}
+		if (click_position >= 0 || is_game_over) click_position = -1;
 		send(sock, (char *) &ready, 4, 0);
 		if (ready == 1 && is_game_over == 0) {
 			ready = 0;

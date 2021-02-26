@@ -5,5 +5,4 @@
 #endif
 
 void shape(Rectangle*, int*, int*);
-void cross(Rectangle*);
-void circle(Rectangle*);
+void place();

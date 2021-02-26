@@ -12,11 +12,11 @@
 extern int block;
 extern Rectangle game[9];
 extern int turn;
+extern int winsP0;
 extern int winsP1;
-extern int winsP2;
-extern char user1[10];
-extern char user2[10];
-extern char user_name[10];
+extern char user0[USERN_LENGTH];
+extern char user1[USERN_LENGTH];
+extern char user_name[USERN_LENGTH];
 extern char IP_ADDRESS[60];
 
 void join_window() {
@@ -25,22 +25,22 @@ void join_window() {
 	SetTargetFPS(GetMonitorRefreshRate(0));
 	Rectangle nickBox = {MeasureText("Nickname:", 20) + 15, 5, 200, 30};
 	Rectangle ipBox = {MeasureText("IP:", 20) + 15, 40, 267, 30};
-	int letterCountNick = 0, letterCountIP = 0;
+	int letterCountUser = 0, letterCountIP = 0;
 	while (!IsKeyDown(KEY_ENTER)) {
 		if (CheckCollisionPointRec(GetMousePosition(), nickBox)) {
 			SetMouseCursor(MOUSE_CURSOR_IBEAM);
 			int key = GetCharPressed();
 			while (key > 0) {
-				if ((key >= 32) && (key <= 125) && (letterCountNick < 10)) {
-					user_name[letterCountNick] = (char)key;
-					letterCountNick++;
+				if ((key >= 32) && (key <= 125) && (letterCountUser < USERN_LENGTH)) {
+					user_name[letterCountUser] = (char)key;
+					letterCountUser++;
 				}
 				key = GetCharPressed();
 			}
 			if (IsKeyPressed(KEY_BACKSPACE)) {
-				letterCountNick--;
-				if (letterCountNick < 0) letterCountNick = 0;
-				user_name[letterCountNick] = '\0';
+				letterCountUser--;
+				if (letterCountUser < 0) letterCountUser = 0;
+				user_name[letterCountUser] = '\0';
 			}
 		}
 		if (CheckCollisionPointRec(GetMousePosition(), ipBox)) {
@@ -67,7 +67,7 @@ void join_window() {
 		DrawText(user_name, nickBox.x + 5, nickBox.y + 4, 20, MAROON);
 		DrawText(IP_ADDRESS, ipBox.x + 5, ipBox.y + 4, 20, MAROON);
 		if (CheckCollisionPointRec(GetMousePosition(), nickBox)) {
-			if (letterCountNick < 10) {
+			if (letterCountUser < USERN_LENGTH) {
 				DrawText("|", nickBox.x + 8 + MeasureText(user_name, 20), nickBox.y + 6, 20, MAROON);
 			}
 		}
@@ -153,10 +153,10 @@ void initHitBox() {
 
 void matchInfo() {
 	if (turn) {
-		DrawText(TextFormat("It's %s (X) turn!", user1), 150/*MeasureText(TextFormat("It's %s (X) turn!", user1), 20) / 5*/, block * 3 + 10, 20, BLACK);
-	} else if (turn == 0) {
-		DrawText(TextFormat("It's %s (0) turn!", user2), 150/*MeasureText(TextFormat("It's %s (0) turn!", user2), 20) / 5*/, block * 3 + 10, 20, BLACK);
+		DrawText(TextFormat("It's %s (X) turn!", user0), MeasureText("It's (X) turn!", 20)/* + MeasureText(user0, 20)*/, block * 3 + 10, 20, BLACK);
+	} else {
+		DrawText(TextFormat("It's %s (0) turn!", user1), MeasureText("It's (0) turn!", 20)/* + MeasureText(user1, 20)*/, block * 3 + 10, 20, BLACK);
 	}
 	DrawText("X:\nO:", 10, block * 3 + 10, 20, BLACK);
-	DrawText(TextFormat("   %i\n   %i\n", winsP1, winsP2), 10, block * 3 + 10, 20, BLACK);
+	DrawText(TextFormat("   %i\n   %i\n", winsP0, winsP1), 10, block * 3 + 10, 20, BLACK);
 }

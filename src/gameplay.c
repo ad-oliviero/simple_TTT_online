@@ -10,11 +10,11 @@ extern int game_grid[9];
 extern int is_game_over;
 extern int ready;
 extern bool turn;
+extern int winsP0;
 extern int winsP1;
-extern int winsP2;
 extern int winner;
-extern char user1[10];
-extern char user2[10];
+extern char user0[USERN_LENGTH];
+extern char user1[USERN_LENGTH];
 
 int checkwinner() {
 	// columns
@@ -55,9 +55,9 @@ void endGame() {
 	DrawRectangleRoundedLines(restart_btn, .7f, 100, 5, RED);
 
 	if (winner == 1) {
-		DrawText(TextFormat("%s (X) won!", user1), MeasureText(TextFormat("%s (X) won!", user1), 20), SCR_HEIGHT / 2.7f, 20, BLACK);//SCR_WIDTH / 3.3f, SCR_HEIGHT / 2.7f, 20, BLACK);
+		DrawText(TextFormat("%s (X) won!", user0), MeasureText("(X) won!", 20) + restart_btn.x, SCR_HEIGHT / 2.7f, 20, BLACK); //SCR_WIDTH / 3.3f, SCR_HEIGHT / 2.7f, 20, BLACK);
 	} else if (winner == 2) {
-		DrawText(TextFormat("%s (O) won!", user2), MeasureText(TextFormat("%s (O) won!", user2), 20), SCR_HEIGHT / 2.7f, 20, BLACK);//SCR_WIDTH / 3.3f, SCR_HEIGHT / 2.7f, 20, BLACK);
+		DrawText(TextFormat("%s (O) won!", user1), MeasureText("(O) won!", 20) + restart_btn.x, SCR_HEIGHT / 2.7f, 20, BLACK); //SCR_WIDTH / 3.3f, SCR_HEIGHT / 2.7f, 20, BLACK);
 	} else if (winner == 3) {
 		DrawText("Draw...", SCR_WIDTH / 2.45f, SCR_HEIGHT / 2.74f, 30, BLACK);
 	}

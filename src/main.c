@@ -22,18 +22,18 @@ int game_grid[9] = {
 	0, 0, 0
 };
 int is_game_over = 0;
-int turn = 1;
+int turn = 0;
+int winsP0 = 0;
 int winsP1 = 0;
-int winsP2 = 0;
 int is_btn_pressed = 0;
 int click_position = -1;
 int winner = 0;
 int ready = 0;
 int permisson;
-char user_name[10] = {0};
+char user_name[USERN_LENGTH] = {0};
 void log_level(){}
-char user1[10];
-char user2[10];
+char user0[USERN_LENGTH];
+char user1[USERN_LENGTH];
 
 void* window_main();
 
@@ -53,11 +53,7 @@ void* window_main() {
 	SetTargetFPS(GetMonitorRefreshRate(0));
 	initHitBox();
 	while (!WindowShouldClose()) {
-		if (turn) {
-			cross(game);
-		} else {
-			circle(game);
-		}
+		place();
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 		grid();
@@ -68,6 +64,7 @@ void* window_main() {
 			endGame(winner);
 		}
 		matchInfo();
+		DrawFPS(10, 10);
 		EndDrawing();
 	}
 	CloseWindow();

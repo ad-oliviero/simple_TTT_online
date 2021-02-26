@@ -9,8 +9,8 @@
 extern int game_grid[9];
 extern int is_game_over;
 extern bool turn;
+extern int winsP0;
 extern int winsP1;
-extern int winsP2;
 
 int checkwinner() {
 	// columns
@@ -50,9 +50,9 @@ void endGame(int winner) {
 			game_grid[i] = 0;
 		}
 		if (winner == 1) {
-			winsP1++;
+			winsP0++;
 		} else if (winner == 2) {
-			winsP2++;
+			winsP1++;
 		}
 		is_game_over = 0;
 	}

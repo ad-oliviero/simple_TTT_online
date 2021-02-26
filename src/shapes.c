@@ -8,6 +8,7 @@
 
 extern int block;
 extern int click_position;
+extern Rectangle game[9];
 extern int game_grid[9];
 extern int is_game_over;
 extern bool turn;
@@ -26,17 +27,9 @@ void shape(Rectangle *position, int *position_id, int *type) {
 	}
 }
 
-void cross(Rectangle *game) {
+void place() {
 	for (int i = 0; i < 9; i++) {
-		if (CheckCollisionPointRec(GetMousePosition(), game[i]) && IsMouseButtonDown(0) && is_game_over == 0) {
-			click_position = i;
-		}
-	}
-}
-
-void circle(Rectangle *game) {
-	for (int i = 0; i < 9; i++) {
-		if (CheckCollisionPointRec(GetMousePosition(), game[i]) && game_grid[i] == 0 && IsMouseButtonDown(0) && is_game_over == 0) {
+		if (CheckCollisionPointRec(GetMousePosition(), game[i]) && IsMouseButtonDown(0) && !is_game_over) {
 			click_position = i;
 		}
 	}
