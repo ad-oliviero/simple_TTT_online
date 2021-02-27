@@ -7,20 +7,19 @@
 #include <pthread.h>
 #include "include/gameplay.h"
 #include "include/main.h"
-#define PORT 5555
 
+int click = -1;
+int clientfd[2];
 int is_game_over = 0;
+int game_grid[9] = {0};
+int ready_check[2];
 int turn = 0;
+int user_id = 0;
 int winsP0 = 0;
 int winsP1 = 0;
 int winner = 0;
-int game_grid[9] = {0};
-int click = -1;
-int ready_check[2];
 char user0[USERN_LENGTH];
 char user1[USERN_LENGTH];
-int clientfd[2];
-int user_id = 0;
 
 void* communication(void*);
 
@@ -28,26 +27,26 @@ int main(void) {
 	// creating socket and connecting to it
 	struct sockaddr_in address;
 	int server_fd, opt = 1, addrlen = sizeof(address);
-	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) return EXIT_FAILURE;
-	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) return EXIT_FAILURE;
+	server_fd = socket(AF_INET, SOCK_STREAM, 0);
+	setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
-	address.sin_port = htons( PORT );
-	if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) return EXIT_FAILURE;
+	address.sin_port = htons(PORT);
+	bind(server_fd, (struct sockaddr *)&address, sizeof(address));
 
 	// accepting clients
-	if (listen(server_fd, 3) < 0) return EXIT_FAILURE;
-	if ((clientfd[0] = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) return EXIT_FAILURE;
+	listen(server_fd, 3);
+	clientfd[0] = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
 	recv(clientfd[0], (char *) &user0, sizeof(user0), 0);
 	printf("Connected %s\n", user0);
 
-	if (listen(server_fd, 3) < 0) return EXIT_FAILURE;
-	if ((clientfd[1] = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) return EXIT_FAILURE;
+	listen(server_fd, 3);
+	clientfd[1] = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
 	recv(clientfd[1], (char *) &user1, sizeof(user1), 0);
 	printf("Connected %s\n", user1);
 
 	// initializing connection
-	if (listen(server_fd, 3) < 0) return EXIT_FAILURE;
+	listen(server_fd, 3);
 	send(clientfd[0], (char *) &user0, sizeof(user0), 0);
 	send(clientfd[0], (char *) &user1, sizeof(user1), 0);
 	send(clientfd[0], (char *) &user_id, 4, 0);
@@ -90,7 +89,7 @@ void* communication(void* arg) {
 			else game_grid[click] = 2;
 			turn = !turn;
 		}
-		if (ready_check[0] == 1 && ready_check[1] == 1) endGame(winner); // checks if all clients are ready to continue
+		if (ready_check[0] && ready_check[1]) endGame(winner); // checks if all clients are ready to continue
 	}
 	pthread_exit(NULL);
 }

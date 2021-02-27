@@ -8,7 +8,7 @@
 
 extern int game_grid[9];
 extern int is_game_over;
-extern bool turn;
+extern int turn;
 extern int winsP0;
 extern int winsP1;
 
@@ -45,15 +45,8 @@ int checkwinner() {
 }
 
 void endGame(int winner) {
-	if (is_game_over) {
-		for (int i = 0; i < 9; i ++) {
-			game_grid[i] = 0;
-		}
-		if (winner == 1) {
-			winsP0++;
-		} else if (winner == 2) {
-			winsP1++;
-		}
-		is_game_over = 0;
-	}
+	for (int i = 0; i < 9; i ++) game_grid[i] = 0;
+	if (winner == 1) winsP0++;
+	else if (winner == 2) winsP1++;
+	is_game_over = 0;
 }

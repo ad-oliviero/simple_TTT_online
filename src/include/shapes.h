@@ -4,5 +4,5 @@
 	#include "raylib.h"
 #endif
 
-void shape(Rectangle*, int*, int*);
 void place();
+void shape(Rectangle*, int*, int*);

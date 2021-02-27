@@ -5,30 +5,30 @@
 #ifdef __linux__
 	#include <sys/socket.h>
 	#include <arpa/inet.h>
+	#define SOCK	int sock
 #elif _WIN32
 	#include <winsock2.h>
+	#define SOCK	unsigned int sock
 #endif
 #include "include/main.h"
-#define PORT		5555
 
 extern int click_position;
-extern int game_grid[9];
 extern int is_game_over;
-extern int turn;
-extern int winsP0;
-extern int winsP1;
-extern int winner;
-#ifdef __linux__
-	int sock;
-#elif _WIN32
-	unsigned int sock;
-#endif
+extern int game_grid[9];
 extern int ready;
+extern int turn;
 extern char user0[USERN_LENGTH];
 extern char user1[USERN_LENGTH];
 extern char user_name[USERN_LENGTH];
+extern int winsP0;
+extern int winsP1;
+extern int winner;
+
+SOCK;
 int user_id = -1;
-char IP_ADDRESS[60];
+char IP_ADDRESS[15];
+char recv_msg[1024];
+char send_msg[128];
 
 int client_connect() {
 	#ifdef _WIN32
@@ -36,12 +36,11 @@ int client_connect() {
 		WSAStartup(MAKEWORD(2, 2), &Data);
 	#endif
 	struct sockaddr_in server_id;
-	if (sock == -1)	return 1;
 	server_id.sin_addr.s_addr = inet_addr(IP_ADDRESS);
 	server_id.sin_family = AF_INET;
 	server_id.sin_port = htons(PORT);
 	sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (connect(sock, (struct sockaddr *) &server_id, sizeof(server_id)) < 0) return 1;
+	connect(sock, (struct sockaddr *) &server_id, sizeof(server_id));
 	return 0;
 }
 

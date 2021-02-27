@@ -9,7 +9,7 @@
 extern int game_grid[9];
 extern int is_game_over;
 extern int ready;
-extern bool turn;
+extern int turn;
 extern int winsP0;
 extern int winsP1;
 extern int winner;
@@ -54,13 +54,9 @@ void endGame() {
 	DrawRectangleRounded(restart_btn, .7f, 20, DARKGRAY);
 	DrawRectangleRoundedLines(restart_btn, .7f, 100, 5, RED);
 
-	if (winner == 1) {
-		DrawText(TextFormat("%s (X) won!", user0), MeasureText("(X) won!", 20) + restart_btn.x, SCR_HEIGHT / 2.7f, 20, BLACK); //SCR_WIDTH / 3.3f, SCR_HEIGHT / 2.7f, 20, BLACK);
-	} else if (winner == 2) {
-		DrawText(TextFormat("%s (O) won!", user1), MeasureText("(O) won!", 20) + restart_btn.x, SCR_HEIGHT / 2.7f, 20, BLACK); //SCR_WIDTH / 3.3f, SCR_HEIGHT / 2.7f, 20, BLACK);
-	} else if (winner == 3) {
-		DrawText("Draw...", SCR_WIDTH / 2.45f, SCR_HEIGHT / 2.74f, 30, BLACK);
-	}
+	if (winner == 1) DrawText(TextFormat("%s (X) won!", user0), MeasureText("(X) won!", 20) + restart_btn.x, SCR_HEIGHT / 2.7f, 20, BLACK); //SCR_WIDTH / 3.3f, SCR_HEIGHT / 2.7f, 20, BLACK);
+	else if (winner == 2) DrawText(TextFormat("%s (O) won!", user1), MeasureText("(O) won!", 20) + restart_btn.x, SCR_HEIGHT / 2.7f, 20, BLACK); //SCR_WIDTH / 3.3f, SCR_HEIGHT / 2.7f, 20, BLACK);
+	else if (winner == 3) DrawText("Draw...", SCR_WIDTH / 2.45f, SCR_HEIGHT / 2.74f, 30, BLACK);
 
 	if (CheckCollisionPointRec(GetMousePosition(), restart_btn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 		ready = 1;

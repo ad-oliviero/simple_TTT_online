@@ -1,18 +1,24 @@
-name = "Simple_TTT"
-files = main.c gameplay.c gui.c shapes.c client.c
-src_dir = 
-build_dir = ../
-flags = -lraylib -lpthread
-flags_w64 = -L lib/ $(flags) -lopengl32 -lwinmm -lgdi32 -static -lwinpthread -Wl,--subsystem,windows -lwsock32
+BUILD_DIR = ../
+CC = gcc
+CCW64 = x86_64-w64-mingw32-$(CC)
+FILES = main.c client.c gui.c shapes.c gameplay.c
+FLAGS = -O3 -Wall -Wextra
+FLAGS_W64 = $(FLAGS) -Wl,--subsystem,windows
+LIBS = -lraylib -lpthread
+LIBS_W64 = -L lib/ $(FLAGS) -lopengl32 -lwinmm -lgdi32 -static -lwinpthread -lwsock32
+NAME = "Simple_TTT"
+SRC_DIR = 
 
-all: linux windows
+all: client server
+
+client: linux windows
+
+server:
+	$(CC) $(FLAGS) $(LIBS) $(SRC_DIR)server.c $(SRC_DIR)server_gameplay.c $(FLAGS) -o $(BUILD_DIR)server
 
 linux: server
-	gcc -O3 -W -Wall -Wextra $(flags) $(src_dir)$(files) -o $(build_dir)$(name)
+	$(CC) $(FLAGS) $(LIBS) $(SRC_DIR)$(FILES) -o $(BUILD_DIR)$(NAME)
 	@echo Compilation Successfull!
 
 windows:
-	x86_64-w64-mingw32-gcc -O3 $(src_dir)$(files) -o $(build_dir)$(name).exe $(flags_w64)
-
-server:
-	gcc -O3 -W -Wall -Wextra $(src_dir)server.c $(src_dir)server_gameplay.c $(flags) -o $(build_dir)server
+	$(CCW64) $(FLAGS_W64) $(LIBS_W64) $(SRC_DIR)$(FILES) -o $(BUILD_DIR)$(NAME).exe

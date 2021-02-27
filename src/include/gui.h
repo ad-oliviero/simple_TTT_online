@@ -1,4 +1,4 @@
-void join_window();
-void grid();
 void initHitBox();
+void grid();
+void join_window();
 void matchInfo();
