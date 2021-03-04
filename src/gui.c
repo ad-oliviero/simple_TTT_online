@@ -87,7 +87,8 @@ void join_window() {	// drawing the initial window
 	Rectangle nickBox = {MeasureText("Nickname:", 20) + 15, 5, 200, 30};
 	Rectangle ipBox = {MeasureText("IP:", 20) + 15, 40, 267, 30};
 	int letterCountUser = 0, letterCountIP = 0;
-	while (!IsKeyDown(KEY_ENTER) || !WindowShouldClose()) {
+	while (!WindowShouldClose()) {
+		if (IsKeyDown(KEY_ENTER)) break;
 		if (CheckCollisionPointRec(GetMousePosition(), nickBox)) {
 			SetMouseCursor(MOUSE_CURSOR_IBEAM);
 			int key = GetCharPressed();
