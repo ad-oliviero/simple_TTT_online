@@ -1,5 +1,9 @@
 #!/bin/bash
-cd src
+ls build
+if [ $? != 0 ]
+then
+	mkdir build
+fi
 make linux server
 
 if [ $? != 0 ]

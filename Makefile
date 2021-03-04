@@ -15,7 +15,7 @@ all: linux windows server
 client: linux windows
 
 server:
-	$(CC) $(FLAGS) server.c $(SRC)server_gameplay.c  $(LIBS) -o $(BUILD)server
+	$(CC) $(FLAGS) $(SRC)server.c $(SRC)server_gameplay.c  $(LIBS) -o $(BUILD)server
 	@echo -e "\033[0;33mServer compiled!\033[0m"
 
 linux:
