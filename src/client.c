@@ -65,7 +65,7 @@ void* client_comm() {	// communicating data with the server (mostly receiving)
 		}
 
 		// write events
-		if (turn != user_id) click_position = -1; // set click only if it's client's turn
+		if (turn == user_id) click_position = -1; // set click only if it's client's turn
 		send(sock, (char *) &click_position, 4, 0);
 		if (click_position >= 0 || is_game_over) click_position = -1;
 		send(sock, (char *) &ready, 4, 0);

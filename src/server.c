@@ -14,7 +14,6 @@ int is_game_over = 0;
 int game_grid[9] = {0};
 int ready_check[2];
 int turn = 0;
-int user_id = 0;
 int winsP0 = 0;
 int winsP1 = 0;
 int winner = 0;
@@ -32,7 +31,7 @@ int main(void) {
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = htons(PORT);
-	bind(server_fd, (struct sockaddr *)&address, sizeof(address));
+	if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) return -1;
 
 	// accepting clients
 	listen(server_fd, 3);
@@ -49,11 +48,11 @@ int main(void) {
 	listen(server_fd, 3);
 	send(clientfd[0], (char *) &user0, sizeof(user0), 0);
 	send(clientfd[0], (char *) &user1, sizeof(user1), 0);
-	send(clientfd[0], (char *) &user_id, 4, 0);
-	user_id++;
+	send(clientfd[0], (char *) &turn, 4, 0);
+	turn++;
 	send(clientfd[1], (char *) &user0, sizeof(user0), 0);
 	send(clientfd[1], (char *) &user1, sizeof(user1), 0);
-	send(clientfd[1], (char *) &user_id, 4, 0);
+	send(clientfd[1], (char *) &turn, 4, 0);
 
 	// creating and joining threads
 	pthread_t tid[2];
@@ -83,7 +82,7 @@ void* communication(void* arg) {	// communicating data with the client (mostly s
 		recv(clientfd[i], (char *) &click, 4, 0);
 		recv(clientfd[i], (char *) &ready_check[i], sizeof(ready_check), 0);
 		winner = checkwinner();
-		if (turn != i) click = -1; // accepting click only from player's turn client
+		if (turn == i) click = -1; // accepting click only from player's turn client
 		if (click != -1 && game_grid[click] == 0 && is_game_over == 0 ) { // handling clicks
 			if (turn) game_grid[click] = 1;
 			else game_grid[click] = 2;
@@ -91,5 +90,6 @@ void* communication(void* arg) {	// communicating data with the client (mostly s
 		}
 		if (ready_check[0] && ready_check[1]) endGame(winner); // checks if all clients are ready to continue
 	}
+	close(clientfd[i]);
 	pthread_exit(NULL);
 }
