@@ -1,8 +1,4 @@
-#ifdef __linux__
-	#include <raylib.h>
-#elif _WIN32
-	#include "include/raylib.h"
-#endif
+#include "include/raylib.h"
 #include <unistd.h>
 #include "include/main.h"
 
@@ -12,7 +8,7 @@ extern int turn;
 extern int winsP0;
 extern int winsP1;
 
-int checkwinner() {
+int checkwinner() {	// check if someone wins
 	// columns
 	for (int i = 0; i < 3; i++) {
 		if (game_grid[i] == game_grid[i + 3] && game_grid[i + 3] == game_grid[i + 6] && game_grid[i] != 0) {
@@ -36,6 +32,7 @@ int checkwinner() {
 		is_game_over = 1;
 		return game_grid[2];
 	}
+
 	// draw
 	if (game_grid[0] != 0 && game_grid[1] != 0 && game_grid[2] != 0 && game_grid[3] != 0 && game_grid[4] != 0 && game_grid[5] != 0 && game_grid[6] != 0 && game_grid[7] != 0 && game_grid[8] != 0) {
 		is_game_over = 1;
@@ -44,7 +41,7 @@ int checkwinner() {
 	return 0;
 }
 
-void endGame(int winner) {
+void endGame(int winner) {	// resetting the game and update variables
 	for (int i = 0; i < 9; i ++) game_grid[i] = 0;
 	if (winner == 1) winsP0++;
 	else if (winner == 2) winsP1++;

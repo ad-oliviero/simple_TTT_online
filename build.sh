@@ -1,6 +1,6 @@
 #!/bin/bash
 cd src
-make linux
+make linux server
 
 if [ $? != 0 ]
 then

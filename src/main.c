@@ -1,14 +1,13 @@
 #ifdef __linux__
-	#include <raylib.h>
 	#define SOCK	int sock
 #elif _WIN32
-	#include "include/raylib.h"
 	#define SOCK	unsigned int sock
 #endif
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "include/raylib.h"
 #include "include/client.h"
 #include "include/gameplay.h"
 #include "include/gui.h"
@@ -47,22 +46,21 @@ void* window_main() {
 	InitWindow(SCR_WIDTH, SCR_HEIGHT, PROGRAM_NAME);
 	SetTargetFPS(GetMonitorRefreshRate(0));
 	initHitBox();
+	// main game loop
 	while (!WindowShouldClose()) {
 		place();
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 		grid();
-		for (int i = 0; i < 9; i++) {
-			shape(game, &i, &game_grid[i]);
-		}
-		if (is_game_over == 1) {
-			endGame(winner);
-		}
+		for (int i = 0; i < 9; i++) shape(game, &i, &game_grid[i]);
+		if (is_game_over == 1) endGame(winner);
 		matchInfo();
 		//DrawFPS(10, 10);
 		EndDrawing();
 	}
+	// end of the program
 	CloseWindow();
 	close(sock);
 	pthread_exit(NULL);
+	return NULL;
 }

@@ -1,8 +1,4 @@
-#ifdef __linux__
-	#include <raylib.h>
-#elif _WIN32
-	#include "include/raylib.h"
-#endif
+#include "include/raylib.h"
 #include "include/main.h"
 #include "include/client.h"
 
@@ -13,13 +9,11 @@ extern int is_game_over;
 extern int turn;
 extern Rectangle game[9];
 
-void place() {
-	for (int i = 0; i < 9; i++) {
-		if (CheckCollisionPointRec(GetMousePosition(), game[i]) && IsMouseButtonDown(0) && !is_game_over) click_position = i;
-	}
+void place() {	// changes game_grid value where the click is detected (with the hitboxes in gui.c)
+	for (int i = 0; i < 9; i++) if (CheckCollisionPointRec(GetMousePosition(), game[i]) && IsMouseButtonDown(0) && !is_game_over) click_position = i;
 }
 
-void shape(Rectangle *position, int *position_id, int *type) {
+void shape(Rectangle *position, int *position_id, int *type) {	// draw shape where game_grid value is != 0
 	if (*type == 1) {
 		Vector2 startpa = {position[*position_id].x + 20, position[*position_id].y + 20};
 		Vector2 endpa = {startpa.x + block - 40, startpa.y + block - 40};

@@ -1,9 +1,7 @@
 # Prerequisites
 *.d
-<<<<<<< HEAD
-=======
 *.vscode
->>>>>>> 27702a5 (First commit, program already working)
+*build*
 
 # Object files
 *.o
@@ -28,6 +26,7 @@
 # Shared objects (inc. Windows DLLs)
 *.dll
 *.dylib
+*.so
 
 # Executables
 *server*

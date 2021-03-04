@@ -30,7 +30,7 @@ char IP_ADDRESS[15];
 char recv_msg[1024];
 char send_msg[128];
 
-int client_connect() {
+int client_connect() {	// connect to the sock
 	#ifdef _WIN32
 		WSADATA Data;
 		WSAStartup(MAKEWORD(2, 2), &Data);
@@ -44,12 +44,15 @@ int client_connect() {
 	return 0;
 }
 
-void* client_comm() {
+void* client_comm() {	// communicating data with the server (mostly receiving)
+	// initializing the game
 	listen(sock, 1);
 	send(sock, (char *) &user_name, sizeof(user_name), 0);
 	recv(sock, (char *) &user0, sizeof(user0), 0);
 	recv(sock, (char *) &user1, sizeof(user1), 0);
 	recv(sock, (char *) &user_id, 4, 0);
+
+	// communication loop
 	while (1) {
 		// read game data
 		recv(sock, (char *) &is_game_over, 4, 0);
@@ -66,9 +69,7 @@ void* client_comm() {
 		send(sock, (char *) &click_position, 4, 0);
 		if (click_position >= 0 || is_game_over) click_position = -1;
 		send(sock, (char *) &ready, 4, 0);
-		if (ready == 1 && is_game_over == 0) {
-			ready = 0;
-		}
+		if (ready == 1 && is_game_over == 0) ready = 0;
 	}
 	pthread_exit(NULL);
 }

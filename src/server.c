@@ -66,7 +66,7 @@ int main(void) {
 	return 0;
 }
 
-void* communication(void* arg) {
+void* communication(void* arg) {	// communicating data with the client (mostly sending)
 	int i = *((int *) arg);
 	free(arg);
 	while (1) {

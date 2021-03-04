@@ -1,8 +1,4 @@
-#ifdef __linux__
-	#include <raylib.h>
-#elif _WIN32
-	#include "include/raylib.h"
-#endif
+#include "include/raylib.h"
 #include <unistd.h>
 #include "include/main.h"
 
@@ -16,7 +12,7 @@ extern int winner;
 extern char user0[USERN_LENGTH];
 extern char user1[USERN_LENGTH];
 
-int checkwinner() {
+int checkwinner() {	// check if someone wins
 	// columns
 	for (int i = 0; i < 3; i++) {
 		if (game_grid[i] == game_grid[i + 3] && game_grid[i + 3] == game_grid[i + 6] && game_grid[i] != 0) {
@@ -48,12 +44,14 @@ int checkwinner() {
 	return 0;
 }
 
-void endGame() {
-	DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(RAYWHITE, .5f));
+void endGame() {	// button to continue the game after a match ends
+	DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(RAYWHITE, .5f));	// for obfuscation effect, idk how to use shaders or something
+	// drawing actual button
 	Rectangle restart_btn = {SCR_WIDTH / 5, SCR_HEIGHT / 3, SCR_WIDTH / 5 * 3, SCR_HEIGHT / 10};
 	DrawRectangleRounded(restart_btn, .7f, 20, DARKGRAY);
 	DrawRectangleRoundedLines(restart_btn, .7f, 100, 5, RED);
 
+	// write text in the button, needs some fixes for big nicknames
 	if (winner == 1) DrawText(TextFormat("%s (X) won!", user0), MeasureText("(X) won!", 20) + restart_btn.x, SCR_HEIGHT / 2.7f, 20, BLACK); //SCR_WIDTH / 3.3f, SCR_HEIGHT / 2.7f, 20, BLACK);
 	else if (winner == 2) DrawText(TextFormat("%s (O) won!", user1), MeasureText("(O) won!", 20) + restart_btn.x, SCR_HEIGHT / 2.7f, 20, BLACK); //SCR_WIDTH / 3.3f, SCR_HEIGHT / 2.7f, 20, BLACK);
 	else if (winner == 3) DrawText("Draw...", SCR_WIDTH / 2.45f, SCR_HEIGHT / 2.74f, 30, BLACK);

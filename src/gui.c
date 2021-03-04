@@ -1,8 +1,4 @@
-#ifdef __linux__
-	#include <raylib.h>
-#elif _WIN32
-	#include "include/raylib.h"
-#endif
+#include "include/raylib.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,8 +15,7 @@ extern char user1[USERN_LENGTH];
 extern char user_name[USERN_LENGTH];
 extern Rectangle game[9];
 
-void initHitBox() {
-	// creating boxes to detect touch or mouse clicks
+void initHitBox() {	// creating boxes to detect touch or mouse clicks
 	for (int i = 0; i < 9; i++) {
 		game[i].height = block;
 		game[i].width = block;
@@ -84,14 +79,15 @@ void grid() {
 	DrawLineEx(startp, endp, THICKNESS, BLACK);
 }
 
-void join_window() {
+void join_window() {	// drawing the initial window
 	SetTraceLogCallback(log_level);
-	InitWindow(320, 75, "Nickname and IP");
+	InitWindow(320, 75, "Set nickname and IP address");
 	SetTargetFPS(GetMonitorRefreshRate(0));
+	// i mostly took this part of the code from raylib.com/examples/web/text/loader.html?name=text_input_box, if you want to understand more just open the link
 	Rectangle nickBox = {MeasureText("Nickname:", 20) + 15, 5, 200, 30};
 	Rectangle ipBox = {MeasureText("IP:", 20) + 15, 40, 267, 30};
 	int letterCountUser = 0, letterCountIP = 0;
-	while (!IsKeyDown(KEY_ENTER)) {
+	while (!IsKeyDown(KEY_ENTER) || !WindowShouldClose()) {
 		if (CheckCollisionPointRec(GetMousePosition(), nickBox)) {
 			SetMouseCursor(MOUSE_CURSOR_IBEAM);
 			int key = GetCharPressed();
@@ -141,11 +137,11 @@ void join_window() {
 		EndDrawing();
 	}
 	CloseWindow();
-	if (letterCountIP < 5) strcpy(IP_ADDRESS, "127.0.0.1");
+	if (letterCountIP < 5) strcpy(IP_ADDRESS, "127.0.0.1");	// for default ip, might add offline mode later
 	return;
 }
 
-void matchInfo() {
+void matchInfo() {	// draw match info
 	if (turn) DrawText(TextFormat("It's %s (X) turn!", user0), MeasureText("It's (X) turn!", 20), block * 3 + 10, 20, BLACK);
 	else DrawText(TextFormat("It's %s (0) turn!", user1), MeasureText("It's (0) turn!", 20), block * 3 + 10, 20, BLACK);
 	DrawText("X:\nO:", 10, block * 3 + 10, 20, BLACK);
