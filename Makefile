@@ -5,8 +5,8 @@ CCW64 = x86_64-w64-mingw32-$(CC)
 FILES = $(SRC)main.c $(SRC)client.c $(SRC)gui.c $(SRC)shapes.c $(SRC)gameplay.c
 FLAGS = -O3 -Wall -Wextra
 FLAGS_W64 = $(FLAGS) -Wl,--subsystem,windows
-LIBS = -L $(SRC)lib/raylinux/ -l:libraylib.a -lpthread -lm -ldl
-LIBS_W64 = -L $(SRC)lib/raywindows/ -l:libraylib.a -lopengl32 -lwinmm -lgdi32 -static -lwinpthread -lwsock32
+LIBS = -L $(SRC)raylib -l:libraylib.a -lpthread -lm -ldl
+LIBS_W64 = -L $(SRC)raylib -l:libraylib.a -lopengl32 -lwinmm -lgdi32 -static -lwinpthread -lwsock32
 NAME = "Simple_TTT"
 
 all: linux windows server

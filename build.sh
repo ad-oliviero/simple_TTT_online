@@ -1,9 +1,12 @@
 #!/bin/bash
-ls build
+ls build 2>/dev/null
 if [ $? != 0 ]
 then
 	mkdir build
 fi
+cd src
+../setup_raylib.sh
+cd ..
 make linux server
 
 if [ $? != 0 ]
