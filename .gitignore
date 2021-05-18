@@ -29,8 +29,8 @@
 *.so
 
 # Executables
-*server*
-*Simple_TTT*
+server
+Simple_TTT
 *.exe
 *.out
 *.app
