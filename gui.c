@@ -110,78 +110,9 @@ void join_window()
 		EndDrawing();
 	}
 	printf("%lu\n", strlen(IP_ADDRESS));
-	if (strlen(IP_ADDRESS) < 1)
-		printf("ajdv");
-	// sprintf(IP_ADDRESS, "127.0.0.1");
-	/* int letterCountUser = 0, letterCountIP = 0;
-	while (!WindowShouldClose())
-	{
-		if (IsKeyDown(KEY_ENTER))
-			break;
-		if (CheckCollisionPointRec(GetMousePosition(), nickBox))
-		{
-			SetMouseCursor(MOUSE_CURSOR_IBEAM);
-			int key = GetCharPressed();
-			while (key > 0)
-			{
-				if ((key >= 32) && (key <= 125) && (letterCountUser < USERN_LENGTH))
-				{
-					user_name[letterCountUser] = (char)key;
-					letterCountUser++;
-				}
-				key = GetCharPressed();
-			}
-			if (IsKeyPressed(KEY_BACKSPACE))
-			{
-				letterCountUser--;
-				if (letterCountUser < 0)
-					letterCountUser = 0;
-				user_name[letterCountUser] = '\0';
-			}
-		}
-		if (CheckCollisionPointRec(GetMousePosition(), ipBox))
-		{
-			SetMouseCursor(MOUSE_CURSOR_IBEAM);
-			int key = GetCharPressed();
-			while (key > 0)
-			{
-				if ((key >= 32) && (key <= 125) && (letterCountIP < 15))
-				{
-					IP_ADDRESS[letterCountIP] = (char)key;
-					letterCountIP++;
-				}
-				key = GetCharPressed();
-			}
-			if (IsKeyPressed(KEY_BACKSPACE))
-			{
-				letterCountIP--;
-				if (letterCountIP < 0)
-					letterCountIP = 0;
-				IP_ADDRESS[letterCountIP] = '\0';
-			}
-		}
-		BeginDrawing();
-		DrawText("Nickname:", 10, 10, 20, DARKGRAY);
-		DrawText("IP:", 10, 45, 20, DARKGRAY);
-		DrawRectangleRec(nickBox, LIGHTGRAY);
-		DrawRectangleRec(ipBox, LIGHTGRAY);
-		DrawText(user_name, nickBox.x + 5, nickBox.y + 4, 20, MAROON);
-		DrawText(IP_ADDRESS, ipBox.x + 5, ipBox.y + 4, 20, MAROON);
-		if (CheckCollisionPointRec(GetMousePosition(), nickBox))
-		{
-			if (letterCountUser < USERN_LENGTH)
-				DrawText("|", nickBox.x + 8 + MeasureText(user_name, 20), nickBox.y + 6, 20, MAROON);
-		}
-		if (CheckCollisionPointRec(GetMousePosition(), ipBox))
-		{
-			if (letterCountIP < 15)
-				DrawText("|", ipBox.x + 8 + MeasureText(IP_ADDRESS, 20), ipBox.y + 6, 20, MAROON);
-		}
-		ClearBackground(RAYWHITE);
-		EndDrawing();
-	} */
+	if (strlen(IP_ADDRESS) <= 1)
+		sprintf(IP_ADDRESS, "127.0.0.1");
 	CloseWindow();
-	// if (letterCountIP < 4) sprintf(letterCountIP, "127.0.0.1"); // for default ip, might add offline mode later
 	return;
 }
 

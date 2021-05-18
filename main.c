@@ -29,13 +29,13 @@ char user_name[USERN_LENGTH] = {0};
 char user0[USERN_LENGTH];
 char user1[USERN_LENGTH];
 Rectangle game[9];
+pthread_t tid[4];
 void log_level() {}
 
 int main()
 {
 	join_window();
 	client_connect();
-	pthread_t tid[4];
 	pthread_create(&tid[0], 0, client_comm, NULL);
 	pthread_create(&tid[1], 0, window_main, NULL);
 	for (int i = 0; i <= 1; i++)
@@ -64,6 +64,7 @@ void *window_main()
 		//DrawFPS(10, 10);
 		EndDrawing();
 	}
+	pthread_cancel(tid[0]);
 	// end of the program
 	CloseWindow();
 	close(sock);
