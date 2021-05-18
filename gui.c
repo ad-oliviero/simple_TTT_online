@@ -118,6 +118,7 @@ void join_window()
 
 void matchInfo()
 { // draw match info
+	GuiTextAlignment align = 1;
 	if (turn)
 		DrawText(TextFormat("It's %s (X) turn!", user0), MeasureText("It's (X) turn!", 20), block * 3 + 10, 20, BLACK);
 	else

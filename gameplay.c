@@ -1,5 +1,7 @@
 #include "lib/raylib/include/raylib.h"
+#include "lib/raygui/src/raygui.h"
 #include <unistd.h>
+#include <stdio.h>
 #include "include/main.h"
 
 extern int game_grid[9];
@@ -53,24 +55,17 @@ int checkwinner()
 }
 
 void endGame()
-{																				   // button to continue the game after a match ends
-	DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(RAYWHITE, .5f)); // for obfuscation effect, idk how to use shaders or something
-	// drawing actual button
+{
+	DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, .8f)); // for obfuscation effect, idk how to use shaders or something
 	Rectangle restart_btn = {SCR_WIDTH / 5, SCR_HEIGHT / 3, SCR_WIDTH / 5 * 3, SCR_HEIGHT / 10};
-	DrawRectangleRounded(restart_btn, .7f, 20, DARKGRAY);
-	DrawRectangleRoundedLines(restart_btn, .7f, 100, 5, RED);
+	char restart_text[32] = "Draw...";
 
 	// write text in the button, needs some fixes for big nicknames
 	if (winner == 1)
-		DrawText(TextFormat("%s (X) won!", user0), MeasureText("(X) won!", 20) + restart_btn.x, SCR_HEIGHT / 2.7f, 20, BLACK); //SCR_WIDTH / 3.3f, SCR_HEIGHT / 2.7f, 20, BLACK);
+		sprintf(restart_text, "Player 1 (X) WON!");
 	else if (winner == 2)
-		DrawText(TextFormat("%s (O) won!", user1), MeasureText("(O) won!", 20) + restart_btn.x, SCR_HEIGHT / 2.7f, 20, BLACK); //SCR_WIDTH / 3.3f, SCR_HEIGHT / 2.7f, 20, BLACK);
-	else if (winner == 3)
-		DrawText("Draw...", SCR_WIDTH / 2.45f, SCR_HEIGHT / 2.74f, 30, BLACK);
+		sprintf(restart_text, "Player 2 (O) WON!");
 
-	if (CheckCollisionPointRec(GetMousePosition(), restart_btn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
-	{
+	if (GuiToggle(restart_btn, restart_text, ready))
 		ready = 1;
-		usleep(150000);
-	}
 }
