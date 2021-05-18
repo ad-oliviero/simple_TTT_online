@@ -1,4 +1,8 @@
-#include "raylib/include/raylib.h"
+#include "lib/raylib/include/raylib.h"
+#define RAYGUI_IMPLEMENTATION
+#define RAYGUI_SUPPORT_ICONS
+#define RAYGUI_STATIC
+#include "lib/raygui/src/raygui.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -93,7 +97,23 @@ void join_window()
 	// i mostly took this part of the code from raylib.com/examples/web/text/loader.html?name=text_input_box, if you want to understand more just open the link
 	Rectangle nickBox = {MeasureText("Nickname:", 20) + 15, 5, 200, 30};
 	Rectangle ipBox = {MeasureText("IP:", 20) + 15, 40, 267, 30};
-	int letterCountUser = 0, letterCountIP = 0;
+	while (!WindowShouldClose())
+	{
+		BeginDrawing();
+		if (GuiTextBox(nickBox, user_name, 20, CheckCollisionPointRec(GetMousePosition(), nickBox)))
+			break;
+		if (GuiTextBox(ipBox, IP_ADDRESS, 10, CheckCollisionPointRec(GetMousePosition(), ipBox)))
+			break;
+		DrawText("Nickname:", 10, 10, 20, DARKGRAY);
+		DrawText("IP:", 10, 45, 20, DARKGRAY);
+		ClearBackground(RAYWHITE);
+		EndDrawing();
+	}
+	printf("%lu\n", strlen(IP_ADDRESS));
+	if (strlen(IP_ADDRESS) < 1)
+		printf("ajdv");
+	// sprintf(IP_ADDRESS, "127.0.0.1");
+	/* int letterCountUser = 0, letterCountIP = 0;
 	while (!WindowShouldClose())
 	{
 		if (IsKeyDown(KEY_ENTER))
@@ -159,10 +179,9 @@ void join_window()
 		}
 		ClearBackground(RAYWHITE);
 		EndDrawing();
-	}
+	} */
 	CloseWindow();
-	if (letterCountIP < 5)
-		strcpy(IP_ADDRESS, "127.0.0.1"); // for default ip, might add offline mode later
+	// if (letterCountIP < 4) sprintf(letterCountIP, "127.0.0.1"); // for default ip, might add offline mode later
 	return;
 }
 

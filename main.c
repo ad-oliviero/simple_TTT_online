@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "raylib/include/raylib.h"
+#include "lib/raylib/include/raylib.h"
 #include "include/client.h"
 #include "include/gameplay.h"
 #include "include/gui.h"

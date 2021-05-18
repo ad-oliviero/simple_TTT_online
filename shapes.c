@@ -1,4 +1,4 @@
-#include "raylib/include/raylib.h"
+#include "lib/raylib/include/raylib.h"
 #include "include/main.h"
 #include "include/client.h"
 

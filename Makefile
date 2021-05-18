@@ -1,27 +1,49 @@
-BUILD = build/
-SRC = src/
+SRC = .
 CC = gcc
-CCW64 = x86_64-w64-mingw32-$(CC)
-FILES = $(SRC)main.c $(SRC)client.c $(SRC)gui.c $(SRC)shapes.c $(SRC)gameplay.c
-FLAGS = -O3 -Wall -Wextra
-FLAGS_W64 = $(FLAGS) -Wl,--subsystem,windows
-LIBS = -L $(SRC)raylib -l:libraylib.a -lpthread -lm -ldl
-LIBS_W64 = -L $(SRC)raylib -l:libraylib.a -lopengl32 -lwinmm -lgdi32 -static -lwinpthread -lwsock32
-NAME = "Simple_TTT"
+FILES = $(SRC)/main.c $(SRC)/client.c $(SRC)/gui.c $(SRC)/shapes.c $(SRC)/gameplay.c
+OBJS = $(SRC)/main.o $(SRC)/client.o $(SRC)/gui.o $(SRC)/shapes.o $(SRC)/gameplay.o
+CFLAGS = -O3
+CFLAGS_W64 = -Wl,--subsystem,windows
+LDFLAGS = -L $(SRC)/lib/raylib -l:libraylib.a -lpthread -lm -ldl
+LDFLAGS_W64 = -L $(SRC)/lib/raylib -l:libraylib.a -lopengl32 -lwinmm -lgdi32 -static -lwinpthread -lwsock32
+NAME = Simple_TTT
 
-all: linux windows server
-	@echo -e "\033[0;1m\033[0;92mAll done without errors!\033[0m"
+build: main client gui shapes gameplay
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LDFLAGS)
 
-client: linux windows
+build_windows: CFLAGS = $(CFLAGS_W64)
+build_windows: LDFLAGS = $(LDFLAGS_W64)
+build_windows: build
+
+main:
+	$(CC) -c -o $(SRC)/$@.o $(SRC)/$@.c
+
+client:
+	$(CC) -c -o $(SRC)/$@.o $(SRC)/$@.c
+
+gui:
+	$(CC) -c -o $(SRC)/$@.o $(SRC)/$@.c
+
+shapes:
+	$(CC) -c -o $(SRC)/$@.o $(SRC)/$@.c
+
+gameplay:
+	$(CC) -c -o $(SRC)/$@.o $(SRC)/$@.c
 
 server:
-	$(CC) $(FLAGS) $(SRC)server.c $(SRC)server_gameplay.c  $(LIBS) -o $(BUILD)server
-	@echo -e "\033[0;33mServer compiled!\033[0m"
+	$(CC) $(CFLAGS) -o $(SRC)/$@ $(SRC)/$@.c $(SRC)/$@_gameplay.c -lpthread
 
-linux:
-	$(CC) $(FLAGS) $(FILES) $(LIBS) -o $(BUILD)$(NAME)
-	@echo -e "\033[0;33mLinux compiled!\033[0m"
+run:
+	@#$(SRC)/server&$(SRC)/$(NAME)&$(SRC)/$(NAME)
+	$(SRC)/$(NAME)
 
-windows:
-	$(CCW64) $(FLAGS_W64) $(FILES) $(LIBS_W64) -o $(BUILD)$(NAME).exe
-	@echo -e "\033[0;33mWindows compiled!\033[0m"
+clean:
+	rm $(SRC)/$(NAME) $(OBJS) server
+
+debug_build: CFLAGS = -g -Wall -Wextra
+debug_build: build
+debug_run: debug_build run
+
+debug_windows: CFLAGS = -g -Wall -Wextra
+debug_windows: LDFLAGS = $(LDFLAGS_W64)
+debug_windows: build
