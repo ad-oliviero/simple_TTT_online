@@ -102,7 +102,7 @@ void join_window()
 		BeginDrawing();
 		if (GuiTextBox(nickBox, user_name, 20, CheckCollisionPointRec(GetMousePosition(), nickBox)))
 			break;
-		if (GuiTextBox(ipBox, IP_ADDRESS, 10, CheckCollisionPointRec(GetMousePosition(), ipBox)))
+		if (GuiTextBox(ipBox, IP_ADDRESS, 16, CheckCollisionPointRec(GetMousePosition(), ipBox)))
 			break;
 		DrawText("Nickname:", 10, 10, 20, DARKGRAY);
 		DrawText("IP:", 10, 45, 20, DARKGRAY);
