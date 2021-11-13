@@ -19,6 +19,7 @@ int block = SCR_WIDTH / 3;
 int game_grid[9] = {0};
 int is_btn_pressed = 0;
 int is_game_over = 0;
+int game_running = 1;
 int click_position = -1;
 int ready = 0;
 int turn = 0;
@@ -50,7 +51,7 @@ void *window_main()
 	SetTargetFPS(GetMonitorRefreshRate(0));
 	initHitBox();
 	// main game loop
-	while (!WindowShouldClose())
+	while (!WindowShouldClose() && game_running)
 	{
 		place();
 		BeginDrawing();
@@ -65,6 +66,7 @@ void *window_main()
 		EndDrawing();
 	}
 	pthread_cancel(tid[0]);
+	game_running = 0;
 	// end of the program
 	CloseWindow();
 	close(sock);

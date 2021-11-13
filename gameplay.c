@@ -58,14 +58,7 @@ void endGame()
 {
 	DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, .8f)); // for obfuscation effect, idk how to use shaders or something
 	Rectangle restart_btn = {SCR_WIDTH / 5, SCR_HEIGHT / 3, SCR_WIDTH / 5 * 3, SCR_HEIGHT / 10};
-	char restart_text[32] = "Draw...";
 
-	// write text in the button, needs some fixes for big nicknames
-	if (winner == 1)
-		sprintf(restart_text, "Player 1 (X) WON!");
-	else if (winner == 2)
-		sprintf(restart_text, "Player 2 (O) WON!");
-
-	if (GuiToggle(restart_btn, restart_text, ready))
+	if (GuiToggle(restart_btn, winner > 0 ? (winner == 1 ? TextFormat("%s (X) WON!", user0) : TextFormat("%s (0) WON!", user1)) : "Draw...", ready))
 		ready = 1;
 }

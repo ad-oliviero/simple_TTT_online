@@ -123,6 +123,6 @@ void matchInfo()
 		DrawText(TextFormat("It's %s (X) turn!", user0), MeasureText("It's (X) turn!", 20), block * 3 + 10, 20, BLACK);
 	else
 		DrawText(TextFormat("It's %s (0) turn!", user1), MeasureText("It's (0) turn!", 20), block * 3 + 10, 20, BLACK);
-	DrawText("X:\nO:", 10, block * 3 + 10, 20, BLACK);
-	DrawText(TextFormat("   %i\n   %i\n", winsP0, winsP1), 10, block * 3 + 10, 20, BLACK);
+	// DrawText("X:\nO:", 10, block * 3 + 10, 20, BLACK);
+	DrawText(TextFormat("%s: %i\n%s: %i\n", user0, winsP0, user1, winsP1), 10, block * 3 + 10, 20, BLACK);
 }

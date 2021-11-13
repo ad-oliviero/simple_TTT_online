@@ -14,6 +14,7 @@
 
 extern int click_position;
 extern int is_game_over;
+extern int game_running;
 extern int game_grid[9];
 extern int ready;
 extern int turn;
@@ -55,7 +56,7 @@ void *client_comm()
 	recv(sock, (char *)&user_id, 4, 0);
 
 	// communication loop
-	while (1)
+	while (game_running)
 	{
 		// read game data
 		recv(sock, (char *)&is_game_over, 4, 0);
