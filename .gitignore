@@ -58,3 +58,4 @@ dkms.conf
 lib/raylib/
 lib/raylib-git/
 lib/raygui
+include/raylib.h
