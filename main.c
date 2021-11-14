@@ -16,16 +16,8 @@
 
 extern SOCK;
 int block = SCR_WIDTH / 3;
-int game_grid[9] = {0};
-int is_btn_pressed = 0;
-int is_game_over = 0;
 int game_running = 0;
-int click_position = -1;
-int ready = 0;
-int turn = 0;
-int winsP0 = 0;
-int winsP1 = 0;
-int winner = 0;
+struct online_data client_data = {0};
 char user_name[32] = {0};
 char user0[32];
 char user1[32];
@@ -34,6 +26,8 @@ pthread_t tid[4];
 
 int main()
 {
+	// struct online_data *data = (struct online_data *)malloc(sizeof(data));
+	client_data.click_position = -1;
 	if (join_window() != 0)
 		return 0;
 	// client_connect();
@@ -44,8 +38,10 @@ int main()
 	return 0;
 }
 
-void *window_main()
+void *window_main(/* void *arg_data */)
 {
+	// struct online_data *data = (struct online_data *)arg_data;
+	// free(arg_data);
 	SetTraceLogLevel(LOG_NONE);
 	SetConfigFlags(FLAG_MSAA_4X_HINT);
 	InitWindow(SCR_WIDTH, SCR_HEIGHT, PROGRAM_NAME);
@@ -59,9 +55,9 @@ void *window_main()
 		ClearBackground(RAYWHITE);
 		grid();
 		for (int i = 0; i < 9; i++)
-			shape(game, &i, &game_grid[i]);
-		if (is_game_over == 1)
-			endGame(winner);
+			shape(game, &i, &client_data.game_grid[i]);
+		if (client_data.is_game_over == 1)
+			end_client_game(client_data.winner);
 		matchInfo();
 		//DrawFPS(10, 10);
 		EndDrawing();

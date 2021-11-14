@@ -12,10 +12,8 @@
 #include "include/client.h"
 
 extern int block;
+extern struct online_data client_data;
 extern int game_running;
-extern int turn;
-extern int winsP0;
-extern int winsP1;
 extern char user0[32];
 extern char user1[32];
 extern char user_name[32];
@@ -104,10 +102,10 @@ int join_window()
 	return ret;
 }
 
-void matchInfo()
+void matchInfo(/* struct online_data *data */)
 { // draw match info
 	GuiTextAlignment align = 1;
-	const char *info_text = TextFormat("It's %s %s turn!", turn ? user0 : user1, turn ? "(x)" : "(O)");
+	const char *info_text = TextFormat("It's %s %s turn!", client_data.turn ? user0 : user1, client_data.turn ? "(x)" : "(O)");
 	DrawText(info_text, (SCR_WIDTH - MeasureText(info_text, 20)) / 2, block * 3 + 10, 20, BLACK);
-	DrawText(TextFormat("%s: %i\n%s: %i\n", user0, winsP0, user1, winsP1), 10, block * 3 + 40, 20, BLACK);
+	DrawText(TextFormat("%s: %i\n%s: %i\n", user0, client_data.winsP0, user1, client_data.winsP1), 10, block * 3 + 40, 20, BLACK);
 }

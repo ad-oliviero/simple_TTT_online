@@ -31,8 +31,8 @@ shapes:
 gameplay:
 	$(CC) -c -o $(SRC)/$@.o $(SRC)/$@.c
 
-server:
-	$(CC) $(CFLAGS) -o $(SRC)/$@ $(SRC)/$@.c $(SRC)/$@_gameplay.c -lpthread
+server: gameplay
+	$(CC) $(CFLAGS) $(LDFLAGS) -D__SERVER__ -o $(SRC)/$@ $(SRC)/$@.c $(SRC)/gameplay.c
 
 run:
 	$(SRC)/server&$(SRC)/$(NAME)&$(SRC)/$(NAME)
