@@ -27,11 +27,10 @@ extern int winner;
 
 SOCK;
 int user_id = -1;
-char IP_ADDRESS[15];
 char recv_msg[1024];
 char send_msg[128];
 
-int client_connect()
+int client_connect(char *IP_ADDRESS, int PORT)
 { // connect to the sock
 #ifdef _WIN32
 	WSADATA Data;
@@ -42,8 +41,7 @@ int client_connect()
 	server_id.sin_family = AF_INET;
 	server_id.sin_port = htons(PORT);
 	sock = socket(AF_INET, SOCK_STREAM, 0);
-	connect(sock, (struct sockaddr *)&server_id, sizeof(server_id));
-	return 0;
+	return connect(sock, (struct sockaddr *)&server_id, sizeof(server_id));
 }
 
 void *client_comm()

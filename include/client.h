@@ -1,2 +1,2 @@
-int client_connect();
-void* client_comm();
+int client_connect(char *IP_ADDRESS, int PORT);
+void *client_comm();

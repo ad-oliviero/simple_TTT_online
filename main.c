@@ -19,7 +19,7 @@ int block = SCR_WIDTH / 3;
 int game_grid[9] = {0};
 int is_btn_pressed = 0;
 int is_game_over = 0;
-int game_running = 1;
+int game_running = 0;
 int click_position = -1;
 int ready = 0;
 int turn = 0;
@@ -31,12 +31,12 @@ char user0[USERN_LENGTH];
 char user1[USERN_LENGTH];
 Rectangle game[9];
 pthread_t tid[4];
-void log_level() {}
 
 int main()
 {
-	join_window();
-	client_connect();
+	if (join_window() != 0)
+		return 0;
+	// client_connect();
 	pthread_create(&tid[0], 0, client_comm, NULL);
 	pthread_create(&tid[1], 0, window_main, NULL);
 	for (int i = 0; i <= 1; i++)
@@ -46,7 +46,7 @@ int main()
 
 void *window_main()
 {
-	SetTraceLogCallback(log_level);
+	SetTraceLogLevel(LOG_NONE);
 	InitWindow(SCR_WIDTH, SCR_HEIGHT, PROGRAM_NAME);
 	SetTargetFPS(GetMonitorRefreshRate(0));
 	initHitBox();

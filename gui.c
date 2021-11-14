@@ -5,15 +5,17 @@
 #include "lib/raygui/src/raygui.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <string.h>
 #include <unistd.h>
 #include "include/main.h"
+#include "include/client.h"
 
 extern int block;
+extern int game_running;
 extern int turn;
 extern int winsP0;
 extern int winsP1;
-extern char IP_ADDRESS[15];
 extern char user0[USERN_LENGTH];
 extern char user1[USERN_LENGTH];
 extern char user_name[USERN_LENGTH];
@@ -89,31 +91,48 @@ void grid()
 	DrawLineEx(startp, endp, THICKNESS, BLACK);
 }
 
-void join_window()
-{ // drawing the initial window
-	SetTraceLogCallback(log_level);
+int join_window()
+{
+	int ret = 1;
+	SetTraceLogLevel(LOG_NONE);
 	InitWindow(320, 75, "Set nickname and IP address");
 	SetTargetFPS(GetMonitorRefreshRate(0));
-	// i mostly took this part of the code from raylib.com/examples/web/text/loader.html?name=text_input_box, if you want to understand more just open the link
 	Rectangle nickBox = {MeasureText("Nickname:", 20) + 15, 5, 200, 30};
 	Rectangle ipBox = {MeasureText("IP:", 20) + 15, 40, 267, 30};
-	while (!WindowShouldClose())
+	char IP_ADDRESS[16] = {0};
+	while (!game_running && !WindowShouldClose())
 	{
 		BeginDrawing();
-		if (GuiTextBox(nickBox, user_name, 20, CheckCollisionPointRec(GetMousePosition(), nickBox)))
-			break;
-		if (GuiTextBox(ipBox, IP_ADDRESS, 16, CheckCollisionPointRec(GetMousePosition(), ipBox)))
-			break;
+		if ((GuiTextBox(nickBox, user_name, 20, CheckCollisionPointRec(GetMousePosition(), nickBox)) || GuiTextBox(ipBox, IP_ADDRESS, 16, CheckCollisionPointRec(GetMousePosition(), ipBox))))
+		{
+			if (strlen(IP_ADDRESS) <= 1)
+				sprintf(IP_ADDRESS, "127.0.0.1");
+			if (client_connect(IP_ADDRESS, 5555) != -1)
+			{
+				game_running = 1;
+				ret = 0;
+			}
+			else
+			{
+				int tmp_time = time(NULL) + 3;
+				ret = 1;
+				while (time(NULL) != tmp_time)
+				{
+					BeginDrawing();
+					DrawText(TextFormat("Error: connection to %s\non port %i failed!", IP_ADDRESS, 5555), 10, 10, 20, ORANGE);
+					ClearBackground(RAYWHITE);
+					EndDrawing();
+				}
+				sprintf(IP_ADDRESS, "");
+			}
+		}
 		DrawText("Nickname:", 10, 10, 20, DARKGRAY);
 		DrawText("IP:", 10, 45, 20, DARKGRAY);
 		ClearBackground(RAYWHITE);
 		EndDrawing();
 	}
-	printf("%lu\n", strlen(IP_ADDRESS));
-	if (strlen(IP_ADDRESS) <= 1)
-		sprintf(IP_ADDRESS, "127.0.0.1");
 	CloseWindow();
-	return;
+	return ret;
 }
 
 void matchInfo()

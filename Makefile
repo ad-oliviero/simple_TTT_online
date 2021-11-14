@@ -7,6 +7,7 @@ CFLAGS_W64 = -Wl,--subsystem,windows
 LDFLAGS = -L $(SRC)/lib/raylib -l:libraylib.a -lpthread -lm -ldl
 LDFLAGS_W64 = -L $(SRC)/lib/raylib -l:libraylib.a -lopengl32 -lwinmm -lgdi32 -static -lwinpthread -lwsock32
 NAME = Simple_TTT
+.PHONY: server
 
 build: main client gui shapes gameplay
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LDFLAGS)
@@ -34,8 +35,8 @@ server:
 	$(CC) $(CFLAGS) -o $(SRC)/$@ $(SRC)/$@.c $(SRC)/$@_gameplay.c -lpthread
 
 run:
-	@#$(SRC)/server&$(SRC)/$(NAME)&$(SRC)/$(NAME)
-	$(SRC)/$(NAME)
+	$(SRC)/server&$(SRC)/$(NAME)&$(SRC)/$(NAME)
+	@#$(SRC)/$(NAME)
 
 clean:
 	rm $(SRC)/$(NAME) $(OBJS) server
