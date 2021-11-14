@@ -17,7 +17,6 @@
 extern SOCK;
 int block = SCR_WIDTH / 3;
 int game_running = 0;
-struct online_data client_data = {0};
 char user_name[32] = {0};
 char user0[32];
 char user1[32];
@@ -27,20 +26,21 @@ pthread_t tid[4];
 int main()
 {
 	// struct online_data *data = (struct online_data *)malloc(sizeof(data));
+	struct online_data client_data = {0};
 	client_data.click_position = -1;
 	if (join_window() != 0)
 		return 0;
 	// client_connect();
-	pthread_create(&tid[0], 0, client_comm, NULL);
-	pthread_create(&tid[1], 0, window_main, NULL);
+	pthread_create(&tid[0], 0, client_comm, (void *)&client_data);
+	pthread_create(&tid[1], 0, window_main, (void *)&client_data);
 	for (int i = 0; i <= 1; i++)
 		pthread_join(tid[i], NULL);
 	return 0;
 }
 
-void *window_main(/* void *arg_data */)
+void *window_main(void *arg_data)
 {
-	// struct online_data *data = (struct online_data *)arg_data;
+	struct online_data *data = (struct online_data *)arg_data;
 	// free(arg_data);
 	SetTraceLogLevel(LOG_NONE);
 	SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -55,9 +55,9 @@ void *window_main(/* void *arg_data */)
 		ClearBackground(RAYWHITE);
 		grid();
 		for (int i = 0; i < 9; i++)
-			shape(game, &i, &client_data.game_grid[i]);
-		if (client_data.is_game_over == 1)
-			end_client_game(client_data.winner);
+			shape(game, &i, &data->game_grid[i]);
+		if (data->is_game_over == 1)
+			end_client_game(data->winner);
 		matchInfo();
 		//DrawFPS(10, 10);
 		EndDrawing();

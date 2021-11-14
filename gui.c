@@ -12,7 +12,7 @@
 #include "include/client.h"
 
 extern int block;
-extern struct online_data client_data;
+// extern struct online_data client_data;
 extern int game_running;
 extern char user0[32];
 extern char user1[32];
@@ -102,10 +102,10 @@ int join_window()
 	return ret;
 }
 
-void matchInfo(/* struct online_data *data */)
+void matchInfo(struct online_data *data)
 { // draw match info
 	GuiTextAlignment align = 1;
-	const char *info_text = TextFormat("It's %s %s turn!", client_data.turn ? user0 : user1, client_data.turn ? "(x)" : "(O)");
+	const char *info_text = TextFormat("It's %s %s turn!", data->turn ? user0 : user1, data->turn ? "(x)" : "(O)");
 	DrawText(info_text, (SCR_WIDTH - MeasureText(info_text, 20)) / 2, block * 3 + 10, 20, BLACK);
-	DrawText(TextFormat("%s: %i\n%s: %i\n", user0, client_data.winsP0, user1, client_data.winsP1), 10, block * 3 + 40, 20, BLACK);
+	DrawText(TextFormat("%s: %i\n%s: %i\n", user0, data->winsP0, user1, data->winsP1), 10, block * 3 + 40, 20, BLACK);
 }
