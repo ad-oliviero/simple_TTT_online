@@ -18,6 +18,12 @@ struct online_data
 	int winner;
 };
 
+struct server_args
+{
+	int PORT;
+	int is_server_ready;
+};
+
 void *window_main();
 
 #endif // __MAIN_H__

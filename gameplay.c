@@ -14,7 +14,6 @@ extern char user1[32];
 extern struct online_data server_data;
 #endif // __SERVER__
 
-#ifndef __SERVER__
 void end_client_game(struct online_data *data)
 {
 	DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, .8f)); // for obfuscation effect, idk how to use shaders or something
@@ -66,57 +65,54 @@ int checkwinner_client(/ * struct online_data *data * /)
 }
 */
 
-#else  // __SERVER__
-
-int checkwinner()
+int checkwinner(struct online_data *data)
 { // check if someone wins
 	// columns
 	for (int i = 0; i < 3; i++)
 	{
-		if (server_data.game_grid[i] == server_data.game_grid[i + 3] && server_data.game_grid[i + 3] == server_data.game_grid[i + 6] && server_data.game_grid[i] != 0)
+		if (data->game_grid[i] == data->game_grid[i + 3] && data->game_grid[i + 3] == data->game_grid[i + 6] && data->game_grid[i] != 0)
 		{
-			server_data.is_game_over = 1;
-			return server_data.game_grid[i];
+			data->is_game_over = 1;
+			return data->game_grid[i];
 		}
 	}
 	// raws
 	for (int i = 0; i < 9; i += 3)
 	{
-		if (server_data.game_grid[i] == server_data.game_grid[i + 1] && server_data.game_grid[i + 1] == server_data.game_grid[i + 2] && server_data.game_grid[i] != 0)
+		if (data->game_grid[i] == data->game_grid[i + 1] && data->game_grid[i + 1] == data->game_grid[i + 2] && data->game_grid[i] != 0)
 		{
-			server_data.is_game_over = 1;
-			return server_data.game_grid[i];
+			data->is_game_over = 1;
+			return data->game_grid[i];
 		}
 	}
 	// diagonals
-	if (server_data.game_grid[0] == server_data.game_grid[4] && server_data.game_grid[4] == server_data.game_grid[8] && server_data.game_grid[0] != 0 && server_data.game_grid[4] != 0 && server_data.game_grid[8] != 0)
+	if (data->game_grid[0] == data->game_grid[4] && data->game_grid[4] == data->game_grid[8] && data->game_grid[0] != 0 && data->game_grid[4] != 0 && data->game_grid[8] != 0)
 	{
-		server_data.is_game_over = 1;
-		return server_data.game_grid[0];
+		data->is_game_over = 1;
+		return data->game_grid[0];
 	}
-	if (server_data.game_grid[2] == server_data.game_grid[4] && server_data.game_grid[4] == server_data.game_grid[6] && server_data.game_grid[2] != 0 && server_data.game_grid[4] != 0 && server_data.game_grid[6] != 0)
+	if (data->game_grid[2] == data->game_grid[4] && data->game_grid[4] == data->game_grid[6] && data->game_grid[2] != 0 && data->game_grid[4] != 0 && data->game_grid[6] != 0)
 	{
-		server_data.is_game_over = 1;
-		return server_data.game_grid[2];
+		data->is_game_over = 1;
+		return data->game_grid[2];
 	}
 
 	// draw
-	if (server_data.game_grid[0] != 0 && server_data.game_grid[1] != 0 && server_data.game_grid[2] != 0 && server_data.game_grid[3] != 0 && server_data.game_grid[4] != 0 && server_data.game_grid[5] != 0 && server_data.game_grid[6] != 0 && server_data.game_grid[7] != 0 && server_data.game_grid[8] != 0)
+	if (data->game_grid[0] != 0 && data->game_grid[1] != 0 && data->game_grid[2] != 0 && data->game_grid[3] != 0 && data->game_grid[4] != 0 && data->game_grid[5] != 0 && data->game_grid[6] != 0 && data->game_grid[7] != 0 && data->game_grid[8] != 0)
 	{
-		server_data.is_game_over = 1;
+		data->is_game_over = 1;
 		return 3;
 	}
 	return 0;
 }
 
-void end_server_game(int winner)
+void end_server_game(int winner, struct online_data *data)
 { // resetting the game and update variables
 	for (int i = 0; i < 9; i++)
-		server_data.game_grid[i] = 0;
+		data->game_grid[i] = 0;
 	if (winner == 1)
-		server_data.winsP0++;
+		data->winsP0++;
 	else if (winner == 2)
-		server_data.winsP1++;
-	server_data.is_game_over = 0;
+		data->winsP1++;
+	data->is_game_over = 0;
 }
-#endif // __SERVER__

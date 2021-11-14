@@ -4,7 +4,7 @@
 #include "main.h"
 void initHitBox();
 void grid();
-int join_window();
+int join_window(char *IP_ADDRESS, int *PORT);
 void matchInfo(struct online_data *data);
 
 #endif // __GUI_H__

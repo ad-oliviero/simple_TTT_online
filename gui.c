@@ -8,8 +8,10 @@
 #include <time.h>
 #include <string.h>
 #include <unistd.h>
+#include <pthread.h>
 #include "include/main.h"
 #include "include/client.h"
+#include "include/server.h"
 
 extern int block;
 // extern struct online_data client_data;
@@ -18,6 +20,7 @@ extern char user0[32];
 extern char user1[32];
 extern char user_name[32];
 extern Rectangle game[9];
+extern pthread_t server_tid[128];
 
 void initHitBox()
 { // creating boxes to detect touch or mouse clicks
@@ -58,43 +61,100 @@ void grid()
 	DrawLineEx((Vector2){0, block * 2}, (Vector2){SCR_WIDTH, block * 2}, THICKNESS + 1, BLACK);
 }
 
-int join_window()
+int join_window(char *IP_ADDRESS, int *PORT)
 {
-	int ret = 1;
+	int ret = -1, selection_step = 0, game_mode = -1, game_hosting = -1;
+	char portchar[16] = "5555";
 	SetTraceLogLevel(LOG_NONE);
-	InitWindow(320, 75, "Set nickname and IP address");
+	InitWindow(320, 75, "Game Mode Selection");
+	// InitWindow(320, 75, "Set nickname and IP address");
 	SetTargetFPS(GetMonitorRefreshRate(0));
 	Rectangle nickBox = {MeasureText("Nickname:", 20) + 15, 5, 200, 30};
 	Rectangle ipBox = {MeasureText("IP:", 20) + 15, 40, 267, 30};
-	char IP_ADDRESS[16] = {0};
+	Rectangle portBox = {MeasureText("Port:", 20) + 15, 40, 242, 30};
 	while (!game_running && !WindowShouldClose())
 	{
 		BeginDrawing();
-		if ((GuiTextBox(nickBox, user_name, 20, CheckCollisionPointRec(GetMousePosition(), nickBox)) || GuiTextBox(ipBox, IP_ADDRESS, 16, CheckCollisionPointRec(GetMousePosition(), ipBox))))
+		if (selection_step == 0)
 		{
-			if (strlen(IP_ADDRESS) <= 1)
-				sprintf(IP_ADDRESS, "127.0.0.1");
-			if (client_connect(IP_ADDRESS, 5555) != -1)
+			DrawText("Select Game Mode", (320 - MeasureText("Select Game Mode", 20)) / 2, 5, 20, DARKGRAY);
+			if (GuiButton((Rectangle){5, 30, 150, 40}, "Single Player"))
 			{
-				game_running = 1;
-				ret = 0;
-			}
-			else
-			{
-				int tmp_time = time(NULL) + 3;
-				ret = 1;
+				int tmp_time = time(NULL) + 2;
+				ret = -1;
+				// selection_step++;
 				while (time(NULL) != tmp_time)
 				{
 					BeginDrawing();
-					DrawText(TextFormat("Error: connection to %s\non port %i failed!", IP_ADDRESS, 5555), 10, 10, 20, RED);
-					ClearBackground(YELLOW);
+					DrawText(TextFormat("  Single Player mode\nis not yet implemented!", IP_ADDRESS, 5555), (320 - MeasureText(TextFormat("Single Player mode\nis not yet implemented!", IP_ADDRESS, 5555), 20)) / 2, 10, 20, ORANGE);
+					ClearBackground(RAYWHITE);
 					EndDrawing();
 				}
-				sprintf(IP_ADDRESS, "");
+				game_mode = 1;
+			}
+			else if (GuiButton((Rectangle){165, 30, 150, 40}, "Multi Player"))
+			{
+				selection_step++;
+				game_mode = 2;
 			}
 		}
-		DrawText("Nickname:", 10, 10, 20, DARKGRAY);
-		DrawText("IP:", 10, 45, 20, DARKGRAY);
+		else if (selection_step == 1 && game_mode == 1)
+		{
+			// TOTO: single player mode
+		}
+		else if (selection_step == 1 && game_mode == 2)
+		{
+			DrawText("Select Game Hosting", (320 - MeasureText("Select Game Hosting", 20)) / 2, 5, 20, DARKGRAY);
+			if (GuiButton((Rectangle){5, 30, 150, 40}, "Host"))
+			{
+				selection_step++;
+				game_hosting = 1;
+			}
+			else if (GuiButton((Rectangle){165, 30, 150, 40}, "Join"))
+			{
+				selection_step += 2;
+				game_hosting = 2;
+			}
+		}
+		else if (selection_step == 2 && game_hosting == 1)
+		{
+			if ((GuiTextBox(nickBox, user_name, 20, CheckCollisionPointRec(GetMousePosition(), nickBox)) || GuiTextBox(portBox, portchar, 8, CheckCollisionPointRec(GetMousePosition(), portBox))))
+			{
+				*PORT = atoi(portchar);
+				game_running = 1;
+				ret = 1;
+			}
+			DrawText("Nickname:", 10, 10, 20, DARKGRAY);
+			DrawText("Port:", 10, 45, 20, DARKGRAY);
+		}
+		else if (selection_step == 3)
+		{
+			if ((GuiTextBox(nickBox, user_name, 20, CheckCollisionPointRec(GetMousePosition(), nickBox)) || GuiTextBox(ipBox, IP_ADDRESS, 16, CheckCollisionPointRec(GetMousePosition(), ipBox))))
+			{
+				if (strlen(IP_ADDRESS) <= 1)
+					sprintf(IP_ADDRESS, "127.0.0.1");
+				if (client_connect(IP_ADDRESS, 5555) != -1)
+				{
+					game_running = 1;
+					ret = 0;
+				}
+				else
+				{
+					int tmp_time = time(NULL) + 3;
+					ret = -1;
+					while (time(NULL) != tmp_time)
+					{
+						BeginDrawing();
+						DrawText(TextFormat("Error: connection to %s\non port %i failed!", IP_ADDRESS, 5555), 10, 10, 20, RED);
+						ClearBackground(YELLOW);
+						EndDrawing();
+					}
+					sprintf(IP_ADDRESS, "");
+				}
+			}
+			DrawText("Nickname:", 10, 10, 20, DARKGRAY);
+			DrawText("IP:", 10, 45, 20, DARKGRAY);
+		}
 		ClearBackground(RAYWHITE);
 		EndDrawing();
 	}

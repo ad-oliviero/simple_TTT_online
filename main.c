@@ -9,30 +9,49 @@
 #include <unistd.h>
 #include "lib/raylib/include/raylib.h"
 #include "include/client.h"
+#include "include/server.h"
 #include "include/gameplay.h"
 #include "include/gui.h"
 #include "include/main.h"
 #include "include/shapes.h"
 
 extern SOCK;
+extern int is_server_ready;
 int block = SCR_WIDTH / 3;
 int game_running = 0;
 char user_name[32] = {0};
 char user0[32];
 char user1[32];
 Rectangle game[9];
-pthread_t tid[4];
+pthread_t tid[3];
 
 int main()
 {
 	struct online_data data = (struct online_data){0};
 	data.click_position = -1;
-	if (join_window() != 0)
+	int PORT = 5555;
+	char IP_ADDR[16] = {0};
+	int join_game = join_window(IP_ADDR, &PORT);
+	if (join_game < 0)
 		return 0;
-	pthread_create(&tid[0], 0, client_comm, (void *)&data);
-	pthread_create(&tid[1], 0, window_main, (void *)&data);
+	else if (join_game == 1)
+	{
+		printf("%d\n", PORT);
+		pthread_create(&tid[2], 0, server_main, &PORT);
+		while (!is_server_ready)
+			;
+		client_connect(IP_ADDR, PORT);
+	}
+	printf("%d\n", PORT);
+	pthread_create(&tid[0], 0, client_comm, &data);
+	pthread_create(&tid[1], 0, window_main, &data);
 	for (int i = 0; i <= 1; i++)
-		pthread_join(tid[1], NULL);
+	{
+		pthread_join(tid[i], NULL);
+		printf("Thread %d joined\n", i);
+	}
+	if (join_game == 1)
+		pthread_join(tid[2], NULL);
 	return 0;
 }
 

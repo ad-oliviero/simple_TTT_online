@@ -1,7 +1,5 @@
 SRC = .
 CC = gcc
-FILES = $(SRC)/main.c $(SRC)/client.c $(SRC)/gui.c $(SRC)/shapes.c $(SRC)/gameplay.c
-OBJS = $(SRC)/main.o $(SRC)/client.o $(SRC)/gui.o $(SRC)/shapes.o $(SRC)/gameplay.o
 CFLAGS = -O3
 CFLAGS_W64 = -Wl,--subsystem,windows
 LDFLAGS = -L $(SRC)/lib/raylib -l:libraylib.a -lpthread -lm -ldl
@@ -10,7 +8,7 @@ NAME = Simple_TTT
 .PHONY: server
 
 build: main client gui shapes gameplay server
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $(NAME) *.o $(LDFLAGS)
 
 build_windows: CFLAGS = $(CFLAGS_W64)
 build_windows: LDFLAGS = $(LDFLAGS_W64)
@@ -31,15 +29,14 @@ shapes:
 gameplay:
 	$(CC) -c -o $(SRC)/$@.o $(SRC)/$@.c
 
-server: gameplay
-	$(CC) $(CFLAGS) $(LDFLAGS) -D__SERVER__ -o $(SRC)/$@ $(SRC)/$@.c $(SRC)/gameplay.c
+server:
+	$(CC) -c -o $(SRC)/$@.o $(SRC)/$@.c	
 
 run:
-	$(SRC)/server&$(SRC)/$(NAME)&$(SRC)/$(NAME)
-	@#$(SRC)/$(NAME)
+	$(SRC)/$(NAME) #&$(SRC)/$(NAME)
 
 clean:
-	rm $(SRC)/$(NAME) $(OBJS) server
+	rm $(NAME) *.o server
 
 debug_build: CFLAGS = -g -Wall -Wextra
 debug_build: build
