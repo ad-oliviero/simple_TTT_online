@@ -26,9 +26,9 @@ int turn = 0;
 int winsP0 = 0;
 int winsP1 = 0;
 int winner = 0;
-char user_name[USERN_LENGTH] = {0};
-char user0[USERN_LENGTH];
-char user1[USERN_LENGTH];
+char user_name[32] = {0};
+char user0[32];
+char user1[32];
 Rectangle game[9];
 pthread_t tid[4];
 
@@ -47,6 +47,7 @@ int main()
 void *window_main()
 {
 	SetTraceLogLevel(LOG_NONE);
+	SetConfigFlags(FLAG_MSAA_4X_HINT);
 	InitWindow(SCR_WIDTH, SCR_HEIGHT, PROGRAM_NAME);
 	SetTargetFPS(GetMonitorRefreshRate(0));
 	initHitBox();

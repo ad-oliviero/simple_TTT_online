@@ -9,7 +9,7 @@ LDFLAGS_W64 = -L $(SRC)/lib/raylib -l:libraylib.a -lopengl32 -lwinmm -lgdi32 -st
 NAME = Simple_TTT
 .PHONY: server
 
-build: main client gui shapes gameplay
+build: main client gui shapes gameplay server
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LDFLAGS)
 
 build_windows: CFLAGS = $(CFLAGS_W64)

@@ -18,17 +18,17 @@ extern int game_running;
 extern int game_grid[9];
 extern int ready;
 extern int turn;
-extern char user0[USERN_LENGTH];
-extern char user1[USERN_LENGTH];
-extern char user_name[USERN_LENGTH];
+extern char user0[32];
+extern char user1[32];
+extern char user_name[32];
 extern int winsP0;
 extern int winsP1;
 extern int winner;
 
 SOCK;
 int user_id = -1;
-char recv_msg[1024];
-char send_msg[128];
+// char recv_msg[1024];
+// char send_msg[128];
 
 int client_connect(char *IP_ADDRESS, int PORT)
 { // connect to the sock
@@ -63,9 +63,7 @@ void *client_comm()
 		recv(sock, (char *)&winsP1, 4, 0);
 		recv(sock, (char *)&winner, 4, 0);
 		for (int i = 0; i < 9; i++)
-		{
 			recv(sock, (char *)&game_grid[i], 4, 0);
-		}
 
 		// write events
 		if (turn == user_id)

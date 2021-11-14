@@ -17,12 +17,12 @@ int turn = 0;
 int winsP0 = 0;
 int winsP1 = 0;
 int winner = 0;
-char user0[USERN_LENGTH];
-char user1[USERN_LENGTH];
+char user0[32];
+char user1[32];
 
 void *communication(void *);
 
-int main(void)
+int main(int argc, char **argv)
 {
 	// creating socket and connecting to it
 	struct sockaddr_in address;
@@ -31,7 +31,7 @@ int main(void)
 	setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
-	address.sin_port = htons(PORT);
+	address.sin_port = htons(5555);
 	if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
 		return -1;
 
@@ -75,6 +75,7 @@ void *communication(void *arg)
 	free(arg);
 	while (1)
 	{
+		winner = checkwinner();
 		// send game data
 		send(clientfd[i], (char *)&is_game_over, 4, 0);
 		send(clientfd[i], (char *)&turn, 4, 0);
@@ -88,7 +89,6 @@ void *communication(void *arg)
 		// read events
 		recv(clientfd[i], (char *)&click, 4, 0);
 		recv(clientfd[i], (char *)&ready_check[i], sizeof(ready_check), 0);
-		winner = checkwinner();
 		if (turn == i)
 			click = -1; // accepting click only from player's turn client
 		if (click != -1 && game_grid[click] == 0 && is_game_over == 0)

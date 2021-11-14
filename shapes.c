@@ -20,16 +20,12 @@ void shape(Rectangle *position, int *position_id, int *type)
 { // draw shape where game_grid value is != 0
 	if (*type == 1)
 	{
-		Vector2 startpa = {position[*position_id].x + 20, position[*position_id].y + 20};
-		Vector2 endpa = {startpa.x + block - 40, startpa.y + block - 40};
-		DrawLineEx(startpa, endpa, THICKNESS, BLACK);
-		Vector2 startpb = {position[*position_id].x + block - 20, position[*position_id].y + 20};
-		Vector2 endpb = {startpb.x - block + 40, startpb.y + block - 40};
-		DrawLineEx(startpb, endpb, THICKNESS, BLACK);
+		DrawLineEx((Vector2){position[*position_id].x + 20, position[*position_id].y + 20}, (Vector2){position[*position_id].x + block - 20, position[*position_id].y + block - 20}, THICKNESS, BLACK);
+		DrawLineEx((Vector2){position[*position_id].x + block - 20, position[*position_id].y + 20}, (Vector2){position[*position_id].x + block - block + 20, position[*position_id].y + block - 20}, THICKNESS, BLACK);
 	}
 	else if (*type == 2)
 	{
-		DrawCircle(position[*position_id].x + block / 2, position[*position_id].y + block / 2, block / THICKNESS, BLACK);
-		DrawCircle(position[*position_id].x + block / 2, position[*position_id].y + block / 2, block / (THICKNESS / 10 + 3), RAYWHITE);
+		DrawCircle(position[*position_id].x + block / 2, position[*position_id].y + block / 2, block / THICKNESS + 10, BLACK);
+		DrawCircle(position[*position_id].x + block / 2, position[*position_id].y + block / 2, block / THICKNESS + 7, RAYWHITE);
 	}
 }

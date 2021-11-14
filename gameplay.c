@@ -11,8 +11,8 @@ extern int turn;
 extern int winsP0;
 extern int winsP1;
 extern int winner;
-extern char user0[USERN_LENGTH];
-extern char user1[USERN_LENGTH];
+extern char user0[32];
+extern char user1[32];
 
 int checkwinner()
 { // check if someone wins
