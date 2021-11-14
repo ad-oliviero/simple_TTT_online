@@ -7,7 +7,7 @@
 #include "include/main.h"
 
 #ifndef __SERVER__
-// extern struct online_data client_data;
+extern struct online_data client_data;
 extern char user0[32];
 extern char user1[32];
 #else  // __SERVER__
@@ -15,13 +15,13 @@ extern struct online_data server_data;
 #endif // __SERVER__
 
 #ifndef __SERVER__
-void end_client_game(struct online_data *data)
+void end_client_game(/*struct online_data * data */)
 {
 	DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, .8f)); // for obfuscation effect, idk how to use shaders or something
 	Rectangle restart_btn = {SCR_WIDTH / 5, SCR_HEIGHT / 3, SCR_WIDTH / 5 * 3, SCR_HEIGHT / 10};
 
-	if (GuiToggle(restart_btn, data->winner > 0 ? (data->winner == 1 ? TextFormat("%s (X) WON!", user0) : TextFormat("%s (0) WON!", user1)) : "Draw...", data->ready))
-		data->ready = 1;
+	if (GuiToggle(restart_btn, client_data.winner > 0 ? (client_data.winner == 1 ? TextFormat("%s (X) WON!", user0) : TextFormat("%s (0) WON!", user1)) : "Draw...", client_data.ready))
+		client_data.ready = 1;
 }
 
 /* 

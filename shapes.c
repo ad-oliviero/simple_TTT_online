@@ -2,15 +2,15 @@
 #include "include/main.h"
 #include "include/client.h"
 
-// extern struct online_data client_data;
+extern struct online_data client_data;
 extern int block;
 extern Rectangle game[9];
 
-void place(struct online_data *data)
+void place(/* struct online_data *data */)
 { // changes game_grid value where the click is detected (with the hitboxes in gui.c)
 	for (int i = 0; i < 9; i++)
-		if (CheckCollisionPointRec(GetMousePosition(), game[i]) && IsMouseButtonDown(0) && !data->is_game_over)
-			data->click_position = i;
+		if (CheckCollisionPointRec(GetMousePosition(), game[i]) && IsMouseButtonDown(0) && !client_data.is_game_over)
+			client_data.click_position = i;
 }
 
 void shape(Rectangle *position, int *position_id, int *type)
