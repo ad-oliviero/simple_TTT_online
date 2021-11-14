@@ -1,4 +1,6 @@
-#define PROGRAM_NAME "Simple TTT - online"
+#ifndef __MAIN_H__
+#define __MAIN_H__
+
 #define SCR_WIDTH 450
 #define SCR_HEIGHT 800
 #define THICKNESS 3.0f
@@ -17,3 +19,5 @@ struct online_data
 };
 
 void *window_main();
+
+#endif // __MAIN_H__

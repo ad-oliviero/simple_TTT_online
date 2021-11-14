@@ -14,15 +14,13 @@
 #include "include/main.h"
 
 extern int game_running;
-extern struct online_data client_data;
+// extern struct online_data cslient_data;
 extern char user0[32];
 extern char user1[32];
 extern char user_name[32];
 
 SOCK;
 int user_id = -1;
-// char recv_msg[1024];
-// char send_msg[128];
 
 int client_connect(char *IP_ADDRESS, int PORT)
 { // connect to the sock
@@ -38,11 +36,10 @@ int client_connect(char *IP_ADDRESS, int PORT)
 	return connect(sock, (struct sockaddr *)&server_id, sizeof(server_id));
 }
 
-void *client_comm(/* void *arg_data */)
+void *client_comm(void *arg_data)
 { // communicating data with the server (mostly receiving)
 	// initializing the game
-	// struct online_data *data = malloc(sizeof(data));
-	// free(arg_data);
+	struct online_data *data = (struct online_data *)arg_data;
 	listen(sock, 1);
 	send(sock, (char *)&user_name, sizeof(user_name), 0);
 	recv(sock, (char *)&user0, sizeof(user0), 0);
@@ -53,23 +50,23 @@ void *client_comm(/* void *arg_data */)
 	while (game_running)
 	{
 		// read game data
-		recv(sock, (char *)&client_data.is_game_over, 4, 0);
-		recv(sock, (char *)&client_data.turn, 4, 0);
-		recv(sock, (char *)&client_data.winsP0, 4, 0);
-		recv(sock, (char *)&client_data.winsP1, 4, 0);
-		recv(sock, (char *)&client_data.winner, 4, 0);
+		recv(sock, (char *)&data->is_game_over, 4, 0);
+		recv(sock, (char *)&data->turn, 4, 0);
+		recv(sock, (char *)&data->winsP0, 4, 0);
+		recv(sock, (char *)&data->winsP1, 4, 0);
+		recv(sock, (char *)&data->winner, 4, 0);
 		for (int i = 0; i < 9; i++)
-			recv(sock, (char *)&client_data.game_grid[i], 4, 0);
+			recv(sock, (char *)&data->game_grid[i], 4, 0);
 
 		// write events
-		if (client_data.turn == user_id)
-			client_data.click_position = -1; // set click only if it's client's turn
-		send(sock, (char *)&client_data.click_position, 4, 0);
-		if (client_data.click_position >= 0 || client_data.is_game_over)
-			client_data.click_position = -1;
-		send(sock, (char *)&client_data.ready, 4, 0);
-		if (client_data.ready == 1 && client_data.is_game_over == 0)
-			client_data.ready = 0;
+		if (data->turn == user_id)
+			data->click_position = -1; // set click only if it's client's turn
+		send(sock, (char *)&data->click_position, 4, 0);
+		if (data->click_position >= 0 || data->is_game_over)
+			data->click_position = -1;
+		send(sock, (char *)&data->ready, 4, 0);
+		if (data->ready == 1 && data->is_game_over == 0)
+			data->ready = 0;
 	}
 	pthread_exit(NULL);
 }
