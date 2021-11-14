@@ -10,13 +10,6 @@
 
 int clientfd[2];
 int ready_check[2];
-// int click_position = -1;
-// int is_game_over = 0;
-// int game_grid[9] = {0};
-// int turn = 0;
-// int winsP0 = 0;
-// int winsP1 = 0;
-// int winner = 0;
 struct online_data server_data = {0};
 char user0[32];
 char user1[32];
@@ -76,6 +69,7 @@ void *communication(void *arg)
 	free(arg);
 	while (1)
 	{
+		// server_data.turn = !server_data.turn;
 		server_data.winner = checkwinner();
 		// send game server_data
 		send(clientfd[i], (char *)&server_data.is_game_over, 4, 0);
@@ -84,11 +78,9 @@ void *communication(void *arg)
 		send(clientfd[i], (char *)&server_data.winsP1, 4, 0);
 		send(clientfd[i], (char *)&server_data.winner, 4, 0);
 		for (int j = 0; j < 9; j++)
-		{
 			send(clientfd[i], &server_data.game_grid[j], 4, 0);
-		}
 		// read events
-		recv(clientfd[i], (char *)&server_data.click_position, 4, 0);
+		recv(clientfd[i], (char *)&server_data.click_position, sizeof(server_data.click_position), 0);
 		recv(clientfd[i], (char *)&ready_check[i], sizeof(ready_check), 0);
 		if (server_data.turn == i)
 			server_data.click_position = -1; // accepting click_position only from player's turn client
