@@ -40,30 +40,30 @@ void *client_comm(void *arg_data)
 	// initializing the game
 	struct online_data *data = (struct online_data *)arg_data;
 	listen(sock, 1);
-	send(sock, &user_name, sizeof(user_name), 0);
-	recv(sock, &user0, sizeof(user0), 0);
-	recv(sock, &user1, sizeof(user1), 0);
-	recv(sock, &user_id, 4, 0);
+	send(sock, (char *)&user_name, sizeof(user_name), 0);
+	recv(sock, (char *)&user0, sizeof(user0), 0);
+	recv(sock, (char *)&user1, sizeof(user1), 0);
+	recv(sock, (char *)&user_id, sizeof(user_id), 0);
 
 	// communication loop
 	while (game_running)
 	{
 		// read game data
-		recv(sock, &data->is_game_over, sizeof(data->is_game_over), 0);
-		recv(sock, &data->turn, sizeof(data->turn), 0);
-		recv(sock, &data->winsP0, sizeof(data->winsP0), 0);
-		recv(sock, &data->winsP1, sizeof(data->winsP1), 0);
-		recv(sock, &data->winner, sizeof(data->winner), 0);
+		recv(sock, (char *)&data->is_game_over, sizeof(data->is_game_over), 0);
+		recv(sock, (char *)&data->turn, sizeof(data->turn), 0);
+		recv(sock, (char *)&data->winsP0, sizeof(data->winsP0), 0);
+		recv(sock, (char *)&data->winsP1, sizeof(data->winsP1), 0);
+		recv(sock, (char *)&data->winner, sizeof(data->winner), 0);
 		for (int i = 0; i < 9; i++)
-			recv(sock, &data->game_grid[i], sizeof(data->game_grid[i]), 0);
+			recv(sock, (char *)&data->game_grid[i], sizeof(data->game_grid[i]), 0);
 
 		// checking if client has permission to play and sending data
 		if (data->turn == user_id)
 			data->click_position = -1; // set click only if it's client's turn
-		send(sock, &data->click_position, sizeof(data->click_position), 0);
+		send(sock, (char *)&data->click_position, sizeof(data->click_position), 0);
 		if (data->click_position >= 0 || data->is_game_over)
 			data->click_position = -1;
-		send(sock, &data->ready, sizeof(data->ready), 0);
+		send(sock, (char *)&data->ready, sizeof(data->ready), 0);
 		if (data->ready == 1 && data->is_game_over == 0)
 			data->ready = 0;
 	}
