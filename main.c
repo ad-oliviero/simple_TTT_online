@@ -35,7 +35,6 @@ int main()
 		return 0;
 	else if (join_game == 1)
 	{
-		printf("%d\n", PORT);
 		pthread_create(&tid[2], 0, server_main, &PORT);
 		while (client_connect(IP_ADDR, PORT))
 			;

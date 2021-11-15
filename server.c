@@ -47,12 +47,10 @@ void *server_main(void *PORT_arg)
 	listen(server_fd, 3);
 	clientfd[0] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
 	recv(clientfd[0], (char *)&user0, sizeof(user0), 0);
-	printf("Connected %s\n", user0);
 
 	listen(server_fd, 3);
 	clientfd[1] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
 	recv(clientfd[1], (char *)&user1, sizeof(user1), 0);
-	printf("Connected %s\n", user1);
 
 	// initializing connection
 	listen(server_fd, 3);
