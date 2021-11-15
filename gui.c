@@ -73,8 +73,10 @@ int join_window(char *IP_ADDRESS, int *PORT)
 	Rectangle portBox = {MeasureText("Port:", 20) + 15, 40, 242, 30};
 	while (!game_running && !WindowShouldClose())
 	{
+		char *clipboard = (char *)GetClipboardText();
+		clipboard[17] = '\0';
 		BeginDrawing();
-		if (selection_step == 0)
+		if (selection_step == 0) // starting selection
 		{
 			DrawText("Select Game Mode", (320 - MeasureText("Select Game Mode", 20)) / 2, 5, 20, DARKGRAY);
 			if (GuiButton((Rectangle){5, 30, 150, 40}, "Single Player"))
@@ -97,11 +99,11 @@ int join_window(char *IP_ADDRESS, int *PORT)
 				game_mode = 2;
 			}
 		}
-		else if (selection_step == 1 && game_mode == 1)
+		else if (selection_step == 1 && game_mode == 1) // single player
 		{
 			// TOTO: single player mode
 		}
-		else if (selection_step == 1 && game_mode == 2)
+		else if (selection_step == 1 && game_mode == 2) // multi player
 		{
 			DrawText("Select Game Hosting", (320 - MeasureText("Select Game Hosting", 20)) / 2, 5, 20, DARKGRAY);
 			if (GuiButton((Rectangle){5, 30, 150, 40}, "Host"))
@@ -115,9 +117,15 @@ int join_window(char *IP_ADDRESS, int *PORT)
 				game_hosting = 2;
 			}
 		}
-		else if (selection_step == 2 && game_hosting == 1)
+		else if (selection_step == 2 && game_hosting == 1) // hosting multi player
 		{
-			if ((GuiTextBox(nickBox, user_name, 20, CheckCollisionPointRec(GetMousePosition(), nickBox)) || GuiTextBox(portBox, portchar, 8, CheckCollisionPointRec(GetMousePosition(), portBox))))
+			int nickbox_selected = CheckCollisionPointRec(GetMousePosition(), nickBox);
+			int portbox_selected = CheckCollisionPointRec(GetMousePosition(), portBox);
+			if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && nickbox_selected)
+				sprintf(user_name, "%s", clipboard);
+			else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && portbox_selected)
+				sprintf(portchar, "%s", clipboard);
+			if (GuiTextBox(nickBox, user_name, 20, nickbox_selected) || GuiTextBox(portBox, portchar, 20, portbox_selected))
 			{
 				*PORT = atoi(portchar);
 				sprintf(IP_ADDRESS, "127.0.0.1");
@@ -127,9 +135,15 @@ int join_window(char *IP_ADDRESS, int *PORT)
 			DrawText("Nickname:", 10, 10, 20, DARKGRAY);
 			DrawText("Port:", 10, 45, 20, DARKGRAY);
 		}
-		else if (selection_step == 3)
+		else if (selection_step == 3) // join multi player
 		{
-			if ((GuiTextBox(nickBox, user_name, 20, CheckCollisionPointRec(GetMousePosition(), nickBox)) || GuiTextBox(ipBox, IP_ADDRESS, 16, CheckCollisionPointRec(GetMousePosition(), ipBox))))
+			int nickbox_selected = CheckCollisionPointRec(GetMousePosition(), nickBox);
+			int ipbox_selected = CheckCollisionPointRec(GetMousePosition(), ipBox);
+			if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && nickbox_selected)
+				sprintf(user_name, "%s", clipboard);
+			else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && ipbox_selected)
+				sprintf(IP_ADDRESS, "%s", clipboard);
+			if (GuiTextBox(nickBox, user_name, 20, nickbox_selected) || GuiTextBox(ipBox, IP_ADDRESS, 16, ipbox_selected))
 			{
 				if (strlen(IP_ADDRESS) <= 1)
 					sprintf(IP_ADDRESS, "127.0.0.1");
