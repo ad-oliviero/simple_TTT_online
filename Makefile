@@ -1,19 +1,22 @@
 SRC = .
 CC = gcc
 NAME = Simple_TTT
-ifeq ($(shell uname), Linux)
+PLATFORM = $(shell uname)
+ifeq ($(PLATFORM), Linux)
 	CFLAGS = -O3
 	LDFLAGS = -L $(SRC)/lib/raylib -l:libraylib.a -lpthread -lm -ldl
-else ifeq ($(shell uname), windows32)
+else ifeq ($(PLATFORM), windows32)
+	CFLAGS = -Wl,--subsystem,windows
+	LDFLAGS = -L $(SRC)/lib/raylib -l:libraylib.a -lopengl32 -lwinmm -lgdi32 -static -lwinpthread -lwsock32
+else ifeq ($(PLATFORM), linux_win)
+	CC = x86_64-w64-mingw32-gcc
 	CFLAGS = -Wl,--subsystem,windows
 	LDFLAGS = -L $(SRC)/lib/raylib -l:libraylib.a -lopengl32 -lwinmm -lgdi32 -static -lwinpthread -lwsock32
 endif
-
 .PHONY: server
 
 build: main client gui shapes gameplay server
 	$(CC) $(CFLAGS) -o $(NAME) *.o $(LDFLAGS)
-
 
 main:
 	$(CC) -c -o $(SRC)/$@.o $(SRC)/$@.c
