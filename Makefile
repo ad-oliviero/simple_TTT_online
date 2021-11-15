@@ -1,7 +1,7 @@
 SRC = .
 CC = gcc
 NAME = Simple_TTT
-ifeq ($(shell uname), linux)
+ifeq ($(shell uname), Linux)
 	CFLAGS = -O3
 	LDFLAGS = -L $(SRC)/lib/raylib -l:libraylib.a -lpthread -lm -ldl
 else ifeq ($(shell uname), windows32)
