@@ -14,7 +14,6 @@
 #include "include/main.h"
 
 extern int game_running;
-// extern struct online_data cslient_data;
 extern char user0[32];
 extern char user1[32];
 extern char user_name[32];
@@ -41,9 +40,7 @@ void *client_comm(void *arg_data)
 	// initializing the game
 	struct online_data *data = (struct online_data *)arg_data;
 	listen(sock, 1);
-	printf("cioao\n\n");
 	send(sock, &user_name, sizeof(user_name), 0);
-	sleep(10);
 	recv(sock, &user0, sizeof(user0), 0);
 	recv(sock, &user1, sizeof(user1), 0);
 	recv(sock, &user_id, 4, 0);

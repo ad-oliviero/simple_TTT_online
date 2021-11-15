@@ -33,7 +33,7 @@ server:
 	$(CC) -c -o $(SRC)/$@.o $(SRC)/$@.c	
 
 run:
-	$(SRC)/$(NAME) #&$(SRC)/$(NAME)
+	$(SRC)/$(NAME)&$(SRC)/$(NAME)
 
 clean:
 	rm $(NAME) *.o server

@@ -16,7 +16,6 @@
 #include "include/shapes.h"
 
 extern SOCK;
-extern int is_server_ready;
 int block = SCR_WIDTH / 3;
 int game_running = 0;
 char user_name[32] = {0};
@@ -38,18 +37,13 @@ int main()
 	{
 		printf("%d\n", PORT);
 		pthread_create(&tid[2], 0, server_main, &PORT);
-		while (!is_server_ready)
+		while (client_connect(IP_ADDR, PORT))
 			;
-		client_connect(IP_ADDR, PORT);
 	}
-	printf("%d\n", PORT);
 	pthread_create(&tid[0], 0, client_comm, &data);
 	pthread_create(&tid[1], 0, window_main, &data);
 	for (int i = 0; i <= 1; i++)
-	{
 		pthread_join(tid[i], NULL);
-		printf("Thread %d joined\n", i);
-	}
 	if (join_game == 1)
 		pthread_join(tid[2], NULL);
 	return 0;

@@ -10,7 +10,6 @@
 
 int clientfd[2];
 int ready_check[2];
-int is_server_ready = 0;
 struct online_data server_data = {0};
 extern int game_running;
 extern char user0[32];
@@ -43,7 +42,6 @@ void *server_main(void *PORT_arg)
 	clientfd[1] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
 	recv(clientfd[1], &user1, sizeof(user1), 0);
 	printf("Connected %s\n", user1);
-	is_server_ready = 1;
 
 	// initializing connection
 	listen(server_fd, 3);

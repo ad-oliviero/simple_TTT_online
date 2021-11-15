@@ -14,7 +14,6 @@
 #include "include/server.h"
 
 extern int block;
-// extern struct online_data client_data;
 extern int game_running;
 extern char user0[32];
 extern char user1[32];
@@ -121,6 +120,7 @@ int join_window(char *IP_ADDRESS, int *PORT)
 			if ((GuiTextBox(nickBox, user_name, 20, CheckCollisionPointRec(GetMousePosition(), nickBox)) || GuiTextBox(portBox, portchar, 8, CheckCollisionPointRec(GetMousePosition(), portBox))))
 			{
 				*PORT = atoi(portchar);
+				sprintf(IP_ADDRESS, "127.0.0.1");
 				game_running = 1;
 				ret = 1;
 			}
