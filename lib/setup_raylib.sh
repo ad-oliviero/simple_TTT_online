@@ -11,4 +11,4 @@ mv raylib/ ../../
 # raygui
 cd ../../
 git clone https://github.com/raysan5/raygui.git
-cp ./raylib/src/raylib.h ./raygui/src
+cp ./raylib-git/src/raylib.h ./raygui/src
