@@ -19,28 +19,28 @@ build: main client gui shapes gameplay server
 	$(CC) $(CFLAGS) -o $(NAME) *.o $(LDFLAGS)
 
 main:
-	$(CC) -c -o $(SRC)/$@.o $(SRC)/$@.c
+	$(CC) $(CFLAGS) -c -o $(SRC)/$@.o $(SRC)/$@.c
 
 client:
-	$(CC) -c -o $(SRC)/$@.o $(SRC)/$@.c
+	$(CC) $(CFLAGS) -c -o $(SRC)/$@.o $(SRC)/$@.c
 
 gui:
-	$(CC) -c -o $(SRC)/$@.o $(SRC)/$@.c
+	$(CC) $(CFLAGS) -c -o $(SRC)/$@.o $(SRC)/$@.c
 
 shapes:
-	$(CC) -c -o $(SRC)/$@.o $(SRC)/$@.c
+	$(CC) $(CFLAGS) -c -o $(SRC)/$@.o $(SRC)/$@.c
 
 gameplay:
-	$(CC) -c -o $(SRC)/$@.o $(SRC)/$@.c
+	$(CC) $(CFLAGS) -c -o $(SRC)/$@.o $(SRC)/$@.c
 
 server:
-	$(CC) -c -o $(SRC)/$@.o $(SRC)/$@.c	
+	$(CC) $(CFLAGS) -c -o $(SRC)/$@.o $(SRC)/$@.c	
 
 run:
-	$(SRC)/$(NAME)&$(SRC)/$(NAME)
+	$(SRC)/$(NAME) &$(SRC)/$(NAME)
 
 clean:
-	rm $(NAME) *.o server *.exe
+	rm $(NAME) *.o *.exe
 
 debug_build: CFLAGS = -g -Wall -Wextra
 debug_build: build

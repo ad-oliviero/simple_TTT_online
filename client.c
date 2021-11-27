@@ -14,12 +14,8 @@
 #include "include/main.h"
 
 extern int game_running;
-extern char user0[32];
-extern char user1[32];
-extern char user_name[32];
-
 SOCK;
-int user_id = -1;
+// int user_id = -1;
 
 int client_connect(char *IP_ADDRESS, int PORT)
 { // connect to the sock
@@ -40,10 +36,10 @@ void *client_comm(void *arg_data)
 	// initializing the game
 	struct online_data *data = (struct online_data *)arg_data;
 	listen(sock, 1);
-	send(sock, (char *)&user_name, sizeof(user_name), 0);
-	recv(sock, (char *)&user0, sizeof(user0), 0);
-	recv(sock, (char *)&user1, sizeof(user1), 0);
-	recv(sock, (char *)&user_id, sizeof(user_id), 0);
+	send(sock, (char *)&data->users[0], sizeof(data->users[0]), 0);
+	recv(sock, (char *)&data->users[1], sizeof(data->users[1]), 0);
+	recv(sock, (char *)&data->users[2], sizeof(data->users[2]), 0);
+	recv(sock, (char *)&data->user_id, sizeof(data->user_id), 0);
 
 	// communication loop
 	while (game_running)
@@ -58,7 +54,7 @@ void *client_comm(void *arg_data)
 			recv(sock, (char *)&data->game_grid[i], sizeof(data->game_grid[i]), 0);
 
 		// checking if client has permission to play and sending data
-		if (data->turn == user_id)
+		if (data->turn == data->user_id)
 			data->click_position = -1; // set click only if it's client's turn
 		send(sock, (char *)&data->click_position, sizeof(data->click_position), 0);
 		if (data->click_position >= 0 || data->is_game_over)

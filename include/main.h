@@ -16,12 +16,19 @@ struct online_data
 	int winsP0;
 	int winsP1;
 	int winner;
+	int user_id;
+	char users[4][32];
 };
 
 struct server_args
 {
+	char IP_ADDRESS[16];
 	int PORT;
-	int is_server_ready;
+	long int server_tid;
+	int thread_id;
+	long int client_tid[4];
+	int client_running;
+	struct online_data data;
 };
 
 void *window_main();

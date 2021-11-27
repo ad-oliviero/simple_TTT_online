@@ -16,8 +16,6 @@
 extern int block;
 extern int game_running;
 extern char user0[32];
-extern char user1[32];
-extern char user_name[32];
 extern Rectangle game[9];
 extern pthread_t server_tid[128];
 
@@ -60,7 +58,7 @@ void grid()
 	DrawLineEx((Vector2){0, block * 2}, (Vector2){SCR_WIDTH, block * 2}, THICKNESS + 1, BLACK);
 }
 
-int join_window(char *IP_ADDRESS, int *PORT)
+int join_window(char *IP_ADDRESS, int *PORT, struct online_data *data)
 {
 	int ret = -1, selection_step = 0, game_mode = -1, game_hosting = -1;
 	char portchar[16] = "5555";
@@ -122,10 +120,10 @@ int join_window(char *IP_ADDRESS, int *PORT)
 			int nickbox_selected = CheckCollisionPointRec(GetMousePosition(), nickBox);
 			int portbox_selected = CheckCollisionPointRec(GetMousePosition(), portBox);
 			if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && nickbox_selected)
-				sprintf(user_name, "%s", clipboard);
+				sprintf(data->users[0], "%s", clipboard);
 			else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && portbox_selected)
 				sprintf(portchar, "%s", clipboard);
-			if (GuiTextBox(nickBox, user_name, 20, nickbox_selected) || GuiTextBox(portBox, portchar, 20, portbox_selected))
+			if (GuiTextBox(nickBox, data->users[0], 20, nickbox_selected) || GuiTextBox(portBox, portchar, 20, portbox_selected))
 			{
 				*PORT = atoi(portchar);
 				sprintf(IP_ADDRESS, "127.0.0.1");
@@ -140,10 +138,10 @@ int join_window(char *IP_ADDRESS, int *PORT)
 			int nickbox_selected = CheckCollisionPointRec(GetMousePosition(), nickBox);
 			int ipbox_selected = CheckCollisionPointRec(GetMousePosition(), ipBox);
 			if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && nickbox_selected)
-				sprintf(user_name, "%s", clipboard);
+				sprintf(data->users[0], "%s", clipboard);
 			else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && ipbox_selected)
 				sprintf(IP_ADDRESS, "%s", clipboard);
-			if (GuiTextBox(nickBox, user_name, 20, nickbox_selected) || GuiTextBox(ipBox, IP_ADDRESS, 16, ipbox_selected))
+			if (GuiTextBox(nickBox, data->users[0], 20, nickbox_selected) || GuiTextBox(ipBox, IP_ADDRESS, 16, ipbox_selected))
 			{
 				if (strlen(IP_ADDRESS) <= 1)
 					sprintf(IP_ADDRESS, "127.0.0.1");
@@ -163,7 +161,7 @@ int join_window(char *IP_ADDRESS, int *PORT)
 						ClearBackground(YELLOW);
 						EndDrawing();
 					}
-					sprintf(IP_ADDRESS, "");
+					sprintf(IP_ADDRESS, " ");
 				}
 			}
 			DrawText("Nickname:", 10, 10, 20, DARKGRAY);
@@ -178,8 +176,7 @@ int join_window(char *IP_ADDRESS, int *PORT)
 
 void matchInfo(struct online_data *data)
 { // draw match info
-	GuiTextAlignment align = 1;
-	const char *info_text = TextFormat("It's %s %s turn!", data->turn ? user0 : user1, data->turn ? "(x)" : "(O)");
+	const char *info_text = TextFormat("It's %s %s turn!", data->turn ? data->users[1] : data->users[2], data->turn ? "(x)" : "(O)");
 	DrawText(info_text, (SCR_WIDTH - MeasureText(info_text, 20)) / 2, block * 3 + 10, 20, BLACK);
-	DrawText(TextFormat("%s: %i\n%s: %i\n", user0, data->winsP0, user1, data->winsP1), 10, block * 3 + 40, 20, BLACK);
+	DrawText(TextFormat("%s: %i\n%s: %i\n", data->users[1], data->winsP0, data->users[2], data->winsP1), 10, block * 3 + 40, 20, BLACK);
 }

@@ -18,25 +18,23 @@
 extern SOCK;
 int block = SCR_WIDTH / 3;
 int game_running = 0;
-char user_name[32] = {0};
-char user0[32];
-char user1[32];
 Rectangle game[9];
 pthread_t tid[3];
 
 int main()
 {
 	struct online_data data = (struct online_data){0};
+	struct server_args server = (struct server_args){0};
 	data.click_position = -1;
-	int PORT = 5555;
-	char IP_ADDR[16] = {0};
-	int join_game = join_window(IP_ADDR, &PORT);
+	data.user_id = -1;
+	server.PORT = 5555;
+	int join_game = join_window(server.IP_ADDRESS, &server.PORT, &data);
 	if (join_game < 0)
 		return 0;
 	else if (join_game == 1)
 	{
-		pthread_create(&tid[2], 0, server_main, &PORT);
-		while (client_connect(IP_ADDR, PORT))
+		pthread_create(&tid[2], 0, server_main, &server);
+		while (client_connect(server.IP_ADDRESS, server.PORT))
 			;
 	}
 	pthread_create(&tid[0], 0, client_comm, &data);
@@ -53,7 +51,7 @@ void *window_main(void *arg_data)
 	struct online_data *data = (struct online_data *)arg_data;
 	SetTraceLogLevel(LOG_NONE);
 	SetConfigFlags(FLAG_MSAA_4X_HINT);
-	InitWindow(SCR_WIDTH, SCR_HEIGHT, TextFormat("Simple TTT - %s", user_name));
+	InitWindow(SCR_WIDTH, SCR_HEIGHT, TextFormat("Simple TTT - %s", data->users[0]));
 	SetTargetFPS(GetMonitorRefreshRate(0));
 	initHitBox();
 	// main game loop
