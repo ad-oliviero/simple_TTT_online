@@ -17,8 +17,7 @@ struct client_data {
 	int click_position;
 	int ready;
 	int turn;
-	int winsP0;
-	int winsP1;
+	int winsP[2];
 	int winner;
 	int user_id;
 	char users[4][32];

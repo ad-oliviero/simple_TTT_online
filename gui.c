@@ -159,5 +159,5 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 void matchInfo(struct client_data *data) { // draw match info
 	const char *info_text = TextFormat("It's %s %s turn!", data->turn ? data->users[1] : data->users[2], data->turn ? "(x)" : "(O)");
 	DrawText(info_text, (SCR_WIDTH - MeasureText(info_text, 20)) / 2, block * 3 + 10, 20, BLACK);
-	DrawText(TextFormat("%s: %i\n%s: %i\n", data->users[1], data->winsP0, data->users[2], data->winsP1), 10, block * 3 + 40, 20, BLACK);
+	DrawText(TextFormat("%s: %i\n%s: %i\n", data->users[1], data->winsP[0], data->users[2], data->winsP[1]), 10, block * 3 + 40, 20, BLACK);
 }

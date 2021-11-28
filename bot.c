@@ -23,16 +23,40 @@ void *bot_main() {
 	return NULL;
 }
 
+void bot_easy(struct client_data *data) {
+	for (int i = 0; i < 9 && data->click_position < 0; i++) {
+		int rand_num = rand() % 9;
+		if (data->game_grid[rand_num] == 0) {
+			data->click_position = rand_num;
+		}
+	}
+}
+void bot_medium(struct client_data *data) { bot_easy(data); }
+void bot_hard(struct client_data *data) { bot_medium(data); }
+void bot_impossible(struct client_data *data) { bot_hard(data); }
+
 void *bot_ai(void *arg) {
 	struct client_data *data = (struct client_data *)arg;
-	// main game loop
 	srand(time(NULL));
 	while (game_running) {
 		if (!data->is_game_over && !data->turn) {
 			usleep(rand() % 100000);
-			if (data->bot_hardness == 0)
-				data->click_position = rand() % 9;
-			else if (data->bot_hardness == 1) {
+			switch (data->bot_hardness) {
+			case 1:
+				bot_medium(data);
+				break;
+
+			case 2:
+				bot_hard(data);
+				break;
+
+			case 3:
+				bot_impossible(data);
+				break;
+
+			default:
+				bot_easy(data);
+				break;
 			}
 		}
 		data->ready = (data->is_game_over == 1);

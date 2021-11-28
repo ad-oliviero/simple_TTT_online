@@ -45,26 +45,22 @@ void *server_main(void *arg) {
 	// accepting clients
 	listen(server_fd, 3);
 	clientfd[0] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
-	recv(clientfd[0], (char *)&server_data->data.users[1], sizeof(server_data->data.users[1]), 0);
+	read(clientfd[0], (char *)&server_data->data.users[1], sizeof(server_data->data.users[1]));
 
 	listen(server_fd, 3);
 	clientfd[1] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
-	recv(clientfd[1], (char *)&server_data->data.users[2], sizeof(server_data->data.users[2]), 0);
+	read(clientfd[1], (char *)&server_data->data.users[2], sizeof(server_data->data.users[2]));
 
 	// initializing connection
 	listen(server_fd, 3);
-	send(clientfd[0], (char *)&server_data->data.users[1], sizeof(server_data->data.users[1]), 0);
-	send(clientfd[0], (char *)&server_data->data.users[2], sizeof(server_data->data.users[2]), 0);
-	send(clientfd[0], (char *)&server_data->data.turn, 4, 0);
+	write(clientfd[0], (char *)&server_data->data.users, sizeof(server_data->data.users));
+	write(clientfd[0], (char *)&server_data->data.turn, 4);
 	server_data->data.turn++;
-	send(clientfd[1], (char *)&server_data->data.users[1], sizeof(server_data->data.users[1]), 0);
-	send(clientfd[1], (char *)&server_data->data.users[2], sizeof(server_data->data.users[2]), 0);
-	send(clientfd[1], (char *)&server_data->data.turn, 4, 0);
+	write(clientfd[1], (char *)&server_data->data.users, sizeof(server_data->data.users));
+	write(clientfd[1], (char *)&server_data->data.turn, 4);
 
 	// creating and joining threads
 	while (server_data->thread_id <= 1) {
-		/* int *arg = malloc(sizeof(*arg));
-		 *arg = i; */
 		server_data->client_running = 0;
 		pthread_create(&server_tid[server_data->thread_id], 0, communication, server_data);
 		while (server_data->client_running == 0)
@@ -79,7 +75,7 @@ void *server_main(void *arg) {
 // void *accept_connections(void *arg) {
 // 	listen(server_fd, 3);
 // 	clientfd[0] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
-// 	recv(clientfd[0], (char *)&server_data->data.users[1], sizeof(server_data->data.users[1]), 0);
+// 	read(clientfd[0], (char *)&server_data->data.users[1], sizeof(server_data->data.users[1]));
 // }
 
 void *communication(void *arg) { // communicating server_data->data with the client (mostly sending)
@@ -90,18 +86,16 @@ void *communication(void *arg) { // communicating server_data->data with the cli
 		// server_data->data.turn = !server_data->data.turn;
 		server_data->data.winner = checkwinner(&server_data->data);
 
-		// send server_data->data to client
-		send(clientfd[client_id], (const char *)&server_data->data.is_game_over, sizeof(server_data->data.is_game_over), 0);
-		send(clientfd[client_id], (const char *)&server_data->data.turn, sizeof(server_data->data.turn), 0);
-		send(clientfd[client_id], (const char *)&server_data->data.winsP0, sizeof(server_data->data.winsP0), 0);
-		send(clientfd[client_id], (const char *)&server_data->data.winsP1, sizeof(server_data->data.winsP1), 0);
-		send(clientfd[client_id], (const char *)&server_data->data.winner, sizeof(server_data->data.winner), 0);
-		for (int i = 0; i < 9; i++)
-			send(clientfd[client_id], (const char *)&server_data->data.game_grid[i], sizeof(server_data->data.game_grid[i]), 0);
+		// write server_data->data to client
+		write(clientfd[client_id], (const char *)&server_data->data.is_game_over, sizeof(server_data->data.is_game_over));
+		write(clientfd[client_id], (const char *)&server_data->data.turn, sizeof(server_data->data.turn));
+		write(clientfd[client_id], (const char *)&server_data->data.winsP, sizeof(server_data->data.winsP));
+		write(clientfd[client_id], (const char *)&server_data->data.winner, sizeof(server_data->data.winner));
+		write(clientfd[client_id], (const char *)&server_data->data.game_grid, sizeof(server_data->data.game_grid));
 
 		// read client events
-		recv(clientfd[client_id], (char *)&server_data->data.click_position, sizeof(server_data->data.click_position), 0);
-		recv(clientfd[client_id], (char *)&ready_check[client_id], sizeof(ready_check), 0);
+		read(clientfd[client_id], (char *)&server_data->data.click_position, sizeof(server_data->data.click_position));
+		read(clientfd[client_id], (char *)&ready_check[client_id], sizeof(ready_check));
 
 		// check if client has permission to play
 		if (server_data->data.turn == client_id)

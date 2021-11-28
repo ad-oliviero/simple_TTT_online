@@ -32,29 +32,26 @@ void *client_comm(void *arg) { // communicating data with the server (mostly rec
 	// initializing the game
 	struct client_data *data = (struct client_data *)arg;
 	listen(data->sock, 1);
-	send(data->sock, (char *)&data->users[0], sizeof(data->users[0]), 0);
-	recv(data->sock, (char *)&data->users[1], sizeof(data->users[1]), 0);
-	recv(data->sock, (char *)&data->users[2], sizeof(data->users[2]), 0);
-	recv(data->sock, (char *)&data->user_id, sizeof(data->user_id), 0);
+	write(data->sock, (char *)&data->users[0], sizeof(data->users[0]));
+	read(data->sock, (char *)&data->users, sizeof(data->users));
+	read(data->sock, (char *)&data->user_id, sizeof(data->user_id));
 
 	// communication loop
 	while (game_running) {
 		// read game data
-		recv(data->sock, (char *)&data->is_game_over, sizeof(data->is_game_over), 0);
-		recv(data->sock, (char *)&data->turn, sizeof(data->turn), 0);
-		recv(data->sock, (char *)&data->winsP0, sizeof(data->winsP0), 0);
-		recv(data->sock, (char *)&data->winsP1, sizeof(data->winsP1), 0);
-		recv(data->sock, (char *)&data->winner, sizeof(data->winner), 0);
-		for (int i = 0; i < 9; i++)
-			recv(data->sock, (char *)&data->game_grid[i], sizeof(data->game_grid[i]), 0);
+		read(data->sock, (char *)&data->is_game_over, sizeof(data->is_game_over));
+		read(data->sock, (char *)&data->turn, sizeof(data->turn));
+		read(data->sock, (char *)&data->winsP, sizeof(data->winsP));
+		read(data->sock, (char *)&data->winner, sizeof(data->winner));
+		read(data->sock, (char *)&data->game_grid, sizeof(data->game_grid));
 
 		// checking if client has permission to play and sending data
 		if (data->turn == data->user_id)
 			data->click_position = -1; // set click only if it's client's turn
-		send(data->sock, (char *)&data->click_position, sizeof(data->click_position), 0);
+		write(data->sock, (char *)&data->click_position, sizeof(data->click_position));
 		if (data->click_position >= 0 || data->is_game_over)
 			data->click_position = -1;
-		send(data->sock, (char *)&data->ready, sizeof(data->ready), 0);
+		write(data->sock, (char *)&data->ready, sizeof(data->ready));
 		if (data->ready == 1 && data->is_game_over == 0)
 			data->ready = 0;
 	}

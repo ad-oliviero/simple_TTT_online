@@ -100,8 +100,8 @@ void end_server_game(int winner, struct client_data *data) { // resetting the ga
 	for (int i = 0; i < 9; i++)
 		data->game_grid[i] = 0;
 	if (winner == 1)
-		data->winsP0++;
+		data->winsP[0]++;
 	else if (winner == 2)
-		data->winsP1++;
+		data->winsP[1]++;
 	data->is_game_over = 0;
 }
