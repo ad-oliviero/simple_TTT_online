@@ -15,7 +15,7 @@ else ifeq ($(PLATFORM), linux_win)
 endif
 .PHONY: server
 
-build: main client gui shapes gameplay server
+build: main client gui shapes gameplay server bot
 	$(CC) $(CFLAGS) -o $(NAME) *.o $(LDFLAGS)
 
 main:
@@ -36,8 +36,11 @@ gameplay:
 server:
 	$(CC) $(CFLAGS) -c -o $(SRC)/$@.o $(SRC)/$@.c	
 
+bot:
+	$(CC) $(CFLAGS) -c -o $(SRC)/$@.o $(SRC)/$@.c	
+
 run:
-	$(SRC)/$(NAME) &$(SRC)/$(NAME)
+	$(SRC)/$(NAME) #&$(SRC)/$(NAME)
 
 clean:
 	rm $(NAME) *.o *.exe

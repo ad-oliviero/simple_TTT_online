@@ -1,33 +1,30 @@
-#include <unistd.h>
 #include <stdio.h>
+#include <unistd.h>
 #ifdef __linux__
-#include <sys/socket.h>
-#include <netinet/in.h>
-#define SOCK int sock
+	#include <netinet/in.h>
+	#include <sys/socket.h>
 #elif _WIN32
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#define SOCK unsigned int sock
+	#include <winsock2.h>
+	#include <ws2tcpip.h>
 #endif
-#include <stdlib.h>
-#include <string.h>
-#include <pthread.h>
-#include <sys/types.h>
-#include <sys/syscall.h>
 #include "include/gameplay.h"
 #include "include/main.h"
+#include <pthread.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
 
-int clientfd[2];
-int ready_check[2];
+int clientfd[4], server_fd;
+int ready_check[4];
 extern int game_running;
 pthread_t server_tid[128];
 
 void *communication(void *);
 
-void *server_main(void *arg)
-{
-	struct server_args *server_data = (struct server_args *)arg;
-	server_data->server_tid = pthread_self();
+void *server_main(void *arg) {
+	struct server_data *server_data = (struct server_data *)arg;
+	server_data->server_tid			= pthread_self();
 
 	// int PORT = *(int *)PORT_arg;
 	// creating socket and connecting to it
@@ -36,12 +33,12 @@ void *server_main(void *arg)
 	WSAStartup(MAKEWORD(2, 2), &Data);
 #endif
 	struct sockaddr_in address;
-	int server_fd, opt = 1, addrlen = sizeof(address);
+	int opt = 1, addrlen = sizeof(address);
 	server_fd = socket(AF_INET, SOCK_STREAM, 0);
 	setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
-	address.sin_family = AF_INET;
+	address.sin_family		= AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
-	address.sin_port = htons(server_data->PORT);
+	address.sin_port		= htons(server_data->PORT);
 	if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
 		return NULL;
 
@@ -65,10 +62,9 @@ void *server_main(void *arg)
 	send(clientfd[1], (char *)&server_data->data.turn, 4, 0);
 
 	// creating and joining threads
-	while (server_data->thread_id <= 1)
-	{
+	while (server_data->thread_id <= 1) {
 		/* int *arg = malloc(sizeof(*arg));
-		*arg = i; */
+		 *arg = i; */
 		server_data->client_running = 0;
 		pthread_create(&server_tid[server_data->thread_id], 0, communication, server_data);
 		while (server_data->client_running == 0)
@@ -80,13 +76,17 @@ void *server_main(void *arg)
 	return 0;
 }
 
-void *communication(void *arg)
-{ // communicating server_data->data with the client (mostly sending)
-	struct server_args *server_data = (struct server_args *)arg;
-	int client_id = server_data->thread_id;
-	server_data->client_running = 1;
-	while (game_running)
-	{
+// void *accept_connections(void *arg) {
+// 	listen(server_fd, 3);
+// 	clientfd[0] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
+// 	recv(clientfd[0], (char *)&server_data->data.users[1], sizeof(server_data->data.users[1]), 0);
+// }
+
+void *communication(void *arg) { // communicating server_data->data with the client (mostly sending)
+	struct server_data *server_data = (struct server_data *)arg;
+	int client_id					= server_data->thread_id;
+	server_data->client_running		= 1;
+	while (game_running) {
 		// server_data->data.turn = !server_data->data.turn;
 		server_data->data.winner = checkwinner(&server_data->data);
 
@@ -105,9 +105,8 @@ void *communication(void *arg)
 
 		// check if client has permission to play
 		if (server_data->data.turn == client_id)
-			server_data->data.click_position = -1; // accepting click_position only from player's turn client
-		if (server_data->data.click_position != -1 && server_data->data.game_grid[server_data->data.click_position] == 0 && server_data->data.is_game_over == 0)
-		{ // handling click_positions
+			server_data->data.click_position = -1;																												   // accepting click_position only from player's turn client
+		if (server_data->data.click_position != -1 && server_data->data.game_grid[server_data->data.click_position] == 0 && server_data->data.is_game_over == 0) { // handling click_positions
 			if (server_data->data.turn)
 				server_data->data.game_grid[server_data->data.click_position] = 1;
 			else

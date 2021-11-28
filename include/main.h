@@ -4,9 +4,13 @@
 #define SCR_WIDTH 450
 #define SCR_HEIGHT 800
 #define THICKNESS 3.0f
+#ifndef _WIN32
+	#define SOCK int
+#else
+	#define SOCK unsigned int
+#endif
 
-struct online_data
-{
+struct client_data {
 	int game_grid[9];
 	int is_btn_pressed;
 	int is_game_over;
@@ -18,17 +22,19 @@ struct online_data
 	int winner;
 	int user_id;
 	char users[4][32];
+	int bot_hardness;
+	int game_mode;
+	SOCK sock;
 };
 
-struct server_args
-{
+struct server_data {
 	char IP_ADDRESS[16];
 	int PORT;
 	long int server_tid;
 	int thread_id;
 	long int client_tid[4];
 	int client_running;
-	struct online_data data;
+	struct client_data data;
 };
 
 void *window_main();

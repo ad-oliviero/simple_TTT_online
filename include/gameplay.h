@@ -3,8 +3,8 @@
 
 #include "main.h"
 
-void end_client_game(struct online_data *data);
-int checkwinner(struct online_data *data);
-void end_server_game(int winner, struct online_data *data);
+void end_client_game(struct client_data *data);
+int checkwinner(struct client_data *data);
+void end_server_game(int winner, struct client_data *data);
 
 #endif // __GAMEPLAY_H__
