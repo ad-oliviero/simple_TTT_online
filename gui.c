@@ -138,4 +138,10 @@ void matchInfo(struct client_data *data) { // draw match info
 	const char *info_text = TextFormat("It's %s %s turn!", data->turn ? data->users[1] : data->users[2], data->turn ? "(x)" : "(O)");
 	DrawText(info_text, (SCR_WIDTH - MeasureText(info_text, 20)) / 2, BLOCK * 3 + 10, 20, BLACK);
 	DrawText(TextFormat("%s: %i\n%s: %i\n", data->users[1], data->winsP[0], data->users[2], data->winsP[1]), 10, BLOCK * 3 + 40, 20, BLACK);
+	if (data->game_mode == 2) {
+		const char *bot_text = TextFormat("Bot hardness: %s", data->bot_hardness == 0 ? "Easy" : data->bot_hardness == 1 ? "Medium"
+																							 : data->bot_hardness == 2	 ? "Hard"
+																														 : "Impossible");
+		GuiButton((Rectangle){0, 0, 100, 100}, )
+	}
 }
