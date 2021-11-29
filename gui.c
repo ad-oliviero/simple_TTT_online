@@ -142,6 +142,7 @@ void matchInfo(struct client_data *data) { // draw match info
 		const char *bot_text = TextFormat("Bot hardness: %s", data->bot_hardness == 0 ? "Easy" : data->bot_hardness == 1 ? "Medium"
 																							 : data->bot_hardness == 2	 ? "Hard"
 																														 : "Impossible");
-		GuiButton((Rectangle){0, 0, 100, 100}, )
+		int is_max_hardness	 = (data->bot_hardness < 4);
+		data->bot_hardness += (GuiButton((Rectangle){10, BLOCK * 3 + 100, MeasureText(bot_text, 20), 40}, bot_text) * is_max_hardness) - (4 * !is_max_hardness);
 	}
 }
