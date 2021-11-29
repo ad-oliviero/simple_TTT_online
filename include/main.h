@@ -12,7 +12,7 @@
 #endif
 
 struct client_data {
-	int game_grid[9];
+	int game_grid[3][3];
 	int is_btn_pressed;
 	int is_game_over;
 	int click_position[2];

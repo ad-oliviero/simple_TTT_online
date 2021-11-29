@@ -2,7 +2,6 @@
 #include "include/main.h"
 #include "lib/raylib/include/raylib.h"
 
-// extern struct client_data client_data;
 extern Rectangle game[9];
 
 void place(struct client_data *data) { // changes game_grid value where the click is detected (with the hitboxes in gui.c)

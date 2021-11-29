@@ -7,7 +7,6 @@
 #include <unistd.h>
 
 #ifndef __SERVER__
-// extern struct client_data client_data;
 extern char user0[32];
 #else  // __SERVER__
 extern struct client_data server_data;
