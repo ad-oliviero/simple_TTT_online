@@ -64,7 +64,6 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 	Rectangle portBox = {MeasureText("Port:", 20) + 15, 40, 242, 30};
 	while (!game_running && !WindowShouldClose()) {
 		char *clipboard = (char *)GetClipboardText();
-		clipboard[17]	= '\0';
 		BeginDrawing();
 		if (selection_step == 0) // starting selection
 		{
