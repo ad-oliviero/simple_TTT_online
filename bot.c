@@ -33,7 +33,44 @@ void bot_easy(struct client_data *data) {
 		}
 	}
 }
-void bot_medium(struct client_data *data) { bot_easy(data); }
+void bot_medium(struct client_data *data) {
+	bot_easy(data);
+	for (int i = 0; i < 3; i++) {
+		if (data->game_grid[i][0] == 2) {
+			if (data->game_grid[i][1] == 0 && data->game_grid[i][2] == 0) {
+				data->click_position[0] = i;
+				data->click_position[1] = 1;
+			} else if (data->game_grid[i][1] == 2 && data->game_grid[i][2] == 0) {
+				data->click_position[0] = i;
+				data->click_position[1] = 2;
+			} else if (data->game_grid[i][1] == 0 && data->game_grid[i][2] == 2) {
+				data->click_position[0] = i;
+				data->click_position[1] = 1;
+			}
+		}
+		if (data->game_grid[i][1] == 2) {
+			if (data->game_grid[i][0] == 0 && data->game_grid[i][2] == 0) {
+				data->click_position[0] = i;
+				data->click_position[0] = 1;
+			} else if (data->game_grid[i][0] == 2 && data->game_grid[i][2] == 0) {
+				data->click_position[0] = i;
+				data->click_position[2] = 1;
+			} else if (data->game_grid[i][0] == 0 && data->game_grid[i][2] == 2) {
+				data->click_position[0] = i;
+				data->click_position[2] = 0;
+			}
+		}
+		if (data->game_grid[i][2] == 2) {
+			if (data->game_grid[i][0] == 0 && data->game_grid[i][1] == 0) {
+				data->click_position[0] = i;
+				data->click_position[2] = 0;
+			} else if (data->game_grid[i][0] == 2 && data->game_grid[i][1] == 0) {
+				data->click_position[0] = i;
+				data->click_position[2] = 1;
+			}
+		}
+	}
+}
 void bot_hard(struct client_data *data) { bot_medium(data); }
 void bot_impossible(struct client_data *data) { bot_hard(data); }
 
