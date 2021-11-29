@@ -55,7 +55,7 @@ void *window_main(void *arg) {
 		ClearBackground(RAYWHITE);
 		grid();
 		for (int i = 0; i < 9; i++)
-			shape(game, &i, &data->game_grid[i]);
+			shape(game, &i, &data->game_grid[i / 3][i % 3]);
 		if (data->is_game_over == 1)
 			end_client_game(data);
 		matchInfo(data);

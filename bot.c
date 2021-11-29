@@ -26,8 +26,8 @@ void *bot_main() {
 
 void bot_easy(struct client_data *data) {
 	for (int i = 0; i < 9 && data->click_position[0] < 0 && data->click_position[0] < 0; i++) {
-		int rand_num = rand() % 9;
-		if (data->game_grid[rand_num] == 0) {
+		int rand_num = rand() % 8;
+		if (data->game_grid[rand_num / 3][rand_num % 3] == 0) {
 			data->click_position[0] = rand_num / 3;
 			data->click_position[1] = rand_num % 3;
 		}

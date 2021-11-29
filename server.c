@@ -101,12 +101,12 @@ void *communication(void *arg) { // communicating server_data->data with the cli
 		if (server_data->data.turn == client_id) {
 			server_data->data.click_position[0] = -1;
 			server_data->data.click_position[1] = -1;
-		}																																																														  // accepting click_position only from player's turn client
-		if (server_data->data.click_position[0] != -1 && server_data->data.click_position[1] != -1 && server_data->data.game_grid[(server_data->data.click_position[0] * 3) + server_data->data.click_position[1]] == 0 && server_data->data.is_game_over == 0) { // handling click_positions
+		}																																																												   // accepting click_position only from player's turn client
+		if (server_data->data.click_position[0] != -1 && server_data->data.click_position[1] != -1 && server_data->data.game_grid[server_data->data.click_position[0]][server_data->data.click_position[1]] == 0 && server_data->data.is_game_over == 0) { // handling click_positions
 			if (server_data->data.turn)
-				server_data->data.game_grid[(server_data->data.click_position[0] * 3) + server_data->data.click_position[1]] = 1;
+				server_data->data.game_grid[server_data->data.click_position[0]][server_data->data.click_position[1]] = 1;
 			else
-				server_data->data.game_grid[(server_data->data.click_position[0] * 3) + server_data->data.click_position[1]] = 2;
+				server_data->data.game_grid[server_data->data.click_position[0]][server_data->data.click_position[1]] = 2;
 			server_data->data.turn = !server_data->data.turn;
 		}
 		if (ready_check[0] && ready_check[1])

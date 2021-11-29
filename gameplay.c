@@ -21,8 +21,13 @@ void end_client_game(struct client_data *data) {
 }
 
 int checkwinner(struct client_data *data) { // check if someone wins
+	if (data->game_grid[0][0] != 0 && data->game_grid[0][1] != 0 && data->game_grid[0][2] != 0 && data->game_grid[1][0] != 0 && data->game_grid[1][1] != 0 && data->game_grid[1][2] != 0 && data->game_grid[2][0] != 0 && data->game_grid[2][1] != 0 && data->game_grid[2][2] != 0) {
+		data->is_game_over = 1;
+		return 3;
+	}
+
 	// columns
-	for (int i = 0; i < 3; i++) {
+	/* for (int i = 0; i < 3; i++) {
 		if (data->game_grid[i] == data->game_grid[i + 3] && data->game_grid[i + 3] == data->game_grid[i + 6] && data->game_grid[i] != 0) {
 			data->is_game_over = 1;
 			return data->game_grid[i];
@@ -49,13 +54,13 @@ int checkwinner(struct client_data *data) { // check if someone wins
 	if (data->game_grid[0] != 0 && data->game_grid[1] != 0 && data->game_grid[2] != 0 && data->game_grid[3] != 0 && data->game_grid[4] != 0 && data->game_grid[5] != 0 && data->game_grid[6] != 0 && data->game_grid[7] != 0 && data->game_grid[8] != 0) {
 		data->is_game_over = 1;
 		return 3;
-	}
+	} */
 	return 0;
 }
 
 void end_server_game(int winner, struct client_data *data) { // resetting the game and update variables
 	for (int i = 0; i < 9; i++)
-		data->game_grid[i] = 0;
+		data->game_grid[i / 3][i % 3] = 0;
 	if (winner == 1)
 		data->winsP[0]++;
 	else if (winner == 2)
