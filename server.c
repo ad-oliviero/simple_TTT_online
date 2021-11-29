@@ -98,13 +98,15 @@ void *communication(void *arg) { // communicating server_data->data with the cli
 		read(clientfd[client_id], (char *)&ready_check[client_id], sizeof(ready_check));
 
 		// check if client has permission to play
-		if (server_data->data.turn == client_id)
-			server_data->data.click_position = -1;																												   // accepting click_position only from player's turn client
-		if (server_data->data.click_position != -1 && server_data->data.game_grid[server_data->data.click_position] == 0 && server_data->data.is_game_over == 0) { // handling click_positions
+		if (server_data->data.turn == client_id) {
+			server_data->data.click_position[0] = -1;
+			server_data->data.click_position[1] = -1;
+		}																																																														  // accepting click_position only from player's turn client
+		if (server_data->data.click_position[0] != -1 && server_data->data.click_position[1] != -1 && server_data->data.game_grid[(server_data->data.click_position[0] * 3) + server_data->data.click_position[1]] == 0 && server_data->data.is_game_over == 0) { // handling click_positions
 			if (server_data->data.turn)
-				server_data->data.game_grid[server_data->data.click_position] = 1;
+				server_data->data.game_grid[(server_data->data.click_position[0] * 3) + server_data->data.click_position[1]] = 1;
 			else
-				server_data->data.game_grid[server_data->data.click_position] = 2;
+				server_data->data.game_grid[(server_data->data.click_position[0] * 3) + server_data->data.click_position[1]] = 2;
 			server_data->data.turn = !server_data->data.turn;
 		}
 		if (ready_check[0] && ready_check[1])

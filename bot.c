@@ -11,8 +11,9 @@ extern int game_running;
 void *bot_main() {
 	struct client_data data = (struct client_data){0};
 	pthread_t tid[3];
-	data.click_position = -1;
-	data.user_id		= -1;
+	data.click_position[0] = -1;
+	data.click_position[1] = -1;
+	data.user_id		   = -1;
 	sprintf(data.users[0], "CPU");
 	while (client_connect("127.0.0.1", 5555, &data.sock))
 		;
@@ -24,10 +25,11 @@ void *bot_main() {
 }
 
 void bot_easy(struct client_data *data) {
-	for (int i = 0; i < 9 && data->click_position < 0; i++) {
+	for (int i = 0; i < 9 && data->click_position[0] < 0 && data->click_position[0] < 0; i++) {
 		int rand_num = rand() % 9;
 		if (data->game_grid[rand_num] == 0) {
-			data->click_position = rand_num;
+			data->click_position[0] = rand_num / 3;
+			data->click_position[1] = rand_num % 3;
 		}
 	}
 }

@@ -46,11 +46,15 @@ void *client_comm(void *arg) { // communicating data with the server (mostly rec
 		read(data->sock, (char *)&data->game_grid, sizeof(data->game_grid));
 
 		// checking if client has permission to play and sending data
-		if (data->turn == data->user_id)
-			data->click_position = -1; // set click only if it's client's turn
+		if (data->turn == data->user_id) {
+			data->click_position[0] = -1; // set click only if it's client's turn
+			data->click_position[1] = -1;
+		}
 		write(data->sock, (char *)&data->click_position, sizeof(data->click_position));
-		if (data->click_position >= 0 || data->is_game_over)
-			data->click_position = -1;
+		if ((data->click_position[0] >= 0 && data->click_position[1] >= 0) || data->is_game_over) {
+			data->click_position[0] = -1;
+			data->click_position[1] = -1;
+		}
 		write(data->sock, (char *)&data->ready, sizeof(data->ready));
 		if (data->ready == 1 && data->is_game_over == 0)
 			data->ready = 0;

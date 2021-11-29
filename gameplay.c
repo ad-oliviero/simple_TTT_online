@@ -21,48 +21,6 @@ void end_client_game(struct client_data *data) {
 		data->ready = 1;
 }
 
-/*
-int checkwinner_client(/ * struct client_data *data * /)
-{ // check if someone wins
-	// columns
-	for (int i = 0; i < 3; i++)
-	{
-		if (client_data.game_grid[i] == client_data.game_grid[i + 3] && client_data.game_grid[i + 3] == client_data.game_grid[i + 6] && client_data.game_grid[i] != 0)
-		{
-			client_data.is_game_over = 1;
-			return client_data.game_grid[i];
-		}
-	}
-	// raws
-	for (int i = 0; i < 9; i += 3)
-	{
-		if (client_data.game_grid[i] == client_data.game_grid[i + 1] && client_data.game_grid[i + 1] == client_data.game_grid[i + 2] && client_data.game_grid[i] != 0)
-		{
-			client_data.is_game_over = 1;
-			return client_data.game_grid[i];
-		}
-	}
-	// diagonals
-	if (client_data.game_grid[0] == client_data.game_grid[4] && client_data.game_grid[4] == client_data.game_grid[8] && client_data.game_grid[0] != 0 && client_data.game_grid[4] != 0 && client_data.game_grid[8] != 0)
-	{
-		client_data.is_game_over = 1;
-		return client_data.game_grid[0];
-	}
-	if (client_data.game_grid[2] == client_data.game_grid[4] && client_data.game_grid[4] == client_data.game_grid[6] && client_data.game_grid[2] != 0 && client_data.game_grid[4] != 0 && client_data.game_grid[6] != 0)
-	{
-		client_data.is_game_over = 1;
-		return client_data.game_grid[2];
-	}
-	// draw
-	if (client_data.game_grid[0] != 0 && client_data.game_grid[1] != 0 && client_data.game_grid[2] != 0 && client_data.game_grid[3] != 0 && client_data.game_grid[4] != 0 && client_data.game_grid[5] != 0 && client_data.game_grid[6] != 0 && client_data.game_grid[7] != 0 && client_data.game_grid[8] != 0)
-	{
-		client_data.is_game_over = 1;
-		return 3;
-	}
-	return 0;
-}
-*/
-
 int checkwinner(struct client_data *data) { // check if someone wins
 	// columns
 	for (int i = 0; i < 3; i++) {

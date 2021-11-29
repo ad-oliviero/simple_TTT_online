@@ -4,6 +4,7 @@
 #define SCR_WIDTH 450
 #define SCR_HEIGHT 800
 #define THICKNESS 3.0f
+#define BLOCK SCR_WIDTH / 3
 #ifndef _WIN32
 	#define SOCK int
 #else
@@ -14,7 +15,7 @@ struct client_data {
 	int game_grid[9];
 	int is_btn_pressed;
 	int is_game_over;
-	int click_position;
+	int click_position[2];
 	int ready;
 	int turn;
 	int winsP[2];

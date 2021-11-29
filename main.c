@@ -11,7 +11,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-int block		 = SCR_WIDTH / 3;
 int game_running = 0;
 Rectangle game[9];
 pthread_t tid[4];
@@ -19,7 +18,8 @@ pthread_t tid[4];
 int main() {
 	struct client_data data	  = (struct client_data){0};
 	struct server_data server = (struct server_data){0};
-	data.click_position		  = -1;
+	data.click_position[0]	  = -1;
+	data.click_position[1]	  = -1;
 	data.user_id			  = -1;
 	server.PORT				  = 5555;
 	data.game_mode			  = join_window(server.IP_ADDRESS, &server.PORT, &data);
