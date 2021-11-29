@@ -12,7 +12,6 @@
 #include <unistd.h>
 
 int game_running = 0;
-Rectangle game[9];
 pthread_t tid[4];
 
 int main() {
@@ -54,8 +53,9 @@ void *window_main(void *arg) {
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 		grid();
-		for (int i = 0; i < 9; i++)
-			shape(game, &i, &data->game_grid[i / 3][i % 3]);
+		for (int i = 0; i < 3; i++)
+			for (int j = 0; j < 3; j++)
+				shape((int[2]){i, j}, &data->game_grid[i][j]);
 		if (data->is_game_over == 1)
 			end_client_game(data);
 		matchInfo(data);

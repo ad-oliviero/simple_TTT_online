@@ -15,25 +15,15 @@
 
 extern int game_running;
 extern char user0[32];
-extern Rectangle game[9];
+extern Rectangle game[3][3];
 extern pthread_t server_tid[128];
 
 void initHitBox() { // creating boxes to detect touch or mouse clicks
-	for (int i = 0; i < 3; i++) {
-		game[i].x	   = i * BLOCK + 1;
-		game[i].y	   = 1;
-		game[i].height = BLOCK;
-		game[i].width  = BLOCK;
-
-		game[i + 3].x	   = i * BLOCK + 1;
-		game[i + 3].y	   = BLOCK + 1;
-		game[i + 3].height = BLOCK;
-		game[i + 3].width  = BLOCK;
-
-		game[i + 6].x	   = i * BLOCK + 1;
-		game[i + 6].y	   = BLOCK * 2 + 1;
-		game[i + 6].height = BLOCK;
-		game[i + 6].width  = BLOCK;
+	for (int i = 0; i < 9; i++) {
+		game[i / 3][i % 3].x	  = (BLOCK * (i % 3)) + THICKNESS;
+		game[i / 3][i % 3].y	  = (BLOCK * (i / 3)) + THICKNESS;
+		game[i / 3][i % 3].height = BLOCK - 1;
+		game[i / 3][i % 3].width  = BLOCK - 1;
 	}
 }
 
@@ -64,6 +54,7 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 	Rectangle portBox = {MeasureText("Port:", 20) + 15, 40, 242, 30};
 	while (!game_running && !WindowShouldClose()) {
 		char *clipboard = (char *)GetClipboardText();
+		clipboard[16]	= 0;
 		BeginDrawing();
 		if (selection_step == 0) // starting selection
 		{

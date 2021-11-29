@@ -12,8 +12,6 @@
 #include "include/main.h"
 
 extern int game_running;
-// SOCK;
-// int user_id = -1;
 
 int client_connect(char *IP_ADDRESS, int PORT, SOCK *sock) { // connect to the sock
 #ifdef _WIN32

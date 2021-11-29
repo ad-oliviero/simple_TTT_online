@@ -3,6 +3,6 @@
 #include "../lib/raylib/include/raylib.h"
 
 void place(struct client_data *data);
-void shape(Rectangle *, int *, int *);
+void shape(int position_id[2], int *type);
 
 #endif // __SHAPES_H__
