@@ -1,6 +1,8 @@
 SRC = .
 CC = gcc
 NAME = Simple_TTT
+CFLAGS = -Wall -Wextra -std=c99
+OBJ_FLAGS = -c $(CFLAGS)
 PLATFORM = $(shell uname)
 ifeq ($(PLATFORM), Linux)
 	CFLAGS = -O3
@@ -19,25 +21,25 @@ build: main client gui shapes gameplay server bot
 	$(CC) $(CFLAGS) -o $(NAME) *.o $(LDFLAGS)
 
 main:
-	$(CC) $(CFLAGS) -c -o $(SRC)/$@.o $(SRC)/$@.c
+	$(CC) -c $(SRC)/$@.c -o $(SRC)/$@.o	$(OBJ_FLAGS)
 
 client:
-	$(CC) $(CFLAGS) -c -o $(SRC)/$@.o $(SRC)/$@.c
+	$(CC) -c $(SRC)/$@.c -o $(SRC)/$@.o	$(OBJ_FLAGS)
 
 gui:
-	$(CC) $(CFLAGS) -c -o $(SRC)/$@.o $(SRC)/$@.c
+	$(CC) -c $(SRC)/$@.c -o $(SRC)/$@.o	$(OBJ_FLAGS)
 
 shapes:
-	$(CC) $(CFLAGS) -c -o $(SRC)/$@.o $(SRC)/$@.c
+	$(CC) -c $(SRC)/$@.c -o $(SRC)/$@.o	$(OBJ_FLAGS)
 
 gameplay:
-	$(CC) $(CFLAGS) -c -o $(SRC)/$@.o $(SRC)/$@.c
+	$(CC) -c $(SRC)/$@.c -o $(SRC)/$@.o	$(OBJ_FLAGS)
 
 server:
-	$(CC) $(CFLAGS) -c -o $(SRC)/$@.o $(SRC)/$@.c	
+	$(CC) -c $(SRC)/$@.c -o $(SRC)/$@.o	$(OBJ_FLAGS)
 
 bot:
-	$(CC) $(CFLAGS) -c -o $(SRC)/$@.o $(SRC)/$@.c	
+	$(CC) -c $(SRC)/$@.c -o $(SRC)/$@.o	$(OBJ_FLAGS)
 
 run:
 	$(SRC)/$(NAME) #&$(SRC)/$(NAME)
@@ -48,3 +50,11 @@ clean:
 debug_build: CFLAGS = -g -Wall -Wextra
 debug_build: build
 debug_run: debug_build run
+
+android: CC = ../../android_toolchain_ARM_API22/bin/arm-linux-androideabi-gcc
+android: OBJ_FLAGS = -I. -I../../raylib/release/include -I../../raylib/src/external/android/native_app_glue -std=c99 -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wa,--noexecstack -Wformat -Werror=format-security -no-canonical-prefixes -DANDROID -D__ANDROID_API__=22 --sysroot=../../android_toolchain_ARM_API22/sysroot
+android: main client gui shapes gameplay server bot
+android:
+	if [ ! -d "../obj/$(NAME)" ]; then mkdir ../obj/$(NAME); fi
+	mv *.o ../obj/$(NAME)
+

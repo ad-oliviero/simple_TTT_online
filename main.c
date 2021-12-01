@@ -5,7 +5,7 @@
 #include "include/gui.h"
 #include "include/server.h"
 #include "include/shapes.h"
-#include "lib/raylib/include/raylib.h"
+#include "lib/raylib/src/raylib.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>

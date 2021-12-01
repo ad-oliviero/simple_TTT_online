@@ -1,6 +1,6 @@
 #ifndef __SERVER__
-	#include "lib/raygui/src/raygui.h"
-	#include "lib/raylib/include/raylib.h"
+	#include "lib/raylib/src/extras/raygui.h"
+	#include "lib/raylib/src/raylib.h"
 #endif // __SERVER__
 #include "include/main.h"
 #include <stdio.h>
