@@ -47,7 +47,7 @@ run:
 clean:
 	rm $(NAME) *.o *.exe
 
-debug_build: CFLAGS = -g -Wall -Wextra
+debug_build: CFLAGS = -g 
 debug_build: build
 debug_run: debug_build run
 
