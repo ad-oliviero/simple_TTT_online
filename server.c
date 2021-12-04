@@ -25,7 +25,6 @@ void *communication(void *);
 void *server_main(void *arg) {
 	struct server_data *server_data = (struct server_data *)arg;
 	server_data->server_tid			= pthread_self();
-
 	// int PORT = *(int *)PORT_arg;
 	// creating socket and connecting to it
 #ifdef _WIN32
@@ -39,7 +38,7 @@ void *server_main(void *arg) {
 	address.sin_family		= AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port		= htons(server_data->PORT);
-	if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
+	if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) // fails on android
 		return NULL;
 
 	// accepting clients

@@ -84,10 +84,8 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 	Vector2 scr_size = (Vector2){320, 75};
 #endif
 	InitWindow(scr_size.x, scr_size.y, "Game Mode Selection");
-#ifdef ANDROID
 	SCR_WIDTH  = GetScreenWidth();
 	SCR_HEIGHT = GetScreenHeight();
-#endif
 	SetTargetFPS(GetMonitorRefreshRate(0));
 	Rectangle nickBox = {MeasureText("Nickname:", 20) + 15, 5, 200, 30};
 	Rectangle ipBox	  = {MeasureText("IP:", 20) + 15, 40, 267, 30};
@@ -105,11 +103,14 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 		BeginDrawing();
 		if (selection_step == 0) // starting selection
 		{
-			DrawText("Select Game Mode", 80, 5, STTT_TEXT_SIZE, DARKGRAY);
-			if (GuiButton(((Rectangle){5, 30, 150, 40}), "Single Player")) {
+			const Vector2 title_spacing = (Vector2){(SCR_WIDTH - MeasureText("Select Game Mode", STTT_TEXT_SIZE)) / 2, STTT_TEXT_SIZE + 10};
+			DrawText("Select Game Mode", title_spacing.x, 5, STTT_TEXT_SIZE, DARKGRAY);
+			const int sp_button_width = MeasureText("Single player", STTT_TEXT_SIZE);
+			const int mp_button_width = MeasureText("Multi player  ", STTT_TEXT_SIZE);
+			if (GuiButton(((Rectangle){10, title_spacing.y, (SCR_WIDTH / 2) - 20, STTT_TEXT_SIZE * 2}), "Single Player")) {
 				selection_step++;
 				game_mode = 1;
-			} else if (GuiButton(((Rectangle){165, 30, 150, 40}), "Multi Player")) {
+			} else if (GuiButton(((Rectangle){(SCR_WIDTH / 2) + 10, title_spacing.y, (SCR_WIDTH / 2) - 20, STTT_TEXT_SIZE * 2}), "Multi Player")) {
 				selection_step++;
 				game_mode = 2;
 			}
@@ -177,6 +178,10 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 		ClearBackground(WHITE);
 		EndDrawing();
 	}
+#ifndef ANDROID
+	SCR_WIDTH  = 450;
+	SCR_HEIGHT = 800;
+#endif
 	CloseWindow();
 	return ret;
 }
