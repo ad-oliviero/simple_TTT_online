@@ -1,9 +1,9 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
-#define SCR_WIDTH 450
-#define SCR_HEIGHT 800
 #define THICKNESS 3.0f
+extern int SCR_WIDTH;
+extern int SCR_HEIGHT;
 #define BLOCK SCR_WIDTH / 3
 #ifndef _WIN32
 	#define SOCK int

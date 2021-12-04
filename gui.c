@@ -1,11 +1,14 @@
-#include "lib/raylib/src/raylib.h"
-#define RAYGUI_IMPLEMENTATION
-#define RAYGUI_SUPPORT_ICONS
-#define RAYGUI_STATIC
+#include "include/gui.h"
 #include "include/client.h"
 #include "include/main.h"
 #include "include/server.h"
-#include "lib/raylib/src/extras/raygui.h"
+#include "lib/raylib/src/raylib.h"
+#ifndef ANDROID
+	#define RAYGUI_IMPLEMENTATION
+	#define RAYGUI_SUPPORT_ICONS
+	#define RAYGUI_STATIC
+	#include "lib/raylib/src/extras/raygui.h"
+#endif
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,6 +16,8 @@
 #include <time.h>
 #include <unistd.h>
 
+int SCR_WIDTH  = 450;
+int SCR_HEIGHT = 800;
 extern int game_running;
 extern char user0[32];
 extern Rectangle game[3][3];
@@ -44,12 +49,29 @@ void grid() {
 }
 
 #ifdef ANDROID
-bool android_button(Rectangle bounds, const char *text) {
-	DrawRectangleRec(bounds, DARKGRAY);
-	DrawRectangle(bounds.x + THICKNESS, bounds.y + THICKNESS, bounds.width - THICKNESS * 2, bounds.height - THICKNESS * 2, LIGHTGRAY);
-	DrawText(text, bounds.x + (bounds.width / 2) - MeasureText(text, 20) / 2, bounds.y + (bounds.height / 4), 20, BLACK);
-	return CheckCollisionPointRec(GetTouchPosition(0), bounds);
+Vector2 get_touch_pos() {
+	Vector2 touch_pos = GetTouchPosition(0);
+	touch_pos.x *= SCR_WIDTH;
+	touch_pos.y *= SCR_HEIGHT;
+	return touch_pos;
 }
+
+bool gui_button(Rectangle bounds, const char *text) {
+	bool pressed	  = false;
+	bool selected	  = false;
+	Vector2 mouse_pos = GetMousePosition();
+	selected		  = CheckCollisionPointRec(mouse_pos, bounds);
+	pressed			  = IsMouseButtonReleased(MOUSE_LEFT_BUTTON);
+	DrawRectangleRec(bounds, LIGHTGRAY);
+	DrawRectangleLinesEx(bounds, 3, DARKGRAY);
+	DrawText(text, bounds.x + ((bounds.width - MeasureText(text, STTT_TEXT_SIZE)) / 2), bounds.y + ((bounds.height - STTT_TEXT_SIZE) / 2), STTT_TEXT_SIZE, BLACK);
+	DrawRectangleRec(bounds, Fade(BLUE, 0.3f * selected));
+	return pressed && selected;
+}
+
+bool gui_text_box(Rectangle bounds, char *text, int textSize, bool editMode) {}
+
+bool GuiToggle(Rectangle bounds, const char *text, bool active) {}
 #endif
 
 int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
@@ -57,11 +79,15 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 	char portchar[16] = "5555";
 	SetTraceLogLevel(LOG_NONE);
 #ifdef ANDROID
-	const Vector2 scr_size = (Vector2){GetMonitorHeight(0), GetMonitorWidth(0)};
+	Vector2 scr_size = (Vector2){0, 0};
 #else
-	const Vector2 scr_size = (Vector2){320, 75};
+	Vector2 scr_size = (Vector2){320, 75};
 #endif
 	InitWindow(scr_size.x, scr_size.y, "Game Mode Selection");
+#ifdef ANDROID
+	SCR_WIDTH  = GetScreenWidth();
+	SCR_HEIGHT = GetScreenHeight();
+#endif
 	SetTargetFPS(GetMonitorRefreshRate(0));
 	Rectangle nickBox = {MeasureText("Nickname:", 20) + 15, 5, 200, 30};
 	Rectangle ipBox	  = {MeasureText("IP:", 20) + 15, 40, 267, 30};
@@ -69,20 +95,21 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 	while (!game_running && !WindowShouldClose()) {
 #ifdef ANDROID
 		char *clipboard	  = "";
-		Vector2 mouse_pos = GetMousePosition();
+		Vector2 mouse_pos = get_touch_pos();
 #else
-		char *clipboard				 = (char *)GetClipboardText();
-		clipboard[strlen(clipboard)] = 0;
-		Vector2 mouse_pos			 = GetTouchPosition(0);
+		char *clipboard = (char *)GetClipboardText();
+		if (strlen(clipboard) > 16)
+			strncpy(clipboard, clipboard, 16);
+		const Vector2 mouse_pos = GetMousePosition();
 #endif
 		BeginDrawing();
 		if (selection_step == 0) // starting selection
 		{
-			DrawText("Select Game Mode", (scr_size.x - MeasureText("Select Game Mode", 20)) / 2, 5, 20, DARKGRAY);
-			if (GuiButton((Rectangle){5, 30, 150, 40}, "Single Player")) {
+			DrawText("Select Game Mode", 80, 5, STTT_TEXT_SIZE, DARKGRAY);
+			if (GuiButton(((Rectangle){5, 30, 150, 40}), "Single Player")) {
 				selection_step++;
 				game_mode = 1;
-			} else if (GuiButton((Rectangle){165, 30, 150, 40}, "Multi Player")) {
+			} else if (GuiButton(((Rectangle){165, 30, 150, 40}), "Multi Player")) {
 				selection_step++;
 				game_mode = 2;
 			}
@@ -94,14 +121,14 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 			ret			 = 2;
 		} else if (selection_step == 1 && game_mode == 2) // multi player
 		{
-			DrawText("Select Game Hosting", (scr_size.x - MeasureText("Select Game Hosting", 20)) / 2, 5, 20, DARKGRAY);
-			if (GuiButton((Rectangle){5, 30, 150, 40}, "Host")) {
+			DrawText("Select Game Hosting", (scr_size.x - MeasureText("Select Game Hosting", 20)) / 2, 5, STTT_TEXT_SIZE, DARKGRAY);
+			if (GuiButton(((Rectangle){5, 30, 150, 40}), "Host")) {
 				selection_step++;
 				game_hosting = 1;
-			} else if (GuiButton((Rectangle){165, 30, 150, 40}, "Join")) {
-				selection_step += 2;
-				game_hosting = 2;
-			}
+			}												 /* else if ((GuiButton((Rectangle){165, 30, 150, 40}), "Join")) {
+															   selection_step += 2;
+															   game_hosting = 2;
+														   } */
 		} else if (selection_step == 2 && game_hosting == 1) // hosting multi player
 		{
 			int nickbox_selected = CheckCollisionPointRec(mouse_pos, nickBox);
@@ -110,14 +137,14 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 				sprintf(data->users[0], "%s", clipboard);
 			else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && portbox_selected)
 				sprintf(portchar, "%s", clipboard);
-			if (GuiTextBox(nickBox, data->users[0], 20, nickbox_selected) || GuiTextBox(portBox, portchar, 20, portbox_selected)) {
+			if (GuiTextBox(nickBox, data->users[0], STTT_TEXT_SIZE, nickbox_selected) || GuiTextBox(portBox, portchar, STTT_TEXT_SIZE, portbox_selected)) {
 				*PORT = atoi(portchar);
 				sprintf(IP_ADDRESS, "127.0.0.1");
 				game_running = 1;
 				ret			 = 1;
 			}
-			DrawText("Nickname:", 10, 10, 20, DARKGRAY);
-			DrawText("Port:", 10, 45, 20, DARKGRAY);
+			DrawText("Nickname:", 10, 10, STTT_TEXT_SIZE, DARKGRAY);
+			DrawText("Port:", 10, 45, STTT_TEXT_SIZE, DARKGRAY);
 		} else if (selection_step == 3) // join multi player
 		{
 			int nickbox_selected = CheckCollisionPointRec(mouse_pos, nickBox);
@@ -137,17 +164,17 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 					ret			 = -1;
 					while (time(NULL) != tmp_time) {
 						BeginDrawing();
-						DrawText(TextFormat("Error: connection to %s\non port %i failed!", IP_ADDRESS, 5555), 10, 10, 20, RED);
+						DrawText(TextFormat("Error: connection to %s\non port %i failed!", IP_ADDRESS, 5555), 10, 10, STTT_TEXT_SIZE, RED);
 						ClearBackground(YELLOW);
 						EndDrawing();
 					}
 					sprintf(IP_ADDRESS, " ");
 				}
 			}
-			DrawText("Nickname:", 10, 10, 20, DARKGRAY);
-			DrawText("IP:", 10, 45, 20, DARKGRAY);
+			DrawText("Nickname:", 10, 10, STTT_TEXT_SIZE, DARKGRAY);
+			DrawText("IP:", 10, 45, STTT_TEXT_SIZE, DARKGRAY);
 		}
-		ClearBackground(RAYWHITE);
+		ClearBackground(WHITE);
 		EndDrawing();
 	}
 	CloseWindow();
@@ -156,6 +183,6 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 
 void matchInfo(struct client_data *data) { // draw match info
 	const char *info_text = TextFormat("It's %s %s turn!", data->turn ? data->users[1] : data->users[2], data->turn ? "(x)" : "(O)");
-	DrawText(info_text, (SCR_WIDTH - MeasureText(info_text, 20)) / 2, BLOCK * 3 + 10, 20, BLACK);
-	DrawText(TextFormat("%s: %i\n%s: %i\n", data->users[1], data->winsP[0], data->users[2], data->winsP[1]), 10, BLOCK * 3 + 40, 20, BLACK);
+	DrawText(info_text, (SCR_WIDTH - MeasureText(info_text, 20)) / 2, BLOCK * 3 + 10, STTT_TEXT_SIZE, BLACK);
+	DrawText(TextFormat("%s: %i\n%s: %i\n", data->users[1], data->winsP[0], data->users[2], data->winsP[1]), 10, BLOCK * 3 + 40, STTT_TEXT_SIZE, BLACK);
 }
