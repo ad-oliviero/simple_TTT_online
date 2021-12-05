@@ -30,28 +30,36 @@ void *server_main(void *arg) {
 #ifdef _WIN32
 	WSADATA Data;
 	WSAStartup(MAKEWORD(2, 2), &Data);
-#endif
+#elif defined(__linux__) || defined(ANDROID)
 	struct sockaddr_in address;
-	int opt = 1, addrlen = sizeof(address);
+	int server_fd, opt = 1, addrlen = sizeof(address);
+#endif
 	server_fd = socket(AF_INET, SOCK_STREAM, 0);
+	if ((server_fd < 0))
+		return NULL;
+
 	setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
+	memset(&address, 0, sizeof(struct sockaddr_in)); // safety
 	address.sin_family		= AF_INET;
-	address.sin_addr.s_addr = INADDR_ANY;
+	address.sin_addr.s_addr = htonl(INADDR_ANY);
 	address.sin_port		= htons(server_data->PORT);
-	if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) // fails on android
+#ifdef ANDROID
+	__android_log_print(ANDROID_LOG_VERBOSE, "Simple_TTT", "PORT: %i", address.sin_port);
+#endif
+	if (bind(server_fd, (const struct sockaddr *)&address, sizeof(struct sockaddr_in)))
 		return NULL;
 
 	// accepting clients
-	listen(server_fd, 3);
-	clientfd[0] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
+	listen(server_fd, 10);
+	clientfd[0] = accept(server_fd, NULL, NULL); // also this fails on android because the port is not 5555
 	read(clientfd[0], (char *)&server_data->data.users[1], sizeof(server_data->data.users[1]));
 
-	listen(server_fd, 3);
-	clientfd[1] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
+	listen(server_fd, 10);
+	clientfd[1] = accept(server_fd, NULL, NULL);
 	read(clientfd[1], (char *)&server_data->data.users[2], sizeof(server_data->data.users[2]));
 
 	// initializing connection
-	listen(server_fd, 3);
+	listen(server_fd, 10);
 	write(clientfd[0], (char *)&server_data->data.users, sizeof(server_data->data.users));
 	write(clientfd[0], (char *)&server_data->data.turn, 4);
 	server_data->data.turn++;
@@ -70,12 +78,6 @@ void *server_main(void *arg) {
 		pthread_join(server_tid[i], NULL);
 	return 0;
 }
-
-// void *accept_connections(void *arg) {
-// 	listen(server_fd, 3);
-// 	clientfd[0] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
-// 	read(clientfd[0], (char *)&server_data->data.users[1], sizeof(server_data->data.users[1]));
-// }
 
 void *communication(void *arg) { // communicating server_data->data with the client (mostly sending)
 	struct server_data *server_data = (struct server_data *)arg;

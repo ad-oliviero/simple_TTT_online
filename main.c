@@ -22,6 +22,7 @@ int main() {
 	data.user_id			  = -1;
 	server.PORT				  = 5555;
 	data.game_mode			  = join_window(server.IP_ADDRESS, &server.PORT, &data);
+
 	if (data.game_mode < 0)
 		return 0;
 	else if (data.game_mode == 1 || data.game_mode == 2) {
@@ -35,8 +36,7 @@ int main() {
 	pthread_create(&tid[1], 0, window_main, &data);
 	if (data.game_mode == 2)
 		pthread_create(&tid[3], 0, bot_main, NULL);
-	for (int i = 0; i < 3; i++)
-		pthread_join(tid[i], NULL);
+	pthread_join(tid[1], NULL);
 	return 0;
 }
 

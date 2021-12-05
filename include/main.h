@@ -10,6 +10,9 @@ extern int SCR_HEIGHT;
 #else
 	#define SOCK unsigned int
 #endif
+#ifdef ANDROID
+	#include <android/log.h> // for android debugging
+#endif
 
 struct client_data {
 	int game_grid[3][3];

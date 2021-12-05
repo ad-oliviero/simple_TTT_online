@@ -69,9 +69,9 @@ bool gui_button(Rectangle bounds, const char *text) {
 	return pressed && selected;
 }
 
-bool gui_text_box(Rectangle bounds, char *text, int textSize, bool editMode) {}
+bool gui_text_box(Rectangle bounds, char *text, int textSize, bool editMode) { return false; }
 
-bool GuiToggle(Rectangle bounds, const char *text, bool active) {}
+bool GuiToggle(Rectangle bounds, const char *text, bool active) { return false; }
 #endif
 
 int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
@@ -105,8 +105,8 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 		{
 			const Vector2 title_spacing = (Vector2){(SCR_WIDTH - MeasureText("Select Game Mode", STTT_TEXT_SIZE)) / 2, STTT_TEXT_SIZE + 10};
 			DrawText("Select Game Mode", title_spacing.x, 5, STTT_TEXT_SIZE, DARKGRAY);
-			const int sp_button_width = MeasureText("Single player", STTT_TEXT_SIZE);
-			const int mp_button_width = MeasureText("Multi player  ", STTT_TEXT_SIZE);
+			// const int sp_button_width = MeasureText("Single player", STTT_TEXT_SIZE);
+			// const int mp_button_width = MeasureText("Multi player  ", STTT_TEXT_SIZE);
 			if (GuiButton(((Rectangle){10, title_spacing.y, (SCR_WIDTH / 2) - 20, STTT_TEXT_SIZE * 2}), "Single Player")) {
 				selection_step++;
 				game_mode = 1;
@@ -181,8 +181,8 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 #ifndef ANDROID
 	SCR_WIDTH  = 450;
 	SCR_HEIGHT = 800;
-#endif
 	CloseWindow();
+#endif
 	return ret;
 }
 
