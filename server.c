@@ -25,7 +25,6 @@ void *communication(void *);
 void *server_main(void *arg) {
 	struct server_data *server_data = (struct server_data *)arg;
 	server_data->server_tid			= pthread_self();
-	// int PORT = *(int *)PORT_arg;
 	// creating socket and connecting to it
 #ifdef _WIN32
 	WSADATA Data;
@@ -43,9 +42,7 @@ void *server_main(void *arg) {
 	address.sin_family		= AF_INET;
 	address.sin_addr.s_addr = htonl(INADDR_ANY);
 	address.sin_port		= htons(server_data->PORT);
-#ifdef ANDROID
-	__android_log_print(ANDROID_LOG_VERBOSE, "Simple_TTT", "PORT: %i", address.sin_port);
-#endif
+	// __android_log_print(ANDROID_LOG_VERBOSE, "Simple_TTT", "PORT: %i", address.sin_port);
 	if (bind(server_fd, (const struct sockaddr *)&address, sizeof(struct sockaddr_in)))
 		return NULL;
 

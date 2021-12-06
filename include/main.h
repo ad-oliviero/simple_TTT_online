@@ -12,6 +12,9 @@ extern int SCR_HEIGHT;
 #endif
 #ifdef ANDROID
 	#include <android/log.h> // for android debugging
+	#define ANDROID_LOGI(...) __android_log_print(ANDROID_LOG_VERBOSE, "Simple_TTT", __VA_ARGS__)
+	#define ANDROID_LOGW(...) __android_log_print(ANDROID_LOG_WARN, "Simple_TTT", __VA_ARGS__)
+	#define ANDROID_LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "Simple_TTT", __VA_ARGS__)
 #endif
 
 struct client_data {

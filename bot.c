@@ -20,7 +20,7 @@ void *bot_main() {
 	pthread_create(&tid[0], 0, client_comm, &data);
 	pthread_create(&tid[1], 0, bot_ai, &data);
 	pthread_join(tid[0], NULL);
-	pthread_join(tid[1], NULL);
+	// pthread_join(tid[1], NULL);
 	return NULL;
 }
 

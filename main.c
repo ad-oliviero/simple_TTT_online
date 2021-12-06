@@ -32,11 +32,13 @@ int main() {
 	}
 	if (data.game_mode == 2)
 		sprintf(data.users[0], "Me");
+	game_running = 1;
 	pthread_create(&tid[0], 0, client_comm, &data);
-	pthread_create(&tid[1], 0, window_main, &data);
+	// pthread_create(&tid[1], 0, window_main, &data); // android does not like a separate thread to draw to the screen
 	if (data.game_mode == 2)
 		pthread_create(&tid[3], 0, bot_main, NULL);
-	pthread_join(tid[1], NULL);
+	// pthread_join(tid[1], NULL);
+	window_main(&data);
 	return 0;
 }
 
@@ -44,15 +46,23 @@ void *window_main(void *arg) {
 	struct client_data *data = (struct client_data *)arg;
 	SetTraceLogLevel(LOG_NONE);
 	SetConfigFlags(FLAG_MSAA_4X_HINT);
-	InitWindow(SCR_WIDTH, SCR_HEIGHT, TextFormat("Simple TTT - %s", data->users[0]));
+#ifdef ANDROID
+	Vector2 scr_size = (Vector2){0, 0};
+#else
+	Vector2 scr_size = (Vector2){SCR_WIDTH, SCR_HEIGHT};
+#endif
+	InitWindow(scr_size.x, scr_size.y, TextFormat("Simple TTT - %s", data->users[0]));
+
 	SetTargetFPS(GetMonitorRefreshRate(0));
 	initHitBox();
 	// main game loop
+	// int count = 0;
 	while (!WindowShouldClose() && game_running) {
 		place(data);
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 		grid();
+		DrawCircle(GetMousePosition().x, GetMousePosition().y, 10, BLACK);
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
 				shape((int[2]){i, j}, &data->game_grid[i][j]);
@@ -61,10 +71,12 @@ void *window_main(void *arg) {
 		matchInfo(data);
 		// DrawFPS(10, 10);
 		EndDrawing();
+		// ANDROID_LOGW("%d", count++);
+		// exit(0);
 	}
 	game_running = 0;
 	// end of the program
 	CloseWindow();
 	close(data->sock);
-	exit(0);
+	return 0;
 }

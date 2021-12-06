@@ -117,7 +117,7 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 		} else if (selection_step == 1 && game_mode == 1) // single player
 		{
 			*PORT = 5555;
-			sprintf(IP_ADDRESS, "127.0.0.1");
+			sprintf(IP_ADDRESS, "192.168.1.120");
 			game_running = 1;
 			ret			 = 2;
 		} else if (selection_step == 1 && game_mode == 2) // multi player

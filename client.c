@@ -19,10 +19,13 @@ int client_connect(char *IP_ADDRESS, int PORT, SOCK *sock) { // connect to the s
 	WSAStartup(MAKEWORD(2, 2), &Data);
 #endif
 	struct sockaddr_in server_id;
+	memset(&server_id, 0, sizeof(struct sockaddr_in));
 	inet_pton(AF_INET, IP_ADDRESS, &server_id.sin_addr);
 	server_id.sin_family = AF_INET;
 	server_id.sin_port	 = htons(PORT);
 	*sock				 = socket(AF_INET, SOCK_STREAM, 0);
+	if (*sock < 0)
+		return -1;
 	return connect(*sock, (struct sockaddr *)&server_id, sizeof(server_id));
 }
 
@@ -33,9 +36,6 @@ void *client_comm(void *arg) { // communicating data with the server (mostly rec
 	write(data->sock, (char *)&data->users[0], sizeof(data->users[0]));
 	read(data->sock, (char *)&data->users, sizeof(data->users));
 	read(data->sock, (char *)&data->user_id, sizeof(data->user_id));
-#ifdef ANDROID
-	__android_log_print(ANDROID_LOG_VERBOSE, "Simple_TTT", "User id: %i", data->user_id);
-#endif
 	printf("User id: %i\n", data->user_id);
 
 	// communication loop
