@@ -59,7 +59,6 @@ void *window_main(void *arg) {
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 		grid();
-		DrawCircle(GetMousePosition().x, GetMousePosition().y, 50, BLACK);
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
 				shape((int[2]){i, j}, &data->game_grid[i][j]);

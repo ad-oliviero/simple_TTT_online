@@ -96,13 +96,11 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 		char *clipboard	  = "";
 		Vector2 mouse_pos = get_touch_pos();
 #else
-		char *clipboard = (char *)GetClipboardText();
-		if (strlen(clipboard) > 16)
-			strncpy(clipboard, clipboard, 16);
+		char *clipboard = malloc(sizeof(char) * 20);
+		strncpy(clipboard, GetClipboardText(), 19);
 		const Vector2 mouse_pos = GetMousePosition();
 #endif
 		BeginDrawing();
-		DrawCircle(GetMousePosition().x, GetMousePosition().y, 50, BLACK);
 		if (selection_step == 0) // starting selection
 		{
 			const Vector2 title_spacing = (Vector2){(SCR_WIDTH - MeasureText("Select Game Mode", STTT_TEXT_SIZE)) / 2, STTT_TEXT_SIZE + 10};
