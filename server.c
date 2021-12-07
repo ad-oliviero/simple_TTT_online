@@ -17,6 +17,7 @@
 
 int clientfd[4], server_fd;
 int ready_check[4];
+int client_count = 0;
 extern int game_running;
 pthread_t server_tid[128];
 
@@ -31,37 +32,51 @@ void *server_main(void *arg) {
 	WSAStartup(MAKEWORD(2, 2), &Data);
 #elif defined(__linux__) || defined(ANDROID)
 	struct sockaddr_in address;
+	struct sockaddr client_addr[4];
 	int server_fd, opt = 1, addrlen = sizeof(address);
 #endif
 	server_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if ((server_fd < 0))
 		return NULL;
 
-	setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
-	memset(&address, 0, sizeof(struct sockaddr_in)); // safety
+	// setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
 	address.sin_family		= AF_INET;
 	address.sin_addr.s_addr = htonl(INADDR_ANY);
 	address.sin_port		= htons(server_data->PORT);
-	// __android_log_print(ANDROID_LOG_VERBOSE, "Simple_TTT", "PORT: %i", address.sin_port);
-	if (bind(server_fd, (const struct sockaddr *)&address, sizeof(struct sockaddr_in)))
-		return NULL;
+	if (bind(server_fd, (const struct sockaddr *)&address, sizeof(struct sockaddr_in))) {
+		LOGE("Error binding to socket");
+		exit(-1);
+	}
+
+	srand(time(NULL));
+	client_count = rand() % 2;
+	listen(server_fd, 10);
 
 	// accepting clients
-	listen(server_fd, 10);
 	clientfd[0] = accept(server_fd, NULL, NULL); // also this fails on android because the port is not 5555
+	if (clientfd[0] < 0) {
+		LOGE("Error in accepting client 1");
+		exit(-1);
+	}
+	LOGI("Client %i connected", clientfd[0]);
 	read(clientfd[0], (char *)&server_data->data.users[1], sizeof(server_data->data.users[1]));
 
-	listen(server_fd, 10);
 	clientfd[1] = accept(server_fd, NULL, NULL);
+	if (clientfd[1] < 0) {
+		LOGE("Error in accepting client 2");
+		exit(-1);
+	}
 	read(clientfd[1], (char *)&server_data->data.users[2], sizeof(server_data->data.users[2]));
+	LOGI("Client %i connected", clientfd[1]);
+
+	// exit(0);
 
 	// initializing connection
-	listen(server_fd, 10);
 	write(clientfd[0], (char *)&server_data->data.users, sizeof(server_data->data.users));
-	write(clientfd[0], (char *)&server_data->data.turn, 4);
-	server_data->data.turn++;
+	write(clientfd[0], (char *)&client_count, sizeof(client_count));
+	client_count = !client_count;
 	write(clientfd[1], (char *)&server_data->data.users, sizeof(server_data->data.users));
-	write(clientfd[1], (char *)&server_data->data.turn, 4);
+	write(clientfd[1], (char *)&client_count, sizeof(client_count));
 
 	// creating and joining threads
 	while (server_data->thread_id <= 1) {

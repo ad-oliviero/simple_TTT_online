@@ -44,35 +44,29 @@ int main() {
 
 void *window_main(void *arg) {
 	struct client_data *data = (struct client_data *)arg;
+#ifdef ANDROID
+#else
 	SetTraceLogLevel(LOG_NONE);
 	SetConfigFlags(FLAG_MSAA_4X_HINT);
-#ifdef ANDROID
-	Vector2 scr_size = (Vector2){0, 0};
-#else
-	Vector2 scr_size = (Vector2){SCR_WIDTH, SCR_HEIGHT};
-#endif
-	InitWindow(scr_size.x, scr_size.y, TextFormat("Simple TTT - %s", data->users[0]));
-
+	InitWindow(SCR_WIDTH, SCR_HEIGHT, TextFormat("Simple TTT - %s", data->users[0]));
 	SetTargetFPS(GetMonitorRefreshRate(0));
+#endif
+
 	initHitBox();
 	// main game loop
-	// int count = 0;
 	while (!WindowShouldClose() && game_running) {
 		place(data);
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 		grid();
-		DrawCircle(GetMousePosition().x, GetMousePosition().y, 10, BLACK);
+		DrawCircle(GetMousePosition().x, GetMousePosition().y, 50, BLACK);
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
 				shape((int[2]){i, j}, &data->game_grid[i][j]);
 		if (data->is_game_over == 1)
 			end_client_game(data);
 		matchInfo(data);
-		// DrawFPS(10, 10);
 		EndDrawing();
-		// ANDROID_LOGW("%d", count++);
-		// exit(0);
 	}
 	game_running = 0;
 	// end of the program

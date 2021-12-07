@@ -78,15 +78,16 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 	int ret = -1, selection_step = 0, game_mode = -1, game_hosting = -1;
 	char portchar[16] = "5555";
 	SetTraceLogLevel(LOG_NONE);
+	SetConfigFlags(FLAG_MSAA_4X_HINT);
 #ifdef ANDROID
 	Vector2 scr_size = (Vector2){0, 0};
 #else
 	Vector2 scr_size = (Vector2){320, 75};
 #endif
 	InitWindow(scr_size.x, scr_size.y, "Game Mode Selection");
-	SCR_WIDTH  = GetScreenWidth();
-	SCR_HEIGHT = GetScreenHeight();
 	SetTargetFPS(GetMonitorRefreshRate(0));
+	SCR_WIDTH		  = GetScreenWidth();
+	SCR_HEIGHT		  = GetScreenHeight();
 	Rectangle nickBox = {MeasureText("Nickname:", 20) + 15, 5, 200, 30};
 	Rectangle ipBox	  = {MeasureText("IP:", 20) + 15, 40, 267, 30};
 	Rectangle portBox = {MeasureText("Port:", 20) + 15, 40, 242, 30};
@@ -101,6 +102,7 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 		const Vector2 mouse_pos = GetMousePosition();
 #endif
 		BeginDrawing();
+		DrawCircle(GetMousePosition().x, GetMousePosition().y, 50, BLACK);
 		if (selection_step == 0) // starting selection
 		{
 			const Vector2 title_spacing = (Vector2){(SCR_WIDTH - MeasureText("Select Game Mode", STTT_TEXT_SIZE)) / 2, STTT_TEXT_SIZE + 10};

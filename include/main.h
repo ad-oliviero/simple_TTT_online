@@ -1,6 +1,8 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
+#include "../lib/raylib/src/raylib.h"
+
 #define THICKNESS 3.0f
 extern int SCR_WIDTH;
 extern int SCR_HEIGHT;
@@ -12,9 +14,52 @@ extern int SCR_HEIGHT;
 #endif
 #ifdef ANDROID
 	#include <android/log.h> // for android debugging
-	#define ANDROID_LOGI(...) __android_log_print(ANDROID_LOG_VERBOSE, "Simple_TTT", __VA_ARGS__)
-	#define ANDROID_LOGW(...) __android_log_print(ANDROID_LOG_WARN, "Simple_TTT", __VA_ARGS__)
-	#define ANDROID_LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "Simple_TTT", __VA_ARGS__)
+	#define LOGI(...)                                                                          \
+		{                                                                                      \
+			char *log_msg = calloc(1, 1024);                                                   \
+			sprintf(log_msg, __VA_ARGS__);                                                     \
+			__android_log_print(ANDROID_LOG_VERBOSE, "Simple_TTT", "Simple TTT: %s", log_msg); \
+			free(log_msg);                                                                     \
+		}
+	#define LOGW(...)                                                                       \
+		{                                                                                   \
+			char *log_msg = calloc(1, 1024);                                                \
+			sprintf(log_msg, __VA_ARGS__);                                                  \
+			__android_log_print(ANDROID_LOG_WARN, "Simple_TTT", "Simple TTT: %s", log_msg); \
+			free(log_msg);                                                                  \
+		}
+	#define LOGE(...)                                                                        \
+		{                                                                                    \
+			char *log_msg = calloc(1, 1024);                                                 \
+			sprintf(log_msg, __VA_ARGS__);                                                   \
+			__android_log_print(ANDROID_LOG_ERROR, "Simple_TTT", "Simple TTT: %s", log_msg); \
+			free(log_msg);                                                                   \
+		}
+#else
+	// #define LOGI(...) fprintf(stderr, "%s\n", TextFormat(__VA_ARGS__))
+	// #define LOGW(...) fprintf(stderr, "\x1b[33m\x1b[0m\n", __VA_ARGS__)
+	// #define LOGE(...) fprintf(stderr, "\x1b[31m%s\x1b[0m\n", __VA_ARGS__)
+	#define LOGI(...)                         \
+		{                                     \
+			char *log_msg = calloc(1, 1024);  \
+			sprintf(log_msg, __VA_ARGS__);    \
+			fprintf(stderr, "%s\n", log_msg); \
+			free(log_msg);                    \
+		}
+	#define LOGW(...)                                      \
+		{                                                  \
+			char *log_msg = calloc(1, 1024);               \
+			sprintf(log_msg, __VA_ARGS__);                 \
+			fprintf(stderr, "\x1b[33m\x1b[0m\n", log_msg); \
+			free(log_msg);                                 \
+		}
+	#define LOGE(...)                                        \
+		{                                                    \
+			char *log_msg = calloc(1, 1024);                 \
+			sprintf(log_msg, __VA_ARGS__);                   \
+			fprintf(stderr, "\x1b[31m%s\x1b[0m\n", log_msg); \
+			free(log_msg);                                   \
+		}
 #endif
 
 struct client_data {
