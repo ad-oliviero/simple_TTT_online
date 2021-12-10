@@ -9,40 +9,42 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 int game_running = 0;
-pthread_t tid[4];
 
 int main() {
-	struct client_data data	  = (struct client_data){0};
-	struct server_data server = (struct server_data){0};
-	data.click_position[0]	  = -1;
-	data.click_position[1]	  = -1;
-	data.user_id			  = -1;
-	server.PORT				  = 5555;
-	data.game_mode			  = join_window(server.IP_ADDRESS, &server.PORT, &data);
+	struct client_data data;
+	struct server_data server;
+	memset(&data, 0, sizeof(struct client_data));
+	memset(&server, 0, sizeof(struct server_data));
+	data.click_position[0] = -1;
+	data.click_position[1] = -1;
+	data.user_id		   = -1;
+	server.PORT			   = 5555;
+	data.game_mode		   = join_window(server.IP_ADDRESS, &server.PORT, &data);
+
+	pthread_t t[4];
 
 	if (data.game_mode < 0)
 		return 0;
 	else if (data.game_mode == 1 || data.game_mode == 2) {
-		pthread_create(&tid[2], 0, server_main, &server);
+		pthread_create(&t[2], 0, server_main, &server);
 		usleep(100000);
 		while (client_connect(server.IP_ADDRESS, server.PORT, &data.sockfd))
 			;
-		int ret = 0;
-		pthread_join(tid[2], (void *)&ret);
-		exit(ret);
 	}
 	if (data.game_mode == 2)
 		sprintf(data.users[0], "Me");
 	game_running = 1;
-	pthread_create(&tid[0], 0, client_comm, &data);
-	// pthread_create(&tid[1], 0, window_main, &data); // android does not like a separate thread to draw to the screen
+	pthread_create(&t[0], 0, client_comm, &data);
+	// pthread_create(&t[1], 0, window_main, &data); // android does not like a separate thread to draw to the screen
 	if (data.game_mode == 2)
-		pthread_create(&tid[3], 0, bot_main, NULL);
-	// pthread_join(tid[1], NULL);
+		pthread_create(&t[3], 0, bot_main, NULL);
+	// pthread_join(t[1], NULL);
 	window_main(&data);
+	close(data.sockfd);
 	return 0;
 }
 

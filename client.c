@@ -12,7 +12,24 @@
 #include "include/main.h"
 
 extern int game_running;
-#define MAXLINE 1000
+
+void print_data(struct client_data *data) {
+	LOGI("Bot hardness: %i\nClick Position 0: %i\nClick Position 1: %i", data->bot_hardness, data->click_position[0], data->click_position[1]);
+	LOGI("\nGame Grid:");
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++)
+			printf("%i, ", data->game_grid[i][j]);
+		printf("\n");
+	}
+	LOGI("Game Mode: %i\nButton Pressed: %i\nGame Over: %i\nReady: %i\nSockfd: %i\nTurn: %i\nUser ID: %i",
+		 data->game_mode, data->is_btn_pressed, data->is_game_over, data->ready, data->sockfd, data->turn, data->user_id);
+	printf("Users: ");
+	for (int i = 0; i < 4; i++)
+		printf("%s, ", data->users[i]);
+	LOGI("\nWinner: %i\nWins Player 0: %i\nWins Player 1: %i", data->winner, data->winsP[0], data->winsP[1]);
+	return;
+}
+
 int client_connect(char *IP_ADDRESS, int PORT, SOCK *sockfd) { // connect to the sock
 	struct sockaddr_in servaddr;
 	inet_pton(AF_INET, IP_ADDRESS, &servaddr.sin_addr);
@@ -28,19 +45,6 @@ int client_connect(char *IP_ADDRESS, int PORT, SOCK *sockfd) { // connect to the
 		LOGE("Connection to %s on port %i failed!", IP_ADDRESS, PORT);
 		exit(-1);
 	}
-
-	char buf[1000] = "";
-	char *msg	   = "Client cciao\n\n";
-	if (recv(*sockfd, buf, sizeof(buf), 0) < 0) {
-		LOGE("Receive error, server could be offline.");
-		exit(-1);
-	}
-	LOGI("Server says: %s", buf);
-	if (send(*sockfd, "client Ciao!", strlen("client Ciao!"), 0) < 0) {
-		LOGE("Send error, server could be offline.");
-		exit(-1);
-	}
-	close(*sockfd);
 
 	/* #ifdef _WIN32
 	WSADATA Data;
@@ -58,39 +62,52 @@ int client_connect(char *IP_ADDRESS, int PORT, SOCK *sockfd) { // connect to the
 }
 
 void *client_comm(void *arg) { // communicating data with the server (mostly receiving)
-							   /* // initializing the game
-							   struct client_data *data = (struct client_data *)arg;
-							   // listen(data->sockfd, 10);
-							   write(data->sockfd, (char *)&data->users[0], sizeof(data->users[0]));
-							   read(data->sockfd, (char *)&data->users, sizeof(data->users));
-							   read(data->sockfd, (char *)&data->user_id, sizeof(data->user_id));
-							   if (data->user_id < 0) {
-								   LOGE("user_id %d\n", data->user_id);
-								   exit(-1);
-							   }
-							   LOGI("user_id: %d", data->user_id);
-							   // communication loop
-							   while (game_running) {
-								   // read game data
-								   read(data->sockfd, (char *)&data->is_game_over, sizeof(data->is_game_over));
-								   read(data->sockfd, (char *)&data->turn, sizeof(data->turn));
-								   read(data->sockfd, (char *)&data->winsP, sizeof(data->winsP));
-								   read(data->sockfd, (char *)&data->winner, sizeof(data->winner));
-								   read(data->sockfd, (char *)&data->game_grid, sizeof(data->game_grid));
-						   
-								   // checking if client has permission to play and sending data
-								   if (data->turn == data->user_id) {
-									   data->click_position[0] = -1; // set click only if it's client's turn
-									   data->click_position[1] = -1;
-								   }
-								   write(data->sockfd, (char *)&data->click_position, sizeof(data->click_position));
-								   if ((data->click_position[0] >= 0 && data->click_position[1] >= 0) || data->is_game_over) {
-									   data->click_position[0] = -1;
-									   data->click_position[1] = -1;
-								   }
-								   write(data->sockfd, (char *)&data->ready, sizeof(data->ready));
-								   if (data->ready == 1 && data->is_game_over == 0)
-									   data->ready = 0;
-							   }
-							   pthread_exit(NULL); */
+	struct client_data *data = (struct client_data *)arg;
+	LOGW("BEFORE");
+	print_data(data);
+	if (recv(data->sockfd, data, sizeof(struct client_data), 0) < 0) {
+		LOGE("Receive error, server could be offline.");
+		exit(-1);
+	}
+	LOGW("AFTER");
+	print_data(data);
+	if (send(data->sockfd, "yes", strlen("yes"), 0) < 0) {
+		LOGE("Send error, server could be offline.");
+		exit(-1);
+	}
+	/* // initializing the game
+	struct client_data *data = (struct client_data *)arg;
+	// listen(data->sockfd, 10);
+	write(data->sockfd, (char *)&data->users[0], sizeof(data->users[0]));
+	read(data->sockfd, (char *)&data->users, sizeof(data->users));
+	read(data->sockfd, (char *)&data->user_id, sizeof(data->user_id));
+	if (data->user_id < 0) {
+		LOGE("user_id %d\n", data->user_id);
+		exit(-1);
+	}
+	LOGI("user_id: %d", data->user_id);
+	// communication loop
+	while (game_running) {
+		// read game data
+		read(data->sockfd, (char *)&data->is_game_over, sizeof(data->is_game_over));
+		read(data->sockfd, (char *)&data->turn, sizeof(data->turn));
+		read(data->sockfd, (char *)&data->winsP, sizeof(data->winsP));
+		read(data->sockfd, (char *)&data->winner, sizeof(data->winner));
+		read(data->sockfd, (char *)&data->game_grid, sizeof(data->game_grid));
+
+		// checking if client has permission to play and sending data
+		if (data->turn == data->user_id) {
+			data->click_position[0] = -1; // set click only if it's client's turn
+			data->click_position[1] = -1;
+		}
+		write(data->sockfd, (char *)&data->click_position, sizeof(data->click_position));
+		if ((data->click_position[0] >= 0 && data->click_position[1] >= 0) || data->is_game_over) {
+			data->click_position[0] = -1;
+			data->click_position[1] = -1;
+		}
+		write(data->sockfd, (char *)&data->ready, sizeof(data->ready));
+		if (data->ready == 1 && data->is_game_over == 0)
+			data->ready = 0;
+	}
+	pthread_exit(NULL); */
 }

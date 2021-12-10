@@ -43,15 +43,15 @@ extern int SCR_HEIGHT;
 		{                                     \
 			char *log_msg = calloc(1, 1024);  \
 			sprintf(log_msg, __VA_ARGS__);    \
-			fprintf(stderr, "%s\n", log_msg); \
+			fprintf(stdout, "%s\n", log_msg); \
 			free(log_msg);                    \
 		}
-	#define LOGW(...)                                      \
-		{                                                  \
-			char *log_msg = calloc(1, 1024);               \
-			sprintf(log_msg, __VA_ARGS__);                 \
-			fprintf(stderr, "\x1b[33m\x1b[0m\n", log_msg); \
-			free(log_msg);                                 \
+	#define LOGW(...)                                        \
+		{                                                    \
+			char *log_msg = calloc(1, 1024);                 \
+			sprintf(log_msg, __VA_ARGS__);                   \
+			fprintf(stderr, "\x1b[33m%s\x1b[0m\n", log_msg); \
+			free(log_msg);                                   \
 		}
 	#define LOGE(...)                                        \
 		{                                                    \
@@ -83,6 +83,7 @@ struct server_data {
 	int PORT;
 	long int server_tid;
 	int thread_id;
+	SOCK clifd[4];
 	long int client_tid[4];
 	int client_running;
 	struct client_data data;

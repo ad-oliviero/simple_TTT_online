@@ -14,17 +14,17 @@
 #include <string.h>
 #include <sys/syscall.h>
 #include <sys/types.h>
+#define MAX_CLI 4
 
-int ready_check[4];
-int client_count = 0;
+int ready_check[MAX_CLI];
 extern int game_running;
-pthread_t server_tid[128];
 
 void *communication(void *);
 
 void *server_main(void *arg) {
 	struct server_data *servdata = (struct server_data *)arg;
-	SOCK listenfd, clifd[4];
+	pthread_t t[MAX_CLI];
+	SOCK listenfd;
 	int opt = 1;
 	struct sockaddr_in servaddr;
 	servaddr.sin_family		 = AF_INET;
@@ -32,11 +32,11 @@ void *server_main(void *arg) {
 	servaddr.sin_port		 = htons(servdata->PORT);
 	memset(servaddr.sin_zero, 0, sizeof(servaddr.sin_zero));
 
-	setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
 	if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		LOGE("Socket creation failed!");
 		return (void *)-1;
 	}
+	setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
 	if (bind(listenfd, (const struct sockaddr *)&servaddr, sizeof(struct sockaddr_in)) < 0) {
 		LOGE("Binding failed!");
 		return (void *)-1;
@@ -45,22 +45,16 @@ void *server_main(void *arg) {
 		LOGE("Error while calling listen()!");
 		return (void *)-1;
 	}
-	clifd[0] = accept(listenfd, NULL, NULL);
-	if (clifd[0] < 0) {
-		LOGE("Failed to accept client 0!");
-		return (void *)-1;
+	for (int i = 0; i < 2 /* MAX_CLI */; i++) {
+		servdata->clifd[i]	= accept(listenfd, NULL, NULL);
+		servdata->thread_id = i;
+		if (servdata->clifd[i] < 0) {
+			LOGE("Failed to accept client %i!", i);
+			return (void *)-1;
+		}
+		pthread_create(&t[i], 0, communication, servdata);
 	}
-
-	char buf[1000] = "";
-	if (send(clifd[0], "Ciao!", strlen("Ciao!"), 0) < 0) {
-		LOGE("Error sending to client 0, disconnected!");
-		return (void *)-1;
-	}
-	if (recv(clifd[0], buf, sizeof(buf), 0) < 0) {
-		LOGE("Error receiving from client 0, disconnected!");
-		return (void *)-1;
-	}
-	LOGI("Client says: %s", buf);
+	pthread_join(t[0], NULL);
 	close(listenfd);
 	return 0;
 
@@ -132,40 +126,59 @@ void *server_main(void *arg) {
 	return 0; */
 }
 
-void *communication(void *arg) { // communicating server_data->data with the client (mostly sending)
-								 /* struct server_data *server_data = (struct server_data *)arg;
-								 int client_id					= server_data->thread_id;
-								 server_data->client_running		= 1;
-								 while (game_running) {
-									 // server_data->data.turn = !server_data->data.turn;
-									 server_data->data.winner = checkwinner(&server_data->data);
-							 
-									 // write server_data->data to client
-									 write(clientfd[client_id], (const char *)&server_data->data.is_game_over, sizeof(server_data->data.is_game_over));
-									 write(clientfd[client_id], (const char *)&server_data->data.turn, sizeof(server_data->data.turn));
-									 write(clientfd[client_id], (const char *)&server_data->data.winsP, sizeof(server_data->data.winsP));
-									 write(clientfd[client_id], (const char *)&server_data->data.winner, sizeof(server_data->data.winner));
-									 write(clientfd[client_id], (const char *)&server_data->data.game_grid, sizeof(server_data->data.game_grid));
-							 
-									 // read client events
-									 read(clientfd[client_id], (char *)&server_data->data.click_position, sizeof(server_data->data.click_position));
-									 read(clientfd[client_id], (char *)&ready_check[client_id], sizeof(ready_check));
-							 
-									 // check if client has permission to play
-									 if (server_data->data.turn == client_id) {
-										 server_data->data.click_position[0] = (void*)-1;
-										 server_data->data.click_position[1] = (void*)-1;
-									 }																																																												   // accepting click_position only from player's turn client
-									 if (server_data->data.click_position[0] != (void*)-1 && server_data->data.click_position[1] != (void*)-1 && server_data->data.game_grid[server_data->data.click_position[0]][server_data->data.click_position[1]] == 0 && server_data->data.is_game_over == 0) { // handling click_positions
-										 if (server_data->data.turn)
-											 server_data->data.game_grid[server_data->data.click_position[0]][server_data->data.click_position[1]] = 1;
-										 else
-											 server_data->data.game_grid[server_data->data.click_position[0]][server_data->data.click_position[1]] = 2;
-										 server_data->data.turn = !server_data->data.turn;
-									 }
-									 if (ready_check[0] && ready_check[1])
-										 end_server_game(server_data->data.winner, &server_data->data); // checks if all clients are ready to continue
-								 }
-								 close(clientfd[client_id]);
-								 pthread_exit(NULL); */
+void *communication(void *arg) {
+	struct server_data *servdata = (struct server_data *)arg;
+	int clid					 = servdata->thread_id;
+	servdata->client_running	 = 1;
+	char buf[1000]				 = "";
+	if (send(servdata->clifd[clid], "Ciao!", strlen("Ciao!"), 0) < 0) {
+		LOGE("Error sending to client %i, disconnected!", clid);
+		return (void *)-1;
+	}
+	if (recv(servdata->clifd[clid], buf, sizeof(buf), 0) < 0) {
+		LOGE("Error receiving from client %i, disconnected!", clid);
+		return (void *)-1;
+	}
+	if (strcmp(buf, "yes") != 0) {
+		LOGE("Connection with the client failed!");
+		return (void *)-1;
+	}
+	close(servdata->clifd[clid]);
+	return 0;
+	// communicating server_data->data with the client (mostly sending)
+	/* struct server_data *server_data = (struct server_data *)arg;
+	int client_id					= server_data->thread_id;
+	server_data->client_running		= 1;
+	while (game_running) {
+		// server_data->data.turn = !server_data->data.turn;
+		server_data->data.winner = checkwinner(&server_data->data);
+
+		// write server_data->data to client
+		write(clientfd[client_id], (const char *)&server_data->data.is_game_over, sizeof(server_data->data.is_game_over));
+		write(clientfd[client_id], (const char *)&server_data->data.turn, sizeof(server_data->data.turn));
+		write(clientfd[client_id], (const char *)&server_data->data.winsP, sizeof(server_data->data.winsP));
+		write(clientfd[client_id], (const char *)&server_data->data.winner, sizeof(server_data->data.winner));
+		write(clientfd[client_id], (const char *)&server_data->data.game_grid, sizeof(server_data->data.game_grid));
+
+		// read client events
+		read(clientfd[client_id], (char *)&server_data->data.click_position, sizeof(server_data->data.click_position));
+		read(clientfd[client_id], (char *)&ready_check[client_id], sizeof(ready_check));
+
+		// check if client has permission to play
+		if (server_data->data.turn == client_id) {
+			server_data->data.click_position[0] = (void*)-1;
+			server_data->data.click_position[1] = (void*)-1;
+		}																																																												   // accepting click_position only from player's turn client
+		if (server_data->data.click_position[0] != (void*)-1 && server_data->data.click_position[1] != (void*)-1 && server_data->data.game_grid[server_data->data.click_position[0]][server_data->data.click_position[1]] == 0 && server_data->data.is_game_over == 0) { // handling click_positions
+			if (server_data->data.turn)
+				server_data->data.game_grid[server_data->data.click_position[0]][server_data->data.click_position[1]] = 1;
+			else
+				server_data->data.game_grid[server_data->data.click_position[0]][server_data->data.click_position[1]] = 2;
+			server_data->data.turn = !server_data->data.turn;
+		}
+		if (ready_check[0] && ready_check[1])
+			end_server_game(server_data->data.winner, &server_data->data); // checks if all clients are ready to continue
+	}
+	close(clientfd[client_id]);
+	pthread_exit(NULL); */
 }
