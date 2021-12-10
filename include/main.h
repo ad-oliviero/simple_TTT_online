@@ -75,7 +75,7 @@ struct client_data {
 	char users[4][32];
 	int bot_hardness;
 	int game_mode;
-	SOCK sock;
+	SOCK sockfd;
 };
 
 struct server_data {

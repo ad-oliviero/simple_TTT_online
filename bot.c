@@ -15,7 +15,7 @@ void *bot_main() {
 	data.click_position[1] = -1;
 	data.user_id		   = -1;
 	sprintf(data.users[0], "CPU");
-	while (client_connect("127.0.0.1", 5555, &data.sock))
+	while (client_connect("127.0.0.1", 5555, &data.sockfd))
 		;
 	pthread_create(&tid[0], 0, client_comm, &data);
 	pthread_create(&tid[1], 0, bot_ai, &data);

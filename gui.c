@@ -97,7 +97,7 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 		Vector2 mouse_pos = get_touch_pos();
 #else
 		char *clipboard = malloc(sizeof(char) * 20);
-		strncpy(clipboard, GetClipboardText(), 19);
+		// strncpy(clipboard, GetClipboardText(), 19);
 		const Vector2 mouse_pos = GetMousePosition();
 #endif
 		BeginDrawing();
@@ -117,7 +117,7 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 		} else if (selection_step == 1 && game_mode == 1) // single player
 		{
 			*PORT = 5555;
-			sprintf(IP_ADDRESS, "192.168.1.120");
+			sprintf(IP_ADDRESS, "127.0.0.1");
 			game_running = 1;
 			ret			 = 2;
 		} else if (selection_step == 1 && game_mode == 2) // multi player
@@ -157,7 +157,7 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 			if (GuiTextBox(nickBox, data->users[0], 20, nickbox_selected) || GuiTextBox(ipBox, IP_ADDRESS, 16, ipbox_selected)) {
 				if (strlen(IP_ADDRESS) <= 1)
 					sprintf(IP_ADDRESS, "127.0.0.1");
-				if (client_connect(IP_ADDRESS, 5555, &data->sock) != -1) {
+				if (client_connect(IP_ADDRESS, 5555, &data->sockfd) != -1) {
 					game_running = 1;
 					ret			 = 0;
 				} else {

@@ -15,7 +15,6 @@
 #include <sys/syscall.h>
 #include <sys/types.h>
 
-int clientfd[4], server_fd;
 int ready_check[4];
 int client_count = 0;
 extern int game_running;
@@ -24,28 +23,70 @@ pthread_t server_tid[128];
 void *communication(void *);
 
 void *server_main(void *arg) {
+	struct server_data *servdata = (struct server_data *)arg;
+	SOCK listenfd, clifd[4];
+	int opt = 1;
+	struct sockaddr_in servaddr;
+	servaddr.sin_family		 = AF_INET;
+	servaddr.sin_addr.s_addr = INADDR_ANY;
+	servaddr.sin_port		 = htons(servdata->PORT);
+	memset(servaddr.sin_zero, 0, sizeof(servaddr.sin_zero));
+
+	setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
+	if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+		LOGE("Socket creation failed!");
+		return (void *)-1;
+	}
+	if (bind(listenfd, (const struct sockaddr *)&servaddr, sizeof(struct sockaddr_in)) < 0) {
+		LOGE("Binding failed!");
+		return (void *)-1;
+	}
+	if (listen(listenfd, 10) < 0) {
+		LOGE("Error while calling listen()!");
+		return (void *)-1;
+	}
+	clifd[0] = accept(listenfd, NULL, NULL);
+	if (clifd[0] < 0) {
+		LOGE("Failed to accept client 0!");
+		return (void *)-1;
+	}
+
+	char buf[1000] = "";
+	if (send(clifd[0], "Ciao!", strlen("Ciao!"), 0) < 0) {
+		LOGE("Error sending to client 0, disconnected!");
+		return (void *)-1;
+	}
+	if (recv(clifd[0], buf, sizeof(buf), 0) < 0) {
+		LOGE("Error receiving from client 0, disconnected!");
+		return (void *)-1;
+	}
+	LOGI("Client says: %s", buf);
+	close(listenfd);
+	return 0;
+
 	/* struct server_data *server_data = (struct server_data *)arg;
 	server_data->server_tid			= pthread_self();
 	// creating socket and connecting to it
-#ifdef _WIN32
+	#ifdef _WIN32
 	WSADATA Data;
 	WSAStartup(MAKEWORD(2, 2), &Data);
-#elif defined(__linux__) || defined(ANDROID)
+	#elif defined(__linux__) || defined(ANDROID)
 	struct sockaddr_in address;
 	struct sockaddr client_addr[4];
 	int server_fd, opt = 1, addrlen = sizeof(address);
-#endif
+	#endif
 	server_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if ((server_fd < 0))
 		return NULL;
 
+		usleep(1000);
 	// setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
 	address.sin_family		= AF_INET;
 	address.sin_addr.s_addr = htonl(INADDR_ANY);
 	address.sin_port		= htons(server_data->PORT);
 	if (bind(server_fd, (const struct sockaddr *)&address, sizeof(struct sockaddr_in))) {
 		LOGE("Error binding to socket");
-		exit(-1);
+		exit((void*)-1);
 	}
 
 	srand(time(NULL));
@@ -56,7 +97,7 @@ void *server_main(void *arg) {
 	clientfd[0] = accept(server_fd, NULL, NULL); // also this fails on android because the port is not 5555
 	if (clientfd[0] < 0) {
 		LOGE("Error in accepting client 1");
-		exit(-1);
+		exit((void*)-1);
 	}
 	LOGI("Client %i connected", clientfd[0]);
 	read(clientfd[0], (char *)&server_data->data.users[1], sizeof(server_data->data.users[1]));
@@ -64,7 +105,7 @@ void *server_main(void *arg) {
 	clientfd[1] = accept(server_fd, NULL, NULL);
 	if (clientfd[1] < 0) {
 		LOGE("Error in accepting client 2");
-		exit(-1);
+		exit((void*)-1);
 	}
 	read(clientfd[1], (char *)&server_data->data.users[2], sizeof(server_data->data.users[2]));
 	LOGI("Client %i connected", clientfd[1]);
@@ -112,10 +153,10 @@ void *communication(void *arg) { // communicating server_data->data with the cli
 							 
 									 // check if client has permission to play
 									 if (server_data->data.turn == client_id) {
-										 server_data->data.click_position[0] = -1;
-										 server_data->data.click_position[1] = -1;
+										 server_data->data.click_position[0] = (void*)-1;
+										 server_data->data.click_position[1] = (void*)-1;
 									 }																																																												   // accepting click_position only from player's turn client
-									 if (server_data->data.click_position[0] != -1 && server_data->data.click_position[1] != -1 && server_data->data.game_grid[server_data->data.click_position[0]][server_data->data.click_position[1]] == 0 && server_data->data.is_game_over == 0) { // handling click_positions
+									 if (server_data->data.click_position[0] != (void*)-1 && server_data->data.click_position[1] != (void*)-1 && server_data->data.game_grid[server_data->data.click_position[0]][server_data->data.click_position[1]] == 0 && server_data->data.is_game_over == 0) { // handling click_positions
 										 if (server_data->data.turn)
 											 server_data->data.game_grid[server_data->data.click_position[0]][server_data->data.click_position[1]] = 1;
 										 else

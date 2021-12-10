@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-int client_connect(char *IP_ADDRESS, int PORT, SOCK *sock);
+int client_connect(char *IP_ADDRESS, int PORT, SOCK *sockfd);
 void *client_comm(void *arg);
 
 #endif // __CLIENT_H__

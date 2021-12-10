@@ -27,8 +27,12 @@ int main() {
 		return 0;
 	else if (data.game_mode == 1 || data.game_mode == 2) {
 		pthread_create(&tid[2], 0, server_main, &server);
-		while (client_connect(server.IP_ADDRESS, server.PORT, &data.sock))
+		usleep(100000);
+		while (client_connect(server.IP_ADDRESS, server.PORT, &data.sockfd))
 			;
+		int ret = 0;
+		pthread_join(tid[2], (void *)&ret);
+		exit(ret);
 	}
 	if (data.game_mode == 2)
 		sprintf(data.users[0], "Me");
@@ -70,6 +74,6 @@ void *window_main(void *arg) {
 	game_running = 0;
 	// end of the program
 	CloseWindow();
-	close(data->sock);
+	// close(data->sockfd);
 	return 0;
 }
