@@ -45,35 +45,111 @@ int client_connect(char *IP_ADDRESS, int PORT, SOCK *sockfd) { // connect to the
 		LOGE("Connection to %s on port %i failed!", IP_ADDRESS, PORT);
 		exit(-1);
 	}
+	return 0;
+}
 
-	/* #ifdef _WIN32
-	WSADATA Data;
-	WSAStartup(MAKEWORD(2, 2), &Data);
-#endif
-	struct sockaddr_in server_id;
-	inet_pton(AF_INET, IP_ADDRESS, &server_id.sin_addr);
-	server_id.sin_family = AF_INET;
-	server_id.sin_port	 = htons(PORT);
-	*sock				 = socket(AF_INET, SOCK_STREAM, 0);
-	if (*sock < 0)
+int client_recv_data(struct client_data *data) {
+	// receiving normal variables
+	/* if (recv(data->sockfd, &data->is_btn_pressed, sizeof(int), 0) < 0) {
+		LOGE("Receive error, server could be offline.");
 		return -1;
-	return connect(*sock, (struct sockaddr *)&server_id, sizeof(server_id)); */
+	} */
+	// if (recv(data->sockfd, &data->is_game_over, sizeof(int), 0) < 0) {
+	// 	LOGE("Receive error, server could be offline.");
+	// 	return -1;
+	// }
+	/* if (recv(data->sockfd, &data->ready, sizeof(int), 0) < 0) {
+		LOGE("Receive error, server could be offline.");
+		return -1;
+	} */
+	// if (recv(data->sockfd, &data->turn, sizeof(int), 0) < 0) {
+	// 	LOGE("Receive error, server could be offline.");
+	// 	return -1;
+	// }
+	// if (recv(data->sockfd, &data->user_id, sizeof(int), 0) < 0) {
+	// 	LOGE("Receive error, server could be offline.");
+	// 	return -1;
+	// }
+	// if (recv(data->sockfd, &data->bot_hardness, sizeof(int), 0) < 0) {
+	// 	LOGE("Receive error, server could be offline.");
+	// 	return -1;
+	// }
+	/* if (recv(data->sockfd, &data->game_mode, sizeof(int), 0) < 0) {
+		LOGE("Receive error, server could be offline.");
+		return -1;
+	} */
+
+	// receiving arrays
+	for (int i = 0; i < 3; i++)
+		for (int j = 0; j < 3; j++)
+			if (recv(data->sockfd, &data->game_grid[i][j], sizeof(int), 0) < 0) {
+				LOGE("Receive error, server could be offline.");
+				return -1;
+			}
+	// for (int i = 0; i < 2; i++) {
+	// 	if (recv(data->sockfd, &data->click_position[i], sizeof(int), 0) < 0) {
+	// 		LOGE("Receive error, server could be offline.");
+	// 		return -1;
+	// 	}
+	// 	if (recv(data->sockfd, &data->winsP[i], sizeof(int), 0) < 0) {
+	// 		LOGE("Receive error, server could be offline.");
+	// 		return -1;
+	// 	}
+	// }
+	// for (int i = 1; i < MAX_CLI; i++)
+	// 	if (recv(data->sockfd, &data->users[i], sizeof(data->users[i]), 0) < 0) {
+	// 		LOGE("Receive error, server could be offline.");
+	// 		return -1;
+	// 	}
+	return 0;
+}
+
+int client_send_data(struct client_data *data) {
+	// receiving normal variables
+	if (send(data->sockfd, &data->ready, sizeof(int), 0) < 0) {
+		LOGE("Receive error, server could be offline.");
+		return -1;
+	}
+	/* if (send(data->sockfd, &data->bot_hardness, sizeof(int), 0) < 0) {
+		LOGE("Receive error, server could be offline.");
+		return -1;
+	} */
+
+	// sending arrays
+	// for (int i = 0; i < 2; i++)
+	if (send(data->sockfd, &data->click_position, sizeof(int) * 2, 0) < 0) {
+		LOGE("Receive error, server could be offline.");
+		return -1;
+	}
 	return 0;
 }
 
 void *client_comm(void *arg) { // communicating data with the server (mostly receiving)
 	struct client_data *data = (struct client_data *)arg;
-	LOGW("BEFORE");
-	print_data(data);
-	if (recv(data->sockfd, data, sizeof(struct client_data), 0) < 0) {
-		LOGE("Receive error, server could be offline.");
-		exit(-1);
-	}
-	LOGW("AFTER");
-	print_data(data);
-	if (send(data->sockfd, "yes", strlen("yes"), 0) < 0) {
-		LOGE("Send error, server could be offline.");
-		exit(-1);
+
+	// if (send(data->sockfd, data->users[0], strlen(data->users[0]), 0) < 0) {
+	// 	LOGE("Failed to send username to server!");
+	// 	return (void *)-1;
+	// }
+
+	while (game_running) {
+		// LOGW("BEFORE");
+		// print_data(data);
+		if (client_recv_data(data) < 0) {
+			LOGE("Receive error: server could be offline!");
+			return (void *)-1;
+		}
+		if (data->turn == data->user_id) {
+			data->click_position[0] = -1; // set click only if it's client's turn
+			data->click_position[1] = -1;
+		}
+		if (client_send_data(data) < 0) {
+			LOGE("Send error: server could be offline!");
+			return (void *)-1;
+		}
+
+		// LOGW("AFTER");
+		// print_data(data);
 	}
 	/* // initializing the game
 	struct client_data *data = (struct client_data *)arg;
@@ -83,7 +159,7 @@ void *client_comm(void *arg) { // communicating data with the server (mostly rec
 	read(data->sockfd, (char *)&data->user_id, sizeof(data->user_id));
 	if (data->user_id < 0) {
 		LOGE("user_id %d\n", data->user_id);
-		exit(-1);
+		return -1;
 	}
 	LOGI("user_id: %d", data->user_id);
 	// communication loop

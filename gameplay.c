@@ -53,8 +53,9 @@ int checkwinner(struct client_data *data) { // check if someone wins7
 }
 
 void end_server_game(int winner, struct client_data *data) { // resetting the game and update variables
-	for (int i = 0; i < 9; i++)
-		data->game_grid[i / 3][i % 3] = 0;
+	for (int i = 0; i < 3; i++)
+		for (int j = 0; j < 3; j++)
+			data->game_grid[i][j] = 0;
 	if (winner == 1)
 		data->winsP[0]++;
 	else if (winner == 2)

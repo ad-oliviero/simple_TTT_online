@@ -4,6 +4,7 @@
 #include "../lib/raylib/src/raylib.h"
 
 #define THICKNESS 3.0f
+#define MAX_CLI 4
 extern int SCR_WIDTH;
 extern int SCR_HEIGHT;
 #define BLOCK SCR_WIDTH / 3

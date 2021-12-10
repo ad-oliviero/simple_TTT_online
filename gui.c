@@ -126,10 +126,10 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 			if (GuiButton(((Rectangle){5, 30, 150, 40}), "Host")) {
 				selection_step++;
 				game_hosting = 1;
-			}												 /* else if ((GuiButton((Rectangle){165, 30, 150, 40}), "Join")) {
-															   selection_step += 2;
-															   game_hosting = 2;
-														   } */
+			} else if ((GuiButton((Rectangle){165, 30, 150, 40}, "Join"))) {
+				selection_step += 2;
+				game_hosting = 2;
+			}
 		} else if (selection_step == 2 && game_hosting == 1) // hosting multi player
 		{
 			int nickbox_selected = CheckCollisionPointRec(mouse_pos, nickBox);

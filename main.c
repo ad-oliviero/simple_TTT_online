@@ -12,6 +12,11 @@
 #include <string.h>
 #include <unistd.h>
 
+// #define RAYGUI_IMPLEMENTATION
+// #define RAYGUI_SUPPORT_ICONS
+// #define RAYGUI_STATIC
+#include "lib/raylib/src/extras/raygui.h"
+
 int game_running = 0;
 
 int main() {
@@ -39,12 +44,13 @@ int main() {
 		sprintf(data.users[0], "Me");
 	game_running = 1;
 	pthread_create(&t[0], 0, client_comm, &data);
-	// pthread_create(&t[1], 0, window_main, &data); // android does not like a separate thread to draw to the screen
+	pthread_create(&t[1], 0, window_main, &data); // android does not like a separate thread to draw to the screen
 	if (data.game_mode == 2)
 		pthread_create(&t[3], 0, bot_main, NULL);
-	// pthread_join(t[1], NULL);
-	window_main(&data);
+	pthread_join(t[1], NULL);
+	// window_main(&data);
 	close(data.sockfd);
+	close(server.data.sockfd);
 	return 0;
 }
 
@@ -76,6 +82,5 @@ void *window_main(void *arg) {
 	game_running = 0;
 	// end of the program
 	CloseWindow();
-	// close(data->sockfd);
 	return 0;
 }

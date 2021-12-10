@@ -14,7 +14,6 @@
 #include <string.h>
 #include <sys/syscall.h>
 #include <sys/types.h>
-#define MAX_CLI 4
 
 int ready_check[MAX_CLI];
 extern int game_running;
@@ -45,7 +44,7 @@ void *server_main(void *arg) {
 		LOGE("Error while calling listen()!");
 		return (void *)-1;
 	}
-	for (int i = 0; i < 2 /* MAX_CLI */; i++) {
+	for (int i = 0; i < 1 /* MAX_CLI */; i++) {
 		servdata->clifd[i]	= accept(listenfd, NULL, NULL);
 		servdata->thread_id = i;
 		if (servdata->clifd[i] < 0) {
@@ -57,93 +56,131 @@ void *server_main(void *arg) {
 	pthread_join(t[0], NULL);
 	close(listenfd);
 	return 0;
+}
 
-	/* struct server_data *server_data = (struct server_data *)arg;
-	server_data->server_tid			= pthread_self();
-	// creating socket and connecting to it
-	#ifdef _WIN32
-	WSADATA Data;
-	WSAStartup(MAKEWORD(2, 2), &Data);
-	#elif defined(__linux__) || defined(ANDROID)
-	struct sockaddr_in address;
-	struct sockaddr client_addr[4];
-	int server_fd, opt = 1, addrlen = sizeof(address);
-	#endif
-	server_fd = socket(AF_INET, SOCK_STREAM, 0);
-	if ((server_fd < 0))
-		return NULL;
+int server_send_data(struct client_data *data, SOCK *sockfd, int clid) {
+	// sending normal variables
+	/* if (send(*sockfd, &data->is_btn_pressed, sizeof(int), 0) < 0) {
+		LOGE("Error sending to client %i, disconnected!", clid);
+		return -1;
+	} */
+	// if (send(*sockfd, &data->is_game_over, sizeof(int), 0) < 0) {
+	// 	LOGE("Error sending to client %i, disconnected!", clid);
+	// 	return -1;
+	// }
+	/* if (send(*sockfd, &data->is_game_over, sizeof(int), 0) < 0) {
+		 LOGE("Error sending to client %i, disconnected!", clid);
+		 return (void *)-1;
+	 } */
+	/* if (send(*sockfd, &data->ready, sizeof(int), 0) < 0) {
+		LOGE("Error sending to client %i, disconnected!", clid);
+		return -1;
+	} */
+	// if (send(*sockfd, &data->turn, sizeof(int), 0) < 0) {
+	// 	LOGE("Error sending to client %i, disconnected!", clid);
+	// 	return -1;
+	// }
+	// if (send(*sockfd, &data->user_id, sizeof(int), 0) < 0) {
+	// 	LOGE("Error sending to client %i, disconnected!", clid);
+	// 	return -1;
+	// }
+	// if (send(*sockfd, &data->bot_hardness, sizeof(int), 0) < 0) {
+	// 	LOGE("Error sending to client %i, disconnected!", clid);
+	// 	return -1;
+	// }
+	/* if (send(*sockfd, &data->game_mode, sizeof(int), 0) < 0) {
+		LOGE("Error sending to client %i, disconnected!", clid);
+		return -1;
+	} */
 
-		usleep(1000);
-	// setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
-	address.sin_family		= AF_INET;
-	address.sin_addr.s_addr = htonl(INADDR_ANY);
-	address.sin_port		= htons(server_data->PORT);
-	if (bind(server_fd, (const struct sockaddr *)&address, sizeof(struct sockaddr_in))) {
-		LOGE("Error binding to socket");
-		exit((void*)-1);
+	// sending arrays
+	for (int i = 0; i < 3; i++)
+		for (int j = 0; j < 3; j++)
+			if (send(*sockfd, &data->game_grid[i][j], sizeof(int), 0) < 0) {
+				LOGE("Error sending to client %i, disconnected!", clid);
+				return -1;
+			}
+	// for (int i = 0; i < 2; i++) {
+	// 	if (send(*sockfd, &data->click_position[i], sizeof(int), 0) < 0) {
+	// 		LOGE("Error sending to client %i, disconnected!", clid);
+	// 		return -1;
+	// 	}
+	// 	if (send(*sockfd, &data->winsP[i], sizeof(int), 0) < 0) {
+	// 		LOGE("Error sending to client %i, disconnected!", clid);
+	// 		return -1;
+	// 	}
+	// }
+	// for (int i = 1; i < MAX_CLI; i++)
+	// 	if (send(*sockfd, &data->users[i], strlen(data->users[i]), 0) < 0) {
+	// 		LOGE("Error sending to client %i, disconnected!", clid);
+	// 		return -1;
+	// 	}
+	return 0;
+}
+
+int server_recv_data(struct client_data *data, SOCK *sockfd, int clid) {
+	// sending normal variables
+	if (recv(*sockfd, &ready_check[clid], sizeof(int), 0) < 0) {
+		LOGE("Error sending to client %i, disconnected!", clid);
+		return -1;
 	}
+	/* if (recv(*sockfd, &data->bot_hardness, sizeof(int), 0) < 0) {
+		LOGE("Error sending to client %i, disconnected!", clid);
+		return -1;
+	} */
 
-	srand(time(NULL));
-	client_count = rand() % 2;
-	listen(server_fd, 10);
-
-	// accepting clients
-	clientfd[0] = accept(server_fd, NULL, NULL); // also this fails on android because the port is not 5555
-	if (clientfd[0] < 0) {
-		LOGE("Error in accepting client 1");
-		exit((void*)-1);
+	// receiving arrays
+	// for (int i = 0; i < 2; i++)
+	if (recv(*sockfd, &data->click_position, sizeof(int) * 2, 0) < 0) {
+		LOGE("Error sending to client %i, disconnected!", clid);
+		return -1;
 	}
-	LOGI("Client %i connected", clientfd[0]);
-	read(clientfd[0], (char *)&server_data->data.users[1], sizeof(server_data->data.users[1]));
-
-	clientfd[1] = accept(server_fd, NULL, NULL);
-	if (clientfd[1] < 0) {
-		LOGE("Error in accepting client 2");
-		exit((void*)-1);
-	}
-	read(clientfd[1], (char *)&server_data->data.users[2], sizeof(server_data->data.users[2]));
-	LOGI("Client %i connected", clientfd[1]);
-
-	// exit(0);
-
-	// initializing connection
-	write(clientfd[0], (char *)&server_data->data.users, sizeof(server_data->data.users));
-	write(clientfd[0], (char *)&client_count, sizeof(client_count));
-	client_count = !client_count;
-	write(clientfd[1], (char *)&server_data->data.users, sizeof(server_data->data.users));
-	write(clientfd[1], (char *)&client_count, sizeof(client_count));
-
-	// creating and joining threads
-	while (server_data->thread_id <= 1) {
-		server_data->client_running = 0;
-		pthread_create(&server_tid[server_data->thread_id], 0, communication, server_data);
-		while (server_data->client_running == 0)
-			;
-		server_data->thread_id++;
-	}
-	for (int i = 0; i <= 1; i++)
-		pthread_join(server_tid[i], NULL);
-	return 0; */
+	return 0;
 }
 
 void *communication(void *arg) {
 	struct server_data *servdata = (struct server_data *)arg;
-	int clid					 = servdata->thread_id;
+	servdata->data.user_id		 = servdata->thread_id;
 	servdata->client_running	 = 1;
 	char buf[1000]				 = "";
-	if (send(servdata->clifd[clid], "Ciao!", strlen("Ciao!"), 0) < 0) {
-		LOGE("Error sending to client %i, disconnected!", clid);
-		return (void *)-1;
+	servdata->data.turn			 = 6;
+
+	// if (recv(servdata->clifd[servdata->data.user_id], servdata->data.users[servdata->data.user_id+1], sizeof(servdata->data.users[servdata->data.user_id+1]), 0) < 0) {
+	// 	LOGE("Receiving username from client %i failed!", servdata->data.user_id);
+	// 	return (void *)-1;
+	// }
+
+	while (game_running) {
+		servdata->data.winner = checkwinner(&servdata->data);
+		if (server_send_data(&servdata->data, &servdata->clifd[servdata->data.user_id], servdata->data.user_id) < 0) {
+			LOGE("Sending game data to client failed!");
+			return (void *)-1;
+		}
+
+		if (server_recv_data(&servdata->data, &servdata->clifd[servdata->data.user_id], servdata->data.user_id) < 0) {
+			LOGE("Receiving game data from client failed!");
+			return (void *)-1;
+		}
+
+		LOGI("pos: %i %i\nturn: %i", servdata->data.click_position[0], servdata->data.click_position[1], servdata->data.turn);
+
+		if (servdata->data.click_position[0] != -1 && servdata->data.click_position[0] != -1 &&
+			servdata->data.game_grid[servdata->data.click_position[0]][servdata->data.click_position[1]] == 0 &&
+			servdata->data.is_game_over == 0) { // handling click position
+			if (servdata->data.turn)
+				servdata->data.game_grid[servdata->data.click_position[0]][servdata->data.click_position[1]] = 1;
+			else
+				servdata->data.game_grid[servdata->data.click_position[0]][servdata->data.click_position[1]] = 2;
+			servdata->data.turn = !servdata->data.turn;
+		}
+		if (servdata->data.turn != servdata->data.user_id) {
+			servdata->data.click_position[0] = -1;
+			servdata->data.click_position[1] = -1;
+		}
+		if (ready_check[0] && ready_check[1])
+			end_server_game(servdata->data.winner, &servdata->data); // checks if all clients are ready to continue
 	}
-	if (recv(servdata->clifd[clid], buf, sizeof(buf), 0) < 0) {
-		LOGE("Error receiving from client %i, disconnected!", clid);
-		return (void *)-1;
-	}
-	if (strcmp(buf, "yes") != 0) {
-		LOGE("Connection with the client failed!");
-		return (void *)-1;
-	}
-	close(servdata->clifd[clid]);
+	close(servdata->clifd[servdata->data.user_id]);
 	return 0;
 	// communicating server_data->data with the client (mostly sending)
 	/* struct server_data *server_data = (struct server_data *)arg;
