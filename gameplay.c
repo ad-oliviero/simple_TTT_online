@@ -1,8 +1,7 @@
 #ifndef __SERVER__
-	#include "lib/raylib/src/extras/raygui.h"
-	#include "lib/raylib/src/raylib.h"
+	#include "lib/raygui/src/raygui.h"
+	#include "lib/raylib/include/raylib.h"
 #endif // __SERVER__
-#include "include/gui.h"
 #include "include/main.h"
 #include <stdio.h>
 #include <unistd.h>

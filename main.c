@@ -5,7 +5,7 @@
 #include "include/gui.h"
 #include "include/server.h"
 #include "include/shapes.h"
-#include "lib/raylib/src/raylib.h"
+#include "lib/raylib/include/raylib.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,7 +22,6 @@ int main() {
 	data.user_id			  = -1;
 	server.PORT				  = 5555;
 	data.game_mode			  = join_window(server.IP_ADDRESS, &server.PORT, &data);
-
 	if (data.game_mode < 0)
 		return 0;
 	else if (data.game_mode == 1 || data.game_mode == 2) {
@@ -32,26 +31,21 @@ int main() {
 	}
 	if (data.game_mode == 2)
 		sprintf(data.users[0], "Me");
-	game_running = 1;
 	pthread_create(&tid[0], 0, client_comm, &data);
-	// pthread_create(&tid[1], 0, window_main, &data); // android does not like a separate thread to draw to the screen
+	pthread_create(&tid[1], 0, window_main, &data);
 	if (data.game_mode == 2)
 		pthread_create(&tid[3], 0, bot_main, NULL);
-	// pthread_join(tid[1], NULL);
-	window_main(&data);
+	for (int i = 0; i < 3; i++)
+		pthread_join(tid[i], NULL);
 	return 0;
 }
 
 void *window_main(void *arg) {
 	struct client_data *data = (struct client_data *)arg;
-#ifdef ANDROID
-#else
 	SetTraceLogLevel(LOG_NONE);
 	SetConfigFlags(FLAG_MSAA_4X_HINT);
 	InitWindow(SCR_WIDTH, SCR_HEIGHT, TextFormat("Simple TTT - %s", data->users[0]));
 	SetTargetFPS(GetMonitorRefreshRate(0));
-#endif
-
 	initHitBox();
 	// main game loop
 	while (!WindowShouldClose() && game_running) {
@@ -59,18 +53,18 @@ void *window_main(void *arg) {
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 		grid();
-		DrawCircle(GetMousePosition().x, GetMousePosition().y, 50, BLACK);
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
 				shape((int[2]){i, j}, &data->game_grid[i][j]);
 		if (data->is_game_over == 1)
 			end_client_game(data);
 		matchInfo(data);
+		// DrawFPS(10, 10);
 		EndDrawing();
 	}
 	game_running = 0;
 	// end of the program
 	CloseWindow();
 	close(data->sock);
-	return 0;
+	exit(0);
 }

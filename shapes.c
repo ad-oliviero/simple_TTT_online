@@ -1,6 +1,6 @@
 #include "include/client.h"
 #include "include/main.h"
-#include "lib/raylib/src/raylib.h"
+#include "lib/raylib/include/raylib.h"
 
 Rectangle game[3][3];
 

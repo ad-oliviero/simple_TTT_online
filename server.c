@@ -17,7 +17,6 @@
 
 int clientfd[4], server_fd;
 int ready_check[4];
-int client_count = 0;
 extern int game_running;
 pthread_t server_tid[128];
 
@@ -26,57 +25,39 @@ void *communication(void *);
 void *server_main(void *arg) {
 	struct server_data *server_data = (struct server_data *)arg;
 	server_data->server_tid			= pthread_self();
+
+	// int PORT = *(int *)PORT_arg;
 	// creating socket and connecting to it
 #ifdef _WIN32
 	WSADATA Data;
 	WSAStartup(MAKEWORD(2, 2), &Data);
-#elif defined(__linux__) || defined(ANDROID)
-	struct sockaddr_in address;
-	struct sockaddr client_addr[4];
-	int server_fd, opt = 1, addrlen = sizeof(address);
 #endif
+	struct sockaddr_in address;
+	int opt = 1, addrlen = sizeof(address);
 	server_fd = socket(AF_INET, SOCK_STREAM, 0);
-	if ((server_fd < 0))
+	setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
+	address.sin_family		= AF_INET;
+	address.sin_addr.s_addr = INADDR_ANY;
+	address.sin_port		= htons(server_data->PORT);
+	if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
 		return NULL;
 
-	// setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
-	address.sin_family		= AF_INET;
-	address.sin_addr.s_addr = htonl(INADDR_ANY);
-	address.sin_port		= htons(server_data->PORT);
-	if (bind(server_fd, (const struct sockaddr *)&address, sizeof(struct sockaddr_in))) {
-		LOGE("Error binding to socket");
-		exit(-1);
-	}
-
-	srand(time(NULL));
-	client_count = rand() % 2;
-	listen(server_fd, 10);
-
 	// accepting clients
-	clientfd[0] = accept(server_fd, NULL, NULL); // also this fails on android because the port is not 5555
-	if (clientfd[0] < 0) {
-		LOGE("Error in accepting client 1");
-		exit(-1);
-	}
-	LOGI("Client %i connected", clientfd[0]);
+	listen(server_fd, 3);
+	clientfd[0] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
 	read(clientfd[0], (char *)&server_data->data.users[1], sizeof(server_data->data.users[1]));
 
-	clientfd[1] = accept(server_fd, NULL, NULL);
-	if (clientfd[1] < 0) {
-		LOGE("Error in accepting client 2");
-		exit(-1);
-	}
+	listen(server_fd, 3);
+	clientfd[1] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
 	read(clientfd[1], (char *)&server_data->data.users[2], sizeof(server_data->data.users[2]));
-	LOGI("Client %i connected", clientfd[1]);
-
-	// exit(0);
 
 	// initializing connection
+	listen(server_fd, 3);
 	write(clientfd[0], (char *)&server_data->data.users, sizeof(server_data->data.users));
-	write(clientfd[0], (char *)&client_count, sizeof(client_count));
-	client_count = !client_count;
+	write(clientfd[0], (char *)&server_data->data.turn, 4);
+	server_data->data.turn++;
 	write(clientfd[1], (char *)&server_data->data.users, sizeof(server_data->data.users));
-	write(clientfd[1], (char *)&client_count, sizeof(client_count));
+	write(clientfd[1], (char *)&server_data->data.turn, 4);
 
 	// creating and joining threads
 	while (server_data->thread_id <= 1) {
@@ -90,6 +71,12 @@ void *server_main(void *arg) {
 		pthread_join(server_tid[i], NULL);
 	return 0;
 }
+
+// void *accept_connections(void *arg) {
+// 	listen(server_fd, 3);
+// 	clientfd[0] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
+// 	read(clientfd[0], (char *)&server_data->data.users[1], sizeof(server_data->data.users[1]));
+// }
 
 void *communication(void *arg) { // communicating server_data->data with the client (mostly sending)
 	struct server_data *server_data = (struct server_data *)arg;
