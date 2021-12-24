@@ -1,11 +1,11 @@
-#include "lib/raylib/include/raylib.h"
+#include "lib/raylib/src/raylib.h"
 #define RAYGUI_IMPLEMENTATION
 #define RAYGUI_SUPPORT_ICONS
 #define RAYGUI_STATIC
 #include "include/client.h"
 #include "include/main.h"
 #include "include/server.h"
-#include "lib/raygui/src/raygui.h"
+#include "lib/raylib/src/extras/raygui.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,8 +53,8 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 	Rectangle ipBox	  = {MeasureText("IP:", 20) + 15, 40, 267, 30};
 	Rectangle portBox = {MeasureText("Port:", 20) + 15, 40, 242, 30};
 	while (!game_running && !WindowShouldClose()) {
-		char *clipboard = (char *)GetClipboardText();
-		clipboard[16]	= 0;
+		// char *clipboard = (char *)GetClipboardText();
+		// clipboard[16]	= 0;
 		BeginDrawing();
 		if (selection_step == 0) // starting selection
 		{
@@ -86,10 +86,10 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 		{
 			int nickbox_selected = CheckCollisionPointRec(GetMousePosition(), nickBox);
 			int portbox_selected = CheckCollisionPointRec(GetMousePosition(), portBox);
-			if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && nickbox_selected)
-				sprintf(data->users[0], "%s", clipboard);
-			else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && portbox_selected)
-				sprintf(portchar, "%s", clipboard);
+			// if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && nickbox_selected)
+			// 	sprintf(data->users[0], "%s", clipboard);
+			// else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && portbox_selected)
+			// 	sprintf(portchar, "%s", clipboard);
 			if (GuiTextBox(nickBox, data->users[0], 20, nickbox_selected) || GuiTextBox(portBox, portchar, 20, portbox_selected)) {
 				*PORT = atoi(portchar);
 				sprintf(IP_ADDRESS, "127.0.0.1");
@@ -102,10 +102,10 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 		{
 			int nickbox_selected = CheckCollisionPointRec(GetMousePosition(), nickBox);
 			int ipbox_selected	 = CheckCollisionPointRec(GetMousePosition(), ipBox);
-			if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && nickbox_selected)
-				sprintf(data->users[0], "%s", clipboard);
-			else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && ipbox_selected)
-				sprintf(IP_ADDRESS, "%s", clipboard);
+			// if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && nickbox_selected)
+			// 	sprintf(data->users[0], "%s", clipboard);
+			// else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && ipbox_selected)
+			// 	sprintf(IP_ADDRESS, "%s", clipboard);
 			if (GuiTextBox(nickBox, data->users[0], 20, nickbox_selected) || GuiTextBox(ipBox, IP_ADDRESS, 16, ipbox_selected)) {
 				if (strlen(IP_ADDRESS) <= 1)
 					sprintf(IP_ADDRESS, "127.0.0.1");

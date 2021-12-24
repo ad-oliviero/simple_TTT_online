@@ -5,7 +5,7 @@
 #include "include/gui.h"
 #include "include/server.h"
 #include "include/shapes.h"
-#include "lib/raylib/include/raylib.h"
+#include "lib/raylib/src/raylib.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,39 +32,32 @@ int main() {
 	if (data.game_mode == 2)
 		sprintf(data.users[0], "Me");
 	pthread_create(&tid[0], 0, client_comm, &data);
-	pthread_create(&tid[1], 0, window_main, &data);
+	// pthread_create(&tid[1], 0, window_main, &data);
 	if (data.game_mode == 2)
 		pthread_create(&tid[3], 0, bot_main, NULL);
-	for (int i = 0; i < 3; i++)
-		pthread_join(tid[i], NULL);
-	return 0;
-}
 
-void *window_main(void *arg) {
-	struct client_data *data = (struct client_data *)arg;
+	// main window
 	SetTraceLogLevel(LOG_NONE);
 	SetConfigFlags(FLAG_MSAA_4X_HINT);
-	InitWindow(SCR_WIDTH, SCR_HEIGHT, TextFormat("Simple TTT - %s", data->users[0]));
+	InitWindow(SCR_WIDTH, SCR_HEIGHT, TextFormat("Simple TTT - %s", data.users[0]));
 	SetTargetFPS(GetMonitorRefreshRate(0));
 	initHitBox();
-	// main game loop
 	while (!WindowShouldClose() && game_running) {
-		place(data);
+		place(&data);
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 		grid();
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
-				shape((int[2]){i, j}, &data->game_grid[i][j]);
-		if (data->is_game_over == 1)
-			end_client_game(data);
-		matchInfo(data);
-		// DrawFPS(10, 10);
+				shape((int[2]){i, j}, &data.game_grid[i][j]);
+		if (data.is_game_over == 1)
+			end_client_game(&data);
+		matchInfo(&data);
 		EndDrawing();
 	}
-	game_running = 0;
 	// end of the program
+	game_running = 0;
 	CloseWindow();
-	close(data->sock);
-	exit(0);
+	close(data.sock);
+	return 0;
 }

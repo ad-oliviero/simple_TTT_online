@@ -1,9 +1,11 @@
 #include "include/bot.h"
 #include "include/client.h"
+#include "include/gameplay.h"
 #include "include/main.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 extern int game_running;
@@ -24,18 +26,16 @@ void *bot_main() {
 	return NULL;
 }
 
-void bot_easy(struct client_data *data) {
-	for (int i = 0; i < 9 && data->click_position[0] < 0 && data->click_position[0] < 0; i++) {
-		int rand_num = rand() % 8;
-		if (data->game_grid[rand_num / 3][rand_num % 3] == 0) {
-			data->click_position[0] = rand_num / 3;
-			data->click_position[1] = rand_num % 3;
+void minimax(struct client_data *data, int *best_score, int player) { // needs an actual implementation
+	while (data->click_position[0] < 0 && data->click_position[0] < 0) {
+		int rand_num[2] = {rand() % 3, rand() % 3};
+		if (data->game_grid[rand_num[0]][rand_num[1]] == 0) {
+			data->click_position[0] = rand_num[0];
+			data->click_position[1] = rand_num[1];
 		}
 	}
+	return;
 }
-void bot_medium(struct client_data *data) { bot_easy(data); }
-void bot_hard(struct client_data *data) { bot_medium(data); }
-void bot_impossible(struct client_data *data) { bot_hard(data); }
 
 void *bot_ai(void *arg) {
 	struct client_data *data = (struct client_data *)arg;
@@ -43,25 +43,10 @@ void *bot_ai(void *arg) {
 	while (game_running) {
 		if (!data->is_game_over && !data->turn) {
 			usleep(rand() % 100000);
-			switch (data->bot_hardness) {
-			case 1:
-				bot_medium(data);
-				break;
-
-			case 2:
-				bot_hard(data);
-				break;
-
-			case 3:
-				bot_impossible(data);
-				break;
-
-			default:
-				bot_easy(data);
-				break;
-			}
+			int best_score = -1;
+			minimax(data, &best_score, data->turn);
 		}
-		data->ready = (data->is_game_over == 1);
+		data->ready = data->is_game_over;
 	}
 	game_running = 0;
 	return NULL;

@@ -1,6 +1,6 @@
 #ifndef __SERVER__
-	#include "lib/raygui/src/raygui.h"
-	#include "lib/raylib/include/raylib.h"
+	#include "lib/raylib/src/extras/raygui.h"
+	#include "lib/raylib/src/raylib.h"
 #endif // __SERVER__
 #include "include/main.h"
 #include <stdio.h>
@@ -20,7 +20,8 @@ void end_client_game(struct client_data *data) {
 		data->ready = 1;
 }
 
-int checkwinner(struct client_data *data) { // check if someone wins7
+// check if someone wins, returns 0 if no one wins, 1 if player 1 (X) wins, 2 if player 2 (O) wins, 3 if it's a draw
+int checkwinner(struct client_data *data) {
 	for (int i = 0; i < 3; i++) {
 		// raws
 		if (data->game_grid[i][0] == data->game_grid[i][1] && data->game_grid[i][1] == data->game_grid[i][2] && data->game_grid[i][0] != 0) {
