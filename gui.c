@@ -46,9 +46,10 @@ void grid() {
 int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 	int ret = -1, selection_step = 0, game_mode = -1, game_hosting = -1;
 	char portchar[16] = "5555";
-	SetTraceLogLevel(LOG_NONE);
-	InitWindow(320, 75, "Game Mode Selection");
-	SetTargetFPS(GetMonitorRefreshRate(0));
+	SetWindowTitle("Game Mode Selection");
+	// SetTraceLogLevel(LOG_NONE);
+	// InitWindow(320, 75, "Game Mode Selection");
+	// SetTargetFPS(GetMonitorRefreshRate(0));
 	Rectangle nickBox = {MeasureText("Nickname:", 20) + 15, 5, 200, 30};
 	Rectangle ipBox	  = {MeasureText("IP:", 20) + 15, 40, 267, 30};
 	Rectangle portBox = {MeasureText("Port:", 20) + 15, 40, 242, 30};
@@ -130,7 +131,7 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 		ClearBackground(RAYWHITE);
 		EndDrawing();
 	}
-	CloseWindow();
+	// CloseWindow();
 	return ret;
 }
 
