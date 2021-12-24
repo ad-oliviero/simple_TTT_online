@@ -50,7 +50,8 @@ debug_build: build
 debug_run: debug_build run
 
 android: CC = ../../android_toolchain_ARM_API30/bin/arm-linux-androideabi-gcc
-android: OBJ_FLAGS = -I. -I../lib/raylib/src -I../../raylib/src/external/android/native_app_glue -std=c99 -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wa,--noexecstack -Wformat -Werror=format-security -no-canonical-prefixes -DANDROID -D__ANDROID_API__=30 --sysroot=../../android_toolchain_ARM_API30/sysroot
+android: OBJ_FLAGS = -I. -I../lib/raylib/src -I../../raylib/src/external/android/native_app_glue -std=c99 -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wa,--noexecstack -Wformat -Werror=format-security -no-canonical-prefixes -D__ANDROID_API__=30 --sysroot=../../android_toolchain_ARM_API30/sysroot
+android: CFLAGS = $(OBJ_FLAGS)
 android: main client gui shapes gameplay server bot
 android:
 	if [ ! -d "../obj/$(NAME)" ]; then mkdir ../obj/$(NAME); fi
