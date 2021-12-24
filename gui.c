@@ -103,7 +103,7 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 			if (GuiTextBox(nickBox, data->username, 20, nickbox_selected) || GuiTextBox(ipBox, IP_ADDRESS, 16, ipbox_selected)) {
 				if (strlen(IP_ADDRESS) <= 1)
 					sprintf(IP_ADDRESS, "127.0.0.1");
-				if (client_connect(IP_ADDRESS, 5555, &data->sock) != -1) {
+				if (client_connect(IP_ADDRESS, 5555, &data->sockfd) != -1) {
 					game_running = 1;
 					ret			 = 0;
 				} else {

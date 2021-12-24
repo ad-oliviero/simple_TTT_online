@@ -20,21 +20,20 @@ struct client_data {
 	int turn;
 	int winsP[2];
 	int winner;
-	int user_id;
+	int uid;
 	char users[4][32];
 	char username[32];
-	int bot_hardness;
 	int game_mode;
-	SOCK sock;
+	SOCK sockfd;
 };
 
 struct server_data {
 	char IP_ADDRESS[16];
 	int PORT;
-	long int server_tid;
 	int client_count;
-	long int client_tid[4];
 	int client_running;
+	int ready_check[4];
+	SOCK clifd[4];
 	struct client_data data;
 };
 

@@ -15,9 +15,9 @@ void *bot_main() {
 	pthread_t tid[3];
 	data.click_position[0] = -1;
 	data.click_position[1] = -1;
-	data.user_id		   = -1;
+	data.uid			   = -1;
 	sprintf(data.username, "CPU");
-	while (client_connect("127.0.0.1", 5555, &data.sock))
+	while (client_connect("127.0.0.1", 5555, &data.sockfd))
 		;
 	pthread_create(&tid[0], 0, client_comm, &data);
 	pthread_create(&tid[1], 0, bot_ai, &data);
@@ -45,7 +45,7 @@ void *bot_ai(void *arg) {
 			usleep(rand() % 100000);
 			minimax(data);
 		}
-		data->ready = data->is_game_over;
+		data->ready = 1;
 	}
 	game_running = 0;
 	return NULL;

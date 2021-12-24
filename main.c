@@ -18,7 +18,7 @@ int main() {
 	struct server_data *server = calloc(1, sizeof(struct server_data));
 	data->click_position[0]	   = -1;
 	data->click_position[1]	   = -1;
-	data->user_id			   = -1;
+	data->uid				   = -1;
 	server->PORT			   = 5555;
 	SetTraceLogLevel(LOG_NONE);
 	SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -30,7 +30,7 @@ int main() {
 		return 0;
 	else if (data->game_mode == 1 || data->game_mode == 2) {
 		pthread_create(&tid[2], 0, server_main, server);
-		while (client_connect(server->IP_ADDRESS, server->PORT, &data->sock))
+		while (client_connect(server->IP_ADDRESS, server->PORT, &data->sockfd))
 			;
 	}
 	if (data->game_mode == 2)
@@ -58,6 +58,6 @@ int main() {
 	// end of the program
 	game_running = 0;
 	CloseWindow();
-	close(data->sock);
+	close(data->sockfd);
 	return 0;
 }
