@@ -34,14 +34,14 @@ int main() {
 			;
 	}
 	if (data->game_mode == 2)
-		sprintf(data->users[0], "Me");
+		sprintf(data->username, "Me");
 	pthread_create(&tid[0], 0, client_comm, data);
 	if (data->game_mode == 2)
 		pthread_create(&tid[3], 0, bot_main, NULL);
 
 	// main window
 	initHitBox();
-	SetWindowTitle(TextFormat("Simple TTT - %s", data->users[0]));
+	SetWindowTitle(TextFormat("Simple TTT - %s", data->username));
 	while (!WindowShouldClose() && game_running) {
 		place(data);
 		BeginDrawing();

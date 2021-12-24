@@ -40,31 +40,19 @@ void *server_main(void *arg) {
 	address.sin_port		= htons(server_data->PORT);
 	if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
 		return NULL;
-
-	// accepting clients
 	listen(server_fd, 3);
-	clientfd[0] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
-	recv(clientfd[0], &server_data->data.users[1], sizeof(server_data->data.users[1]), 0);
 
-	listen(server_fd, 3);
-	clientfd[1] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
-	recv(clientfd[1], &server_data->data.users[2], sizeof(server_data->data.users[2]), 0);
-
-	// initializing connection
-	listen(server_fd, 3);
-	send(clientfd[0], &server_data->data.users, sizeof(server_data->data.users), 0);
-	send(clientfd[0], &server_data->data.turn, sizeof(server_data->data.turn), 0);
-	server_data->data.turn++;
-	send(clientfd[1], &server_data->data.users, sizeof(server_data->data.users), 0);
-	send(clientfd[1], &server_data->data.turn, sizeof(server_data->data.turn), 0);
-
-	// creating and joining threads
-	while (server_data->thread_id <= 1) {
+	// accepting clients and creating and joining threads
+	server_data->client_count = 0;
+	while (server_data->client_count < 2) {
+		clientfd[server_data->client_count] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
+		recv(clientfd[server_data->client_count], &server_data->data.users[server_data->client_count], sizeof(server_data->data.users[server_data->client_count]), 0);
+		send(clientfd[server_data->client_count], &server_data->client_count, sizeof(server_data->client_count), 0);
 		server_data->client_running = 0;
-		pthread_create(&server_tid[server_data->thread_id], 0, communication, server_data);
+		pthread_create(&server_tid[server_data->client_count], 0, communication, server_data);
 		while (server_data->client_running == 0)
 			;
-		server_data->thread_id++;
+		server_data->client_count++;
 	}
 	for (int i = 0; i <= 1; i++)
 		pthread_join(server_tid[i], NULL);
@@ -73,13 +61,14 @@ void *server_main(void *arg) {
 
 void *communication(void *arg) { // communicating server_data->data with the client (mostly sending)
 	struct server_data *server_data = (struct server_data *)arg;
-	int client_id					= server_data->thread_id;
+	int client_id					= server_data->client_count;
 	server_data->client_running		= 1;
 	while (game_running) {
 		// server_data->data.turn = !server_data->data.turn;
 		server_data->data.winner = checkwinner(&server_data->data);
 
 		// send server_data->data to client
+		send(clientfd[client_id], &server_data->data.users, sizeof(server_data->data.users), 0);
 		send(clientfd[client_id], &server_data->data.is_game_over, sizeof(server_data->data.is_game_over), 0);
 		send(clientfd[client_id], &server_data->data.turn, sizeof(server_data->data.turn), 0);
 		send(clientfd[client_id], &server_data->data.winsP, sizeof(server_data->data.winsP), 0);

@@ -22,6 +22,7 @@ struct client_data {
 	int winner;
 	int user_id;
 	char users[4][32];
+	char username[32];
 	int bot_hardness;
 	int game_mode;
 	SOCK sock;
@@ -31,7 +32,7 @@ struct server_data {
 	char IP_ADDRESS[16];
 	int PORT;
 	long int server_tid;
-	int thread_id;
+	int client_count;
 	long int client_tid[4];
 	int client_running;
 	struct client_data data;

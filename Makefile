@@ -40,7 +40,7 @@ bot:
 	$(CC) $(CFLAGS) -c -o $(SRC)/$@.o $(SRC)/$@.c	
 
 run:
-	$(SRC)/$(NAME) #&$(SRC)/$(NAME)
+	$(SRC)/$(NAME) &$(SRC)/$(NAME)
 
 clean:
 	rm $(NAME) *.o *.exe

@@ -30,13 +30,13 @@ void *client_comm(void *arg) { // communicating data with the server (mostly rec
 	// initializing the game
 	struct client_data *data = (struct client_data *)arg;
 	listen(data->sock, 1);
-	send(data->sock, &data->users[0], sizeof(data->users[0]), 0);
-	recv(data->sock, &data->users, sizeof(data->users), 0);
+	send(data->sock, &data->username, sizeof(data->username), 0);
 	recv(data->sock, &data->user_id, sizeof(data->user_id), 0);
 
 	// communication loop
 	while (game_running) {
 		// recv game data
+		recv(data->sock, &data->users, sizeof(data->users), 0);
 		recv(data->sock, &data->is_game_over, sizeof(data->is_game_over), 0);
 		recv(data->sock, &data->turn, sizeof(data->turn), 0);
 		recv(data->sock, &data->winsP, sizeof(data->winsP), 0);

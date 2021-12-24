@@ -9,9 +9,7 @@
 void end_client_game(struct client_data *data) {
 	DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, .8f)); // for obfuscation effect, idk how to use shaders or something
 	Rectangle restart_btn = {SCR_WIDTH / 5, SCR_HEIGHT / 3, SCR_WIDTH / 5 * 3, SCR_HEIGHT / 10};
-
-	if (GuiToggle(restart_btn, data->winner == 3 ? "Draw..." : (data->winner == 1 ? TextFormat("%s (X) WON!", data->users[1]) : TextFormat("%s (0) WON!", data->users[2])), data->ready))
-		data->ready = 1;
+	data->ready			  = GuiToggle(restart_btn, data->winner == 3 ? "Draw..." : (data->winner == 1 ? TextFormat("%s (X) WON!", data->users[0]) : TextFormat("%s (0) WON!", data->users[1])), data->ready);
 }
 
 // check if someone wins, returns 0 if no one wins, 1 if player 1 (X) wins, 2 if player 2 (O) wins, 3 if it's a draw

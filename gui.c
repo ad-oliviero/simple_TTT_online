@@ -81,10 +81,10 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 			int nickbox_selected = CheckCollisionPointRec(GetMousePosition(), nickBox);
 			int portbox_selected = CheckCollisionPointRec(GetMousePosition(), portBox);
 			if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && nickbox_selected)
-				sprintf(data->users[0], "%s", clipboard);
+				sprintf(data->username, "%s", clipboard);
 			else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && portbox_selected)
 				sprintf(portchar, "%s", clipboard);
-			if (GuiTextBox(nickBox, data->users[0], 20, nickbox_selected) || GuiTextBox(portBox, portchar, 20, portbox_selected)) {
+			if (GuiTextBox(nickBox, data->username, 20, nickbox_selected) || GuiTextBox(portBox, portchar, 20, portbox_selected)) {
 				*PORT = atoi(portchar);
 				sprintf(IP_ADDRESS, "127.0.0.1");
 				game_running = 1;
@@ -97,10 +97,10 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 			int nickbox_selected = CheckCollisionPointRec(GetMousePosition(), nickBox);
 			int ipbox_selected	 = CheckCollisionPointRec(GetMousePosition(), ipBox);
 			if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && nickbox_selected)
-				sprintf(data->users[0], "%s", clipboard);
+				sprintf(data->username, "%s", clipboard);
 			else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && ipbox_selected)
 				sprintf(IP_ADDRESS, "%s", clipboard);
-			if (GuiTextBox(nickBox, data->users[0], 20, nickbox_selected) || GuiTextBox(ipBox, IP_ADDRESS, 16, ipbox_selected)) {
+			if (GuiTextBox(nickBox, data->username, 20, nickbox_selected) || GuiTextBox(ipBox, IP_ADDRESS, 16, ipbox_selected)) {
 				if (strlen(IP_ADDRESS) <= 1)
 					sprintf(IP_ADDRESS, "127.0.0.1");
 				if (client_connect(IP_ADDRESS, 5555, &data->sock) != -1) {
@@ -128,7 +128,7 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 }
 
 void matchInfo(struct client_data *data) { // draw match info
-	const char *info_text = TextFormat("It's %s %s turn!", data->turn ? data->users[1] : data->users[2], data->turn ? "(x)" : "(O)");
+	const char *info_text = TextFormat("It's %s %s turn!", data->turn ? data->users[0] : data->users[1], data->turn ? "(x)" : "(O)");
 	DrawText(info_text, (SCR_WIDTH - MeasureText(info_text, 20)) / 2, BLOCK * 3 + 10, 20, BLACK);
-	DrawText(TextFormat("%s: %i\n%s: %i\n", data->users[1], data->winsP[0], data->users[2], data->winsP[1]), 10, BLOCK * 3 + 40, 20, BLACK);
+	DrawText(TextFormat("%s: %i\n%s: %i\n", data->users[0], data->winsP[0], data->users[1], data->winsP[1]), 10, BLOCK * 3 + 40, 20, BLACK);
 }
