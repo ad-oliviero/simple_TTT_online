@@ -6,12 +6,6 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#ifndef __SERVER__
-extern char user0[32];
-#else  // __SERVER__
-extern struct client_data server_data;
-#endif // __SERVER__
-
 void end_client_game(struct client_data *data) {
 	DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, .8f)); // for obfuscation effect, idk how to use shaders or something
 	Rectangle restart_btn = {SCR_WIDTH / 5, SCR_HEIGHT / 3, SCR_WIDTH / 5 * 3, SCR_HEIGHT / 10};

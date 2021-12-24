@@ -12,7 +12,6 @@
 #include <unistd.h>
 
 int game_running = 0;
-pthread_t tid[4];
 
 int main() {
 	struct client_data *data   = calloc(1, sizeof(struct client_data));
@@ -23,9 +22,10 @@ int main() {
 	server->PORT			   = 5555;
 	SetTraceLogLevel(LOG_NONE);
 	SetConfigFlags(FLAG_MSAA_4X_HINT);
-	InitWindow(SCR_WIDTH, SCR_HEIGHT, TextFormat("Simple TTT - %s", data->users[0]));
+	InitWindow(SCR_WIDTH, SCR_HEIGHT, "Game Mode Selection");
 	SetTargetFPS(GetMonitorRefreshRate(0));
 	data->game_mode = join_window(server->IP_ADDRESS, &server->PORT, data);
+	pthread_t tid[4];
 	if (data->game_mode < 0)
 		return 0;
 	else if (data->game_mode == 1 || data->game_mode == 2) {
@@ -41,6 +41,7 @@ int main() {
 
 	// main window
 	initHitBox();
+	SetWindowTitle(TextFormat("Simple TTT - %s", data->users[0]));
 	while (!WindowShouldClose() && game_running) {
 		place(data);
 		BeginDrawing();

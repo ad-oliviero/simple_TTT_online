@@ -26,7 +26,7 @@ void *bot_main() {
 	return NULL;
 }
 
-void minimax(struct client_data *data, int *best_score, int player) { // needs an actual implementation
+void minimax(struct client_data *data) { // needs an actual implementation
 	while (data->click_position[0] < 0 && data->click_position[0] < 0) {
 		int rand_num[2] = {rand() % 3, rand() % 3};
 		if (data->game_grid[rand_num[0]][rand_num[1]] == 0) {
@@ -43,8 +43,7 @@ void *bot_ai(void *arg) {
 	while (game_running) {
 		if (!data->is_game_over && !data->turn) {
 			usleep(rand() % 100000);
-			int best_score = -1;
-			minimax(data, &best_score, data->turn);
+			minimax(data);
 		}
 		data->ready = data->is_game_over;
 	}

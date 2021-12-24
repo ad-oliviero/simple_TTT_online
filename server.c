@@ -18,15 +18,14 @@
 int clientfd[4], server_fd;
 int ready_check[4];
 extern int game_running;
-pthread_t server_tid[128];
 
 void *communication(void *);
 
 void *server_main(void *arg) {
 	struct server_data *server_data = (struct server_data *)arg;
 	server_data->server_tid			= pthread_self();
+	pthread_t server_tid[128];
 
-	// int PORT = *(int *)PORT_arg;
 	// creating socket and connecting to it
 #ifdef _WIN32
 	WSADATA Data;
@@ -35,7 +34,7 @@ void *server_main(void *arg) {
 	struct sockaddr_in address;
 	int opt = 1, addrlen = sizeof(address);
 	server_fd = socket(AF_INET, SOCK_STREAM, 0);
-	setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
+	setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 	address.sin_family		= AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port		= htons(server_data->PORT);
@@ -45,19 +44,19 @@ void *server_main(void *arg) {
 	// accepting clients
 	listen(server_fd, 3);
 	clientfd[0] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
-	read(clientfd[0], (char *)&server_data->data.users[1], sizeof(server_data->data.users[1]));
+	recv(clientfd[0], &server_data->data.users[1], sizeof(server_data->data.users[1]), 0);
 
 	listen(server_fd, 3);
 	clientfd[1] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
-	read(clientfd[1], (char *)&server_data->data.users[2], sizeof(server_data->data.users[2]));
+	recv(clientfd[1], &server_data->data.users[2], sizeof(server_data->data.users[2]), 0);
 
 	// initializing connection
 	listen(server_fd, 3);
-	write(clientfd[0], (char *)&server_data->data.users, sizeof(server_data->data.users));
-	write(clientfd[0], (char *)&server_data->data.turn, 4);
+	send(clientfd[0], &server_data->data.users, sizeof(server_data->data.users), 0);
+	send(clientfd[0], &server_data->data.turn, sizeof(server_data->data.turn), 0);
 	server_data->data.turn++;
-	write(clientfd[1], (char *)&server_data->data.users, sizeof(server_data->data.users));
-	write(clientfd[1], (char *)&server_data->data.turn, 4);
+	send(clientfd[1], &server_data->data.users, sizeof(server_data->data.users), 0);
+	send(clientfd[1], &server_data->data.turn, sizeof(server_data->data.turn), 0);
 
 	// creating and joining threads
 	while (server_data->thread_id <= 1) {
@@ -72,12 +71,6 @@ void *server_main(void *arg) {
 	return 0;
 }
 
-// void *accept_connections(void *arg) {
-// 	listen(server_fd, 3);
-// 	clientfd[0] = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
-// 	read(clientfd[0], (char *)&server_data->data.users[1], sizeof(server_data->data.users[1]));
-// }
-
 void *communication(void *arg) { // communicating server_data->data with the client (mostly sending)
 	struct server_data *server_data = (struct server_data *)arg;
 	int client_id					= server_data->thread_id;
@@ -86,16 +79,16 @@ void *communication(void *arg) { // communicating server_data->data with the cli
 		// server_data->data.turn = !server_data->data.turn;
 		server_data->data.winner = checkwinner(&server_data->data);
 
-		// write server_data->data to client
-		write(clientfd[client_id], (const char *)&server_data->data.is_game_over, sizeof(server_data->data.is_game_over));
-		write(clientfd[client_id], (const char *)&server_data->data.turn, sizeof(server_data->data.turn));
-		write(clientfd[client_id], (const char *)&server_data->data.winsP, sizeof(server_data->data.winsP));
-		write(clientfd[client_id], (const char *)&server_data->data.winner, sizeof(server_data->data.winner));
-		write(clientfd[client_id], (const char *)&server_data->data.game_grid, sizeof(server_data->data.game_grid));
+		// send server_data->data to client
+		send(clientfd[client_id], &server_data->data.is_game_over, sizeof(server_data->data.is_game_over), 0);
+		send(clientfd[client_id], &server_data->data.turn, sizeof(server_data->data.turn), 0);
+		send(clientfd[client_id], &server_data->data.winsP, sizeof(server_data->data.winsP), 0);
+		send(clientfd[client_id], &server_data->data.winner, sizeof(server_data->data.winner), 0);
+		send(clientfd[client_id], &server_data->data.game_grid, sizeof(server_data->data.game_grid), 0);
 
-		// read client events
-		read(clientfd[client_id], (char *)&server_data->data.click_position, sizeof(server_data->data.click_position));
-		read(clientfd[client_id], (char *)&ready_check[client_id], sizeof(ready_check));
+		// recv client events
+		recv(clientfd[client_id], &server_data->data.click_position, sizeof(server_data->data.click_position), 0);
+		recv(clientfd[client_id], &ready_check[client_id], sizeof(ready_check), 0);
 
 		// check if client has permission to play
 		if (server_data->data.turn == client_id) {
@@ -110,7 +103,7 @@ void *communication(void *arg) { // communicating server_data->data with the cli
 			server_data->data.turn = !server_data->data.turn;
 		}
 		if (ready_check[0] && ready_check[1])
-			end_server_game(server_data->data.winner, &server_data->data); // checks if all clients are ready to continue
+			end_server_game(server_data->data.winner, &server_data->data); // checks if all clients are recvy to continue
 	}
 	close(clientfd[client_id]);
 	pthread_exit(NULL);

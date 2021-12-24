@@ -30,30 +30,30 @@ void *client_comm(void *arg) { // communicating data with the server (mostly rec
 	// initializing the game
 	struct client_data *data = (struct client_data *)arg;
 	listen(data->sock, 1);
-	write(data->sock, (char *)&data->users[0], sizeof(data->users[0]));
-	read(data->sock, (char *)&data->users, sizeof(data->users));
-	read(data->sock, (char *)&data->user_id, sizeof(data->user_id));
+	send(data->sock, &data->users[0], sizeof(data->users[0]), 0);
+	recv(data->sock, &data->users, sizeof(data->users), 0);
+	recv(data->sock, &data->user_id, sizeof(data->user_id), 0);
 
 	// communication loop
 	while (game_running) {
-		// read game data
-		read(data->sock, (char *)&data->is_game_over, sizeof(data->is_game_over));
-		read(data->sock, (char *)&data->turn, sizeof(data->turn));
-		read(data->sock, (char *)&data->winsP, sizeof(data->winsP));
-		read(data->sock, (char *)&data->winner, sizeof(data->winner));
-		read(data->sock, (char *)&data->game_grid, sizeof(data->game_grid));
+		// recv game data
+		recv(data->sock, &data->is_game_over, sizeof(data->is_game_over), 0);
+		recv(data->sock, &data->turn, sizeof(data->turn), 0);
+		recv(data->sock, &data->winsP, sizeof(data->winsP), 0);
+		recv(data->sock, &data->winner, sizeof(data->winner), 0);
+		recv(data->sock, &data->game_grid, sizeof(data->game_grid), 0);
 
 		// checking if client has permission to play and sending data
 		if (data->turn == data->user_id) {
 			data->click_position[0] = -1; // set click only if it's client's turn
 			data->click_position[1] = -1;
 		}
-		write(data->sock, (char *)&data->click_position, sizeof(data->click_position));
+		send(data->sock, &data->click_position, sizeof(data->click_position), 0);
 		if ((data->click_position[0] >= 0 && data->click_position[1] >= 0) || data->is_game_over) {
 			data->click_position[0] = -1;
 			data->click_position[1] = -1;
 		}
-		write(data->sock, (char *)&data->ready, sizeof(data->ready));
+		send(data->sock, &data->ready, sizeof(data->ready), 0);
 		if (data->ready == 1 && data->is_game_over == 0)
 			data->ready = 0;
 	}

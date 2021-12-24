@@ -5,10 +5,10 @@
 #define SCR_HEIGHT 800
 #define THICKNESS 3.0f
 #define BLOCK SCR_WIDTH / 3
-#ifndef _WIN32
-	#define SOCK int
-#else
+#ifdef _WIN32
 	#define SOCK unsigned int
+#else
+	#define SOCK int
 #endif
 
 struct client_data {

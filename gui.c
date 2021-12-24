@@ -14,9 +14,7 @@
 #include <unistd.h>
 
 extern int game_running;
-extern char user0[32];
 extern Rectangle game[3][3];
-extern pthread_t server_tid[128];
 
 void initHitBox() { // creating boxes to detect touch or mouse clicks
 	for (int i = 0; i < 9; i++) {
@@ -46,24 +44,19 @@ void grid() {
 int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 	int ret = -1, selection_step = 0, game_mode = -1, game_hosting = -1;
 	char portchar[16] = "5555";
-	SetWindowTitle("Game Mode Selection");
-	// SetTraceLogLevel(LOG_NONE);
-	// InitWindow(320, 75, "Game Mode Selection");
-	// SetTargetFPS(GetMonitorRefreshRate(0));
-	Rectangle nickBox = {MeasureText("Nickname:", 20) + 15, 5, 200, 30};
-	Rectangle ipBox	  = {MeasureText("IP:", 20) + 15, 40, 267, 30};
-	Rectangle portBox = {MeasureText("Port:", 20) + 15, 40, 242, 30};
+	Rectangle nickBox = {MeasureText("Nickname:", 20) + 15, (SCR_HEIGHT / 3) - 40, SCR_WIDTH - MeasureText("Nickname:", 20) - 25, 30};
+	Rectangle ipBox	  = {MeasureText("IP:", 20) + 15, SCR_HEIGHT / 3, SCR_WIDTH - MeasureText("IP:", 20) - 25, 30};
+	Rectangle portBox = {MeasureText("Port:", 20) + 15, SCR_HEIGHT / 3, SCR_WIDTH - MeasureText("Port:", 20) - 25, 30};
 	while (!game_running && !WindowShouldClose()) {
-		// char *clipboard = (char *)GetClipboardText();
-		// clipboard[16]	= 0;
+		char *clipboard = malloc(16);
+		memcpy(clipboard, GetClipboardText(), 16);
 		BeginDrawing();
-		if (selection_step == 0) // starting selection
-		{
-			DrawText("Select Game Mode", (320 - MeasureText("Select Game Mode", 20)) / 2, 5, 20, DARKGRAY);
-			if (GuiButton((Rectangle){5, 30, 150, 40}, "Single Player")) {
+		if (selection_step == 0) { // starting selection
+			DrawText("Select Game Mode", (SCR_WIDTH - MeasureText("Select Game Mode", 20)) / 2, (SCR_HEIGHT / 2) - 100, 20, DARKGRAY);
+			if (GuiButton((Rectangle){10, (SCR_HEIGHT / 2) - 60, (SCR_WIDTH / 2) - 15, 50}, "Single Player")) {
 				selection_step++;
 				game_mode = 1;
-			} else if (GuiButton((Rectangle){165, 30, 150, 40}, "Multi Player")) {
+			} else if (GuiButton((Rectangle){(SCR_WIDTH / 2) + 5, (SCR_HEIGHT / 2) - 60, (SCR_WIDTH / 2) - 15, 50}, "Multi Player")) {
 				selection_step++;
 				game_mode = 2;
 			}
@@ -75,11 +68,11 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 			ret			 = 2;
 		} else if (selection_step == 1 && game_mode == 2) // multi player
 		{
-			DrawText("Select Game Hosting", (320 - MeasureText("Select Game Hosting", 20)) / 2, 5, 20, DARKGRAY);
-			if (GuiButton((Rectangle){5, 30, 150, 40}, "Host")) {
+			DrawText("Select Game Hosting", (SCR_WIDTH - MeasureText("Select Game Hosting", 20)) / 2, (SCR_HEIGHT / 2) - 100, 20, DARKGRAY);
+			if (GuiButton((Rectangle){10, (SCR_HEIGHT / 2) - 60, (SCR_WIDTH / 2) - 15, 50}, "Host")) {
 				selection_step++;
 				game_hosting = 1;
-			} else if (GuiButton((Rectangle){165, 30, 150, 40}, "Join")) {
+			} else if (GuiButton((Rectangle){(SCR_WIDTH / 2) + 5, (SCR_HEIGHT / 2) - 60, (SCR_WIDTH / 2) - 15, 50}, "Join")) {
 				selection_step += 2;
 				game_hosting = 2;
 			}
@@ -87,26 +80,26 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 		{
 			int nickbox_selected = CheckCollisionPointRec(GetMousePosition(), nickBox);
 			int portbox_selected = CheckCollisionPointRec(GetMousePosition(), portBox);
-			// if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && nickbox_selected)
-			// 	sprintf(data->users[0], "%s", clipboard);
-			// else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && portbox_selected)
-			// 	sprintf(portchar, "%s", clipboard);
+			if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && nickbox_selected)
+				sprintf(data->users[0], "%s", clipboard);
+			else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && portbox_selected)
+				sprintf(portchar, "%s", clipboard);
 			if (GuiTextBox(nickBox, data->users[0], 20, nickbox_selected) || GuiTextBox(portBox, portchar, 20, portbox_selected)) {
 				*PORT = atoi(portchar);
 				sprintf(IP_ADDRESS, "127.0.0.1");
 				game_running = 1;
 				ret			 = 1;
 			}
-			DrawText("Nickname:", 10, 10, 20, DARKGRAY);
-			DrawText("Port:", 10, 45, 20, DARKGRAY);
+			DrawText("Nickname:", 10, (SCR_HEIGHT / 3) - 35, 20, DARKGRAY);
+			DrawText("Port:", 10, (SCR_HEIGHT / 3) + 5, 20, DARKGRAY);
 		} else if (selection_step == 3) // join multi player
 		{
 			int nickbox_selected = CheckCollisionPointRec(GetMousePosition(), nickBox);
 			int ipbox_selected	 = CheckCollisionPointRec(GetMousePosition(), ipBox);
-			// if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && nickbox_selected)
-			// 	sprintf(data->users[0], "%s", clipboard);
-			// else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && ipbox_selected)
-			// 	sprintf(IP_ADDRESS, "%s", clipboard);
+			if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && nickbox_selected)
+				sprintf(data->users[0], "%s", clipboard);
+			else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && ipbox_selected)
+				sprintf(IP_ADDRESS, "%s", clipboard);
 			if (GuiTextBox(nickBox, data->users[0], 20, nickbox_selected) || GuiTextBox(ipBox, IP_ADDRESS, 16, ipbox_selected)) {
 				if (strlen(IP_ADDRESS) <= 1)
 					sprintf(IP_ADDRESS, "127.0.0.1");
@@ -125,13 +118,12 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 					sprintf(IP_ADDRESS, " ");
 				}
 			}
-			DrawText("Nickname:", 10, 10, 20, DARKGRAY);
-			DrawText("IP:", 10, 45, 20, DARKGRAY);
+			DrawText("Nickname:", 10, (SCR_HEIGHT / 3) - 35, 20, DARKGRAY);
+			DrawText("IP:", 10, (SCR_HEIGHT / 3) + 5, 20, DARKGRAY);
 		}
 		ClearBackground(RAYWHITE);
 		EndDrawing();
 	}
-	// CloseWindow();
 	return ret;
 }
 
