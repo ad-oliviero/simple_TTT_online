@@ -20,6 +20,14 @@ extern int game_running;
 extern Rectangle game[3][3];
 
 #ifdef __ANDROID_API__
+SCR_HEIGHT = 0;
+SCR_WIDTH  = 0;
+#else
+int SCR_WIDTH  = 450;
+int SCR_HEIGHT = 800;
+#endif
+
+#ifdef __ANDROID_API__
 Vector2 get_touch_pos() {
 	Vector2 touch_pos = GetTouchPosition(0);
 	touch_pos.x *= SCR_WIDTH;
@@ -30,7 +38,7 @@ Vector2 get_touch_pos() {
 bool GuiButton(Rectangle bounds, const char *text) {
 	bool pressed	  = false;
 	bool selected	  = false;
-	Vector2 mouse_pos = GetMousePosition();
+	Vector2 mouse_pos = get_touch_pos();
 	selected		  = CheckCollisionPointRec(mouse_pos, bounds);
 	pressed			  = IsMouseButtonReleased(MOUSE_LEFT_BUTTON);
 	DrawRectangleRec(bounds, LIGHTGRAY);
@@ -77,15 +85,17 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 	Rectangle ipBox	  = {MeasureText("IP:", 20) + 15, SCR_HEIGHT / 3, SCR_WIDTH - MeasureText("IP:", 20) - 25, 30};
 	Rectangle portBox = {MeasureText("Port:", 20) + 15, SCR_HEIGHT / 3, SCR_WIDTH - MeasureText("Port:", 20) - 25, 30};
 	while (!game_running && !WindowShouldClose()) {
-		char *clipboard = malloc(16);
+		char *clipboard = calloc(1, 16);
+#ifndef __ANDROID_API__
 		memcpy(clipboard, GetClipboardText(), 16);
+#endif
 		BeginDrawing();
 		if (selection_step == 0) { // starting selection
-			DrawText("Select Game Mode", (SCR_WIDTH - MeasureText("Select Game Mode", 20)) / 2, (SCR_HEIGHT / 2) - 100, STTT_TEXT_SIZE, DARKGRAY);
-			if (GuiButton((Rectangle){10, (SCR_HEIGHT / 2) - 60, (SCR_WIDTH / 2) - 15, 50}, "Single Player")) {
+			DrawText("Select Game Mode", (SCR_WIDTH - MeasureText("Select Game Mode", STTT_TEXT_SIZE)) / 2, (SCR_HEIGHT / 2) - (SCR_HEIGHT / 9) - 15, STTT_TEXT_SIZE, DARKGRAY);
+			if (GuiButton((Rectangle){10, (SCR_HEIGHT / 2) - 60, (SCR_WIDTH / 2) - 15, (SCR_HEIGHT / 18)}, "Single Player")) {
 				selection_step++;
 				game_mode = 1;
-			} else if (GuiButton((Rectangle){(SCR_WIDTH / 2) + 5, (SCR_HEIGHT / 2) - 60, (SCR_WIDTH / 2) - 15, 50}, "Multi Player")) {
+			} else if (GuiButton((Rectangle){(SCR_WIDTH / 2) + 5, (SCR_HEIGHT / 2) - 60, (SCR_WIDTH / 2) - 15, (SCR_HEIGHT / 18)}, "Multi Player")) {
 				selection_step++;
 				game_mode = 2;
 			}
@@ -97,11 +107,11 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 			ret			 = 2;
 		} else if (selection_step == 1 && game_mode == 2) // multi player
 		{
-			DrawText("Select Game Hosting", (SCR_WIDTH - MeasureText("Select Game Hosting", 20)) / 2, (SCR_HEIGHT / 2) - 100, STTT_TEXT_SIZE, DARKGRAY);
-			if (GuiButton((Rectangle){10, (SCR_HEIGHT / 2) - 60, (SCR_WIDTH / 2) - 15, 50}, "Host")) {
+			DrawText("Select Game Hosting", (SCR_WIDTH - MeasureText("Select Game Hosting", STTT_TEXT_SIZE)) / 2, (SCR_HEIGHT / 2) - 100, STTT_TEXT_SIZE, DARKGRAY);
+			if (GuiButton((Rectangle){10, (SCR_HEIGHT / 2) - 60, (SCR_WIDTH / 2) - 15, (SCR_HEIGHT / 18)}, "Host")) {
 				selection_step++;
 				game_hosting = 1;
-			} else if (GuiButton((Rectangle){(SCR_WIDTH / 2) + 5, (SCR_HEIGHT / 2) - 60, (SCR_WIDTH / 2) - 15, 50}, "Join")) {
+			} else if (GuiButton((Rectangle){(SCR_WIDTH / 2) + 5, (SCR_HEIGHT / 2) - 60, (SCR_WIDTH / 2) - 15, (SCR_HEIGHT / 18)}, "Join")) {
 				selection_step += 2;
 				game_hosting = 2;
 			}
@@ -129,7 +139,7 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 				sprintf(data->username, "%s", clipboard);
 			else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && ipbox_selected)
 				sprintf(IP_ADDRESS, "%s", clipboard);
-			if (GuiTextBox(nickBox, data->username, 20, nickbox_selected) || GuiTextBox(ipBox, IP_ADDRESS, 16, ipbox_selected)) {
+			if (GuiTextBox(nickBox, data->username, STTT_TEXT_SIZE, nickbox_selected) || GuiTextBox(ipBox, IP_ADDRESS, 16, ipbox_selected)) {
 				if (strlen(IP_ADDRESS) <= 1)
 					sprintf(IP_ADDRESS, "127.0.0.1");
 				if (client_connect(IP_ADDRESS, 5555, &data->sockfd) != -1) {

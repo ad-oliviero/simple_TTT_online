@@ -1,8 +1,7 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
-#define SCR_WIDTH 450
-#define SCR_HEIGHT 800
+extern int SCR_WIDTH, SCR_HEIGHT;
 #define THICKNESS 3.0f
 #define BLOCK SCR_WIDTH / 3
 #ifdef _WIN32
@@ -35,9 +34,6 @@
 			free(log_msg);                                                                   \
 		}
 #else
-	// #define LOGI(...) fprintf(stderr, "%s\n", TextFormat(__VA_ARGS__))
-	// #define LOGW(...) fprintf(stderr, "\x1b[33m\x1b[0m\n", __VA_ARGS__)
-	// #define LOGE(...) fprintf(stderr, "\x1b[31m%s\x1b[0m\n", __VA_ARGS__)
 	#define LOGI(...)                         \
 		{                                     \
 			char *log_msg = calloc(1, 1024);  \

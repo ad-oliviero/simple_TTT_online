@@ -1,4 +1,5 @@
 #include "include/client.h"
+#include "include/gui.h"
 #include "include/main.h"
 #include "lib/raylib/src/raylib.h"
 
@@ -7,7 +8,11 @@ Rectangle game[3][3];
 // changes game_grid value where the click is detected (with the hitboxes in gui.c)
 void place(struct client_data *data) {
 	for (int i = 0; i < 9; i++)
+#ifdef __ANDROID_API__
+		if (CheckCollisionPointRec(get_touch_pos(), game[i / 3][i % 3]) && IsMouseButtonDown(0) && !data->is_game_over) {
+#else
 		if (CheckCollisionPointRec(GetMousePosition(), game[i / 3][i % 3]) && IsMouseButtonDown(0) && !data->is_game_over) {
+#endif
 			data->click_position[0] = i / 3;
 			data->click_position[1] = i % 3;
 		}

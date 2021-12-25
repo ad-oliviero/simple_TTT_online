@@ -23,6 +23,10 @@ int main() {
 	SetTraceLogLevel(LOG_NONE);
 	SetConfigFlags(FLAG_MSAA_4X_HINT);
 	InitWindow(SCR_WIDTH, SCR_HEIGHT, "Game Mode Selection");
+#ifdef __ANDROID_API__
+	SCR_WIDTH  = GetScreenWidth();
+	SCR_HEIGHT = GetScreenHeight();
+#endif
 	SetTargetFPS(GetMonitorRefreshRate(0));
 	data->game_mode = join_window(server->IP_ADDRESS, &server->PORT, data);
 	pthread_t tid[4];
@@ -47,6 +51,7 @@ int main() {
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 		grid();
+		DrawCircleV(get_touch_pos(), 20, RED);
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
 				shape((int[2]){i, j}, &data->game_grid[i][j]);

@@ -4,14 +4,14 @@ NAME = Simple_TTT
 PLATFORM = $(shell uname)
 ifeq ($(PLATFORM), Linux)
 	CFLAGS = -O3
-	LDFLAGS = -L $(SRC)/lib/raylib -l:libraylib.a -lpthread -lm -ldl
+	LDFLAGS = -L $(SRC)/lib/raylib/src -l:libraylib.a -lpthread -lm -ldl
 else ifeq ($(PLATFORM), windows32)
 	CFLAGS = -Wl,--subsystem,windows
-	LDFLAGS = -L $(SRC)/lib/raylib -l:libraylib.a -lopengl32 -lwinmm -lgdi32 -static -lwinpthread -lwsock32
+	LDFLAGS = -L $(SRC)/lib/raylib/src -l:libraylib.a -lopengl32 -lwinmm -lgdi32 -static -lwinpthread -lwsock32
 else ifeq ($(PLATFORM), linux_win)
 	CC = x86_64-w64-mingw32-gcc
 	CFLAGS = -Wl,--subsystem,windows
-	LDFLAGS = -L $(SRC)/lib/raylib -l:libraylib.a -lopengl32 -lwinmm -lgdi32 -static -lwinpthread -lwsock32
+	LDFLAGS = -L $(SRC)/lib/raylib/src -l:libraylib.a -lopengl32 -lwinmm -lgdi32 -static -lwinpthread -lwsock32
 endif
 .PHONY: server
 
