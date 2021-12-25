@@ -20,14 +20,8 @@ extern int game_running;
 extern Rectangle game[3][3];
 
 #ifdef __ANDROID_API__
-SCR_HEIGHT = 0;
-SCR_WIDTH  = 0;
-#else
-int SCR_WIDTH  = 450;
-int SCR_HEIGHT = 800;
-#endif
-
-#ifdef __ANDROID_API__
+int SCR_HEIGHT = 0;
+int SCR_WIDTH  = 0;
 Vector2 get_touch_pos() {
 	Vector2 touch_pos = GetTouchPosition(0);
 	touch_pos.x *= SCR_WIDTH;
@@ -50,7 +44,10 @@ bool GuiButton(Rectangle bounds, const char *text) {
 
 bool GuiTextBox(Rectangle bounds, char *text, int textSize, bool editMode) { return false; }
 
-bool GuiToggle(Rectangle bounds, const char *text, bool active) { return false; }
+bool GuiToggle(Rectangle bounds, const char *text, bool active) { return true; }
+#else
+int SCR_WIDTH  = 450;
+int SCR_HEIGHT = 800;
 #endif
 
 void initHitBox() { // creating boxes to detect touch or mouse clicks

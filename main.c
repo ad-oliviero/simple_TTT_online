@@ -51,7 +51,6 @@ int main() {
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 		grid();
-		DrawCircleV(get_touch_pos(), 20, RED);
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
 				shape((int[2]){i, j}, &data->game_grid[i][j]);
