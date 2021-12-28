@@ -82,8 +82,8 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 	Rectangle ipBox	  = {MeasureText("IP:", 20) + 15, SCR_HEIGHT / 3, SCR_WIDTH - MeasureText("IP:", 20) - 25, 30};
 	Rectangle portBox = {MeasureText("Port:", 20) + 15, SCR_HEIGHT / 3, SCR_WIDTH - MeasureText("Port:", 20) - 25, 30};
 	while (!game_running && !WindowShouldClose()) {
-		char *clipboard = calloc(1, 16);
 #ifndef __ANDROID_API__
+		char *clipboard = calloc(1, 16);
 		memcpy(clipboard, GetClipboardText(), 16);
 #endif
 		BeginDrawing();
@@ -114,6 +114,13 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 			}
 		} else if (selection_step == 2 && game_hosting == 1) // hosting multi player
 		{
+#ifdef __ANDROID_API__
+			sprintf(data->username, "Android");
+			*PORT = atoi(portchar);
+			sprintf(IP_ADDRESS, "127.0.0.1");
+			game_running = 1;
+			ret			 = 1;
+#else
 			int nickbox_selected = CheckCollisionPointRec(GetMousePosition(), nickBox);
 			int portbox_selected = CheckCollisionPointRec(GetMousePosition(), portBox);
 			if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && nickbox_selected)
@@ -128,8 +135,17 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 			}
 			DrawText("Nickname:", 10, (SCR_HEIGHT / 3) - 35, STTT_TEXT_SIZE, DARKGRAY);
 			DrawText("Port:", 10, (SCR_HEIGHT / 3) + 5, STTT_TEXT_SIZE, DARKGRAY);
+#endif
 		} else if (selection_step == 3) // join multi player
 		{
+#ifdef __ANDROID_API__
+			sprintf(IP_ADDRESS, "192.168.1.222");
+			sprintf(data->username, "Android");
+			if (client_connect(IP_ADDRESS, 5555, &data->sockfd) != -1) {
+				game_running = 1;
+				ret			 = 0;
+			}
+#else
 			int nickbox_selected = CheckCollisionPointRec(GetMousePosition(), nickBox);
 			int ipbox_selected	 = CheckCollisionPointRec(GetMousePosition(), ipBox);
 			if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && nickbox_selected)
@@ -156,6 +172,7 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 			}
 			DrawText("Nickname:", 10, (SCR_HEIGHT / 3) - 35, STTT_TEXT_SIZE, DARKGRAY);
 			DrawText("IP:", 10, (SCR_HEIGHT / 3) + 5, STTT_TEXT_SIZE, DARKGRAY);
+#endif
 		}
 		ClearBackground(RAYWHITE);
 		EndDrawing();
