@@ -84,7 +84,8 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 	while (!game_running && !WindowShouldClose()) {
 #ifndef __ANDROID_API__
 		char *clipboard = calloc(1, 16);
-		memcpy(clipboard, GetClipboardText(), 16);
+		if (strlen(GetClipboardText()) > 0)
+			memcpy(clipboard, GetClipboardText(), 16);
 #endif
 		BeginDrawing();
 		if (selection_step == 0) { // starting selection
