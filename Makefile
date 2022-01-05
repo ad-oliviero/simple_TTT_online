@@ -1,5 +1,5 @@
 CC = gcc
-SRC_DIR = .
+SRC_DIR = src
 SRCS = main.c gui.c server.c client.c bot.c shapes.c gameplay.c
 BUILD_TYPE ?= DEBUG
 ifeq ($(BUILD_TYPE), DEBUG)
@@ -26,8 +26,8 @@ else ifeq ($(PLATFORM), linux_win)
 else ifeq ($(PLATFORM), web)
 	EMSDK_PATH = /usr/lib/emsdk/upstream/emscripten
 	CC = $(EMSDK_PATH)/emcc
-	CFLAGS = -std=c99 -Os -s -O1 -s ASYNCIFY -s USE_GLFW=3 -s TOTAL_MEMORY=67108864 -s FORCE_FILESYSTEM=1
-	LDFLAGS = raylib/src/libraylib.a
+	CFLAGS = -std=c99 -Os -s -O1 -s ASYNCIFY -s USE_GLFW=3 -s TOTAL_MEMORY=67108864 -s FORCE_FILESYSTEM=1 -lwebsocket.js
+	LDFLAGS = lib/raylib/src/libraylib.a
 	TARGET = Simple_TTT.html
 else ifeq ($(PLATFORM), android)
 	CC = ../../android_toolchain_ARM_API30/bin/arm-linux-androideabi-gcc
@@ -43,7 +43,7 @@ else ifeq ($(PLATFORM), android)
 all: native_app_glue
 native_app_glue:
 	$(CC) $(CFLAGS) -c -o $(SRC)/$@.o ../../android-ndk/sources/android/native_app_glue/android_native_app_glue.c
-# android:
+# all:
 # 	if [ ! -d "../obj/$(NAME)" ]; then mkdir ../obj/$(NAME); fi
 # 	mv *.o ../obj/$(NAME)
 endif
@@ -57,6 +57,7 @@ $(TARGET): $(OBJS)
 
 ifeq ($(PLATFORM), web)
 $(OBJS): CFLAGS=
+#  -s PROXY_POSIX_SOCKETS=1 -pthread -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1
 endif
 $(OBJS): dirs
 	$(CC) $(CFLAGS) -c -o $(OBJ_DIR)/$@ $(SRC_DIR)/$(@F:.o=.c)

@@ -1,9 +1,9 @@
-#include "lib/raylib/src/raylib.h"
+#include "../lib/raylib/src/raylib.h"
 #ifndef __ANDROID_API__
 	#define RAYGUI_IMPLEMENTATION
 	#define RAYGUI_SUPPORT_ICONS
 	#define RAYGUI_STATIC
-	#include "lib/raylib/src/extras/raygui.h"
+	#include "../lib/raylib/src/extras/raygui.h"
 #endif
 #include "include/client.h"
 #include "include/gui.h"

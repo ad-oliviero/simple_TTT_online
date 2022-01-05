@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#ifdef __linux__
+#if defined(__linux__) || defined(__EMSCRIPTEN__)
 	#include <arpa/inet.h>
 	#include <sys/socket.h>
 #elif _WIN32

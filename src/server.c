@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
-#ifdef __linux__
+#if defined(__linux__) || defined(__EMSCRIPTEN__)
 	#include <netinet/in.h>
 	#include <sys/socket.h>
 #elif _WIN32
@@ -44,9 +44,9 @@ void *communication(void *arg) { // communicating servdata->data with the client
 		// accepting click_position only from player's turn client
 		if (servdata->data.click_position[0] != -1 &&
 			servdata->data.click_position[1] != -1 &&
-			servdata->data.game_grid[servdata->data.click_position[0]][servdata->data.click_position[1]] == 0 &&
-			servdata->data.is_game_over == 0) // handling click_positions
-			servdata->data.game_grid[servdata->data.click_position[0]][servdata->data.click_position[1]] = (servdata->data.turn = !servdata->data.turn) + 1;
+			servdata->data.is_game_over == 0)																	   // handling click_positions
+			if (servdata->data.game_grid[servdata->data.click_position[0]][servdata->data.click_position[1]] == 0) // if positions exist, then check for the position being free
+				servdata->data.game_grid[servdata->data.click_position[0]][servdata->data.click_position[1]] = (servdata->data.turn = !servdata->data.turn) + 1;
 		if (servdata->ready_check[0] && servdata->ready_check[1])
 			end_server_game(servdata->data.winner, &servdata->data); // checks if all clients are recvy to continue
 	}
