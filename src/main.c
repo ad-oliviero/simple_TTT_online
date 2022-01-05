@@ -34,9 +34,8 @@ int main() {
 		return 0;
 	else if (data->game_mode == 1 || data->game_mode == 2) {
 		pthread_create(&tid[2], 0, server_main, server);
-		// while (client_connect(server->IP_ADDRESS, server->PORT, &data->sockfd))
-		// ;
-		return 1;
+		while (client_connect(server->IP_ADDRESS, server->PORT, &data->sockfd))
+			;
 	}
 	if (data->game_mode == 2)
 		sprintf(data->username, "Me");
