@@ -16,7 +16,7 @@ then
 
 	sed -i "s/CFLAGS = -Wall -D_DEFAULT_SOURCE -D\$(PLATFORM) -D\$(GRAPHICS) -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing \$(CUSTOM_CFLAGS)/override CFLAGS += -Wall -D_DEFAULT_SOURCE -D\$(PLATFORM) -D\$(GRAPHICS) -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing \$(CUSTOM_CFLAGS)/g" Makefile
 	
-	make CFLAGS="" EMSDK_PATH=/usr/lib/emsdk EMSCRIPTEN_PATH=\$\(EMSDK_PATH\)/upstream/emscripten PYTHON_PATH=/usr/lib/python3.10 CC=\$\(EMSCRIPTEN_PATH\)/emcc AR=\$\(EMSCRIPTEN_PATH\)/emar PLATFORM=PLATFORM_WEB PATH=\$\(shell\ printenv\ PATH\):\$\(EMSDK_PATH\):\$\(EMSCRIPTEN_PATH\):\$\(CLANG_PATH\):\$\(NODE_PATH\):\$\(PYTHON_PATH\) -B
+	make CFLAGS="-lwebsocket.js -s PROXY_POSIX_SOCKETS=1 -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1" EMSDK_PATH=/usr/lib/emsdk EMSCRIPTEN_PATH=\$\(EMSDK_PATH\)/upstream/emscripten PYTHON_PATH=/usr/lib/python3.10 CC=\$\(EMSCRIPTEN_PATH\)/emcc AR=\$\(EMSCRIPTEN_PATH\)/emar PLATFORM=PLATFORM_WEB PATH=\$\(shell\ printenv\ PATH\):\$\(EMSDK_PATH\):\$\(EMSCRIPTEN_PATH\):\$\(CLANG_PATH\):\$\(NODE_PATH\):\$\(PYTHON_PATH\) -B
 else
 	printf "ERROR: $1 is not a valid platform.\nAvailable platforms:\n	'windows'\n	'linux'\n	'web'\n"
 fi

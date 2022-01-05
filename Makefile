@@ -23,10 +23,10 @@ else ifeq ($(PLATFORM), linux_win)
 	CC = x86_64-w64-mingw32-gcc
 	CFLAGS += -Wl,--subsystem,windows
 	LDFLAGS += -lopengl32 -lwinmm -lgdi32 -static -lwinpthread -lwsock32
-else ifeq ($(PLATFORM), web)
+else ifeq ($(PLATFORM), web) # currently not working
 	EMSDK_PATH = /usr/lib/emsdk/upstream/emscripten
 	CC = $(EMSDK_PATH)/emcc
-	CFLAGS = -std=c99 -Os -s -O1 -s ASYNCIFY -s USE_GLFW=3 -s TOTAL_MEMORY=67108864 -s FORCE_FILESYSTEM=1 -lwebsocket.js
+	CFLAGS = -std=c99 -Os -s -O1 -s ASYNCIFY -s USE_GLFW=3 -s TOTAL_MEMORY=67108864 -s FORCE_FILESYSTEM=1 -lwebsocket.js -s PROXY_POSIX_SOCKETS=1 -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1
 	LDFLAGS = lib/raylib/src/libraylib.a
 	TARGET = Simple_TTT.html
 else ifeq ($(PLATFORM), android)
@@ -57,7 +57,6 @@ $(TARGET): $(OBJS)
 
 ifeq ($(PLATFORM), web)
 $(OBJS): CFLAGS=
-#  -s PROXY_POSIX_SOCKETS=1 -pthread -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1
 endif
 $(OBJS): dirs
 	$(CC) $(CFLAGS) -c -o $(OBJ_DIR)/$@ $(SRC_DIR)/$(@F:.o=.c)
