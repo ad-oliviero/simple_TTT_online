@@ -3,6 +3,7 @@
 #if defined(__linux__) || defined(__EMSCRIPTEN__)
 	#include <netinet/in.h>
 	#include <sys/socket.h>
+	#include <sys/syscall.h>
 #elif _WIN32
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
@@ -12,7 +13,6 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/syscall.h>
 #include <sys/types.h>
 
 extern int game_running;

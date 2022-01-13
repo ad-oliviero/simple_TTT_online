@@ -7,7 +7,18 @@ ifeq ($(BUILD_TYPE), DEBUG)
 else
 	CFLAGS = -O2
 endif
-LDFLAGS = -L lib/raylib/src -l:libraylib.a
+
+ifeq ($(PLATFORM), Linux)
+	RAYLIB_PATH = lib/raylib/src/linux
+else ifeq ($(PLATFORM), windows32)
+	RAYLIB_PATH = lib/raylib/src/windows
+else ifeq ($(PLATFORM), linux_win)
+	RAYLIB_PATH = lib/raylib/src/windows
+else ifeq ($(PLATFORM), web)
+	RAYLIB_PATH = lib/raylib/src/web
+endif
+LIBRAYLIB = libraylib.a
+LDFLAGS += -L $(RAYLIB_PATH) -l:$(LIBRAYLIB)
 OBJS = $(SRCS:.c=.o)
 OBJ_DIR = obj
 BUILD_DIR = build
@@ -27,7 +38,7 @@ else ifeq ($(PLATFORM), web) # currently not working
 	EMSDK_PATH = /usr/lib/emsdk/upstream/emscripten
 	CC = $(EMSDK_PATH)/emcc
 	CFLAGS = -std=c99 -Os -s -O1 -s ASYNCIFY -s USE_GLFW=3 -s TOTAL_MEMORY=67108864 -s FORCE_FILESYSTEM=1 # -lwebsocket.js -s PROXY_POSIX_SOCKETS=1 -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1
-	LDFLAGS = lib/raylib/src/libraylib.a
+	LDFLAGS = $(RAYLIB_PATH)/$(LIBRAYLIB)
 	TARGET = Simple_TTT.html
 else ifeq ($(PLATFORM), android)
 	CC = ../../android_toolchain_ARM_API30/bin/arm-linux-androideabi-gcc
@@ -48,6 +59,11 @@ native_app_glue:
 # 	mv *.o ../obj/$(NAME)
 endif
 all: dirs $(TARGET)
+ifeq ($(PLATFORM), linux_win)
+all:
+	cp $(RAYLIB_PATH)/raylib.dll .
+	cp /usr/x86_64-w64-mingw32/bin/libwinpthread-1.dll .
+endif
 
 dirs:
 	mkdir -pv $(BUILD_DIR) $(OBJ_DIR)
@@ -69,4 +85,4 @@ else
 endif
 
 clean:
-	rm $(BUILD_DIR) $(OBJ_DIR)
+	rm -r $(BUILD_DIR) $(OBJ_DIR)
