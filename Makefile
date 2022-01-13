@@ -7,7 +7,10 @@ ifeq ($(BUILD_TYPE), DEBUG)
 else
 	CFLAGS = -O2
 endif
-
+OBJS = $(SRCS:.c=.o)
+OBJ_DIR = obj
+BUILD_DIR = build
+PLATFORM ?= $(shell uname)
 ifeq ($(PLATFORM), Linux)
 	RAYLIB_PATH = lib/raylib/src/linux
 else ifeq ($(PLATFORM), windows32)
@@ -19,10 +22,6 @@ else ifeq ($(PLATFORM), web)
 endif
 LIBRAYLIB = libraylib.a
 LDFLAGS += -L $(RAYLIB_PATH) -l:$(LIBRAYLIB)
-OBJS = $(SRCS:.c=.o)
-OBJ_DIR = obj
-BUILD_DIR = build
-PLATFORM ?= $(shell uname)
 TARGET = Simple_TTT
 
 ifeq ($(PLATFORM), Linux)
