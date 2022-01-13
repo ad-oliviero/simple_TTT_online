@@ -18,6 +18,7 @@
 extern int game_running;
 
 void *communication(void *arg) { // communicating servdata->data with the client (mostly sending)
+#ifndef __EMSCRIPTEN__
 	struct server_data *servdata = (struct server_data *)arg;
 	int client_id				 = servdata->client_count;
 	servdata->client_running	 = 1;
@@ -51,18 +52,20 @@ void *communication(void *arg) { // communicating servdata->data with the client
 			end_server_game(servdata->data.winner, &servdata->data); // checks if all clients are recvy to continue
 	}
 	close(servdata->clifd[client_id]);
+#endif
 	return NULL;
 }
 
 void *server_main(void *arg) {
+#ifndef __EMSCRIPTEN__
 	struct server_data *servdata = (struct server_data *)arg;
 	pthread_t tid[128];
 
 	// creating socket and connecting to it
-#ifdef _WIN32
+	#ifdef _WIN32
 	WSADATA Data;
 	WSAStartup(MAKEWORD(2, 2), &Data);
-#endif
+	#endif
 	struct sockaddr_in address;
 	int opt = 1, addrlen = sizeof(address);
 	SOCK servfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -88,5 +91,6 @@ void *server_main(void *arg) {
 	}
 	for (int i = 0; i <= 1; i++)
 		pthread_join(tid[i], NULL);
+#endif
 	return 0;
 }
