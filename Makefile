@@ -64,8 +64,14 @@ all:
 	cp /usr/x86_64-w64-mingw32/bin/libwinpthread-1.dll .
 endif
 
+ifeq ($(PLATFORM), windows32)
+dirs:
+	IF not exist $(BUILD_DIR) ( mkdir $(BUILD_DIR) )
+	IF not exist $(OBJ_DIR) ( mkdir $(OBJ_DIR) )
+else
 dirs:
 	mkdir -pv $(BUILD_DIR) $(OBJ_DIR)
+endif
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(BUILD_DIR)/$(TARGET) $(OBJ_DIR)/*.o $(LDFLAGS)
