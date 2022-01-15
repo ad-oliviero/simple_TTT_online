@@ -84,6 +84,8 @@ ifeq ($(PLATFORM), web)
 	$(EMSDK_PATH)/emrun $(BUILD_DIR)/$(TARGET)
 else ifeq ($(PLATFORM), windows32)
 	.\$(BUILD_DIR)\$(TARGET)
+else
+	$(BUILD_DIR)/$(TARGET)
 endif
 
 clean:
