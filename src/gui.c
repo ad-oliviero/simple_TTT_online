@@ -81,11 +81,12 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 	Rectangle nickBox = {MeasureText("Nickname:", 20) + 15, (SCR_HEIGHT / 3) - 40, SCR_WIDTH - MeasureText("Nickname:", 20) - 25, 30};
 	Rectangle ipBox	  = {MeasureText("IP:", 20) + 15, SCR_HEIGHT / 3, SCR_WIDTH - MeasureText("IP:", 20) - 25, 30};
 	Rectangle portBox = {MeasureText("Port:", 20) + 15, SCR_HEIGHT / 3, SCR_WIDTH - MeasureText("Port:", 20) - 25, 30};
+	char *clipboard	  = malloc(17);
 	while (!game_running && !WindowShouldClose()) {
 #ifndef __ANDROID_API__
-		char *clipboard = calloc(1, 16);
-		if (strlen(GetClipboardText()) > 0)
-			memcpy(clipboard, GetClipboardText(), 16);
+		const char *rawclipboard = GetClipboardText();
+		if (rawclipboard)
+			memcpy(clipboard, rawclipboard, 16);
 #endif
 		BeginDrawing();
 		if (selection_step == 0) { // starting selection
