@@ -1,10 +1,10 @@
 #include "../lib/raylib/src/raylib.h"
-#ifndef __ANDROID_API__
-	#define RAYGUI_IMPLEMENTATION
-	#define RAYGUI_SUPPORT_ICONS
-	#define RAYGUI_STATIC
-	#include "../lib/raylib/src/extras/raygui.h"
-#endif
+// #ifndef __ANDROID_API__
+#define RAYGUI_IMPLEMENTATION
+#define RAYGUI_SUPPORT_ICONS
+#define RAYGUI_STATIC
+#include "../lib/raylib/src/extras/raygui.h"
+// #endif
 #include "include/client.h"
 #include "include/gui.h"
 #include "include/main.h"
@@ -20,16 +20,18 @@ extern int game_running;
 extern Rectangle game[3][3];
 
 #ifdef __ANDROID_API__
-int SCR_HEIGHT = 0;
+int SCR_WIDTH  = 1080;
+int SCR_HEIGHT = 1920;
+/* int SCR_HEIGHT = 0;
 int SCR_WIDTH  = 0;
-Vector2 get_touch_pos() {
-	Vector2 touch_pos = GetTouchPosition(0);
+Vector2 __wrap_GetMousePosition() {
+	Vector2 touch_pos = GetMousePosition();
 	touch_pos.x *= SCR_WIDTH;
 	touch_pos.y *= SCR_HEIGHT;
 	return touch_pos;
-}
+} */
 
-bool GuiButton(Rectangle bounds, const char *text) {
+/* bool GuiButton(Rectangle bounds, const char *text) {
 	bool pressed	  = false;
 	bool selected	  = false;
 	Vector2 mouse_pos = get_touch_pos();
@@ -40,11 +42,11 @@ bool GuiButton(Rectangle bounds, const char *text) {
 	DrawText(text, bounds.x + ((bounds.width - MeasureText(text, STTT_TEXT_SIZE)) / 2), bounds.y + ((bounds.height - STTT_TEXT_SIZE) / 2), STTT_TEXT_SIZE, BLACK);
 	DrawRectangleRec(bounds, Fade(BLUE, 0.3f * selected));
 	return pressed && selected;
-}
+} */
 
-bool GuiTextBox(Rectangle bounds, char *text, int textSize, bool editMode) { return false; }
+// bool GuiTextBox(Rectangle bounds, char *text, int textSize, bool editMode) { return false; }
 
-bool GuiToggle(Rectangle bounds, const char *text, bool active) { return true; }
+// bool GuiToggle(Rectangle bounds, const char *text, bool active) { return true; }
 #else
 int SCR_WIDTH  = 450;
 int SCR_HEIGHT = 800;
@@ -89,6 +91,7 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 			memcpy(clipboard, rawclipboard, 16);
 #endif
 		BeginDrawing();
+		// DrawText(TextFormat("%d\n%d", GetMonitorHeight(0), GetMonitorWidth(0)), 20, 60, 40, BLACK);
 		if (selection_step == 0) { // starting selection
 			DrawText("Select Game Mode", (SCR_WIDTH - MeasureText("Select Game Mode", STTT_TEXT_SIZE)) / 2, (SCR_HEIGHT / 2) - (SCR_HEIGHT / 9) - 15, STTT_TEXT_SIZE, DARKGRAY);
 			if (GuiButton((Rectangle){10, (SCR_HEIGHT / 2) - 60, (SCR_WIDTH / 2) - 15, (SCR_HEIGHT / 18)}, "Single Player")) {

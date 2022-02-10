@@ -31,8 +31,10 @@ else ifeq ($(PLATFORM), web)
 	CFLAGS = -std=c99 -Os -s -O1 -s ASYNCIFY -s USE_GLFW=3 -s TOTAL_MEMORY=67108864 -s FORCE_FILESYSTEM=1 # -lwebsocket.js -s PROXY_POSIX_SOCKETS=1 -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1
 	LDFLAGS = $(RAYLIB_PATH)/$(LIBRAYLIB)
 else ifeq ($(PLATFORM), android)
+	ANDROID_SDK_PATH = ../android-sdk
+	JAVA_HOME = /usr/lib/jvm/java-17-openjdk/bin
 	CC = ../../android_toolchain_ARM_API30/bin/arm-linux-androideabi-gcc
-	CFLAGS = -I. -Ilib/raylib/src/linux -I../../android-ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/android/ -I../../android-ndk/sources/android/native_app_glue -std=c99 -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wa,--noexecstack -Wformat -Werror=format-security -no-canonical-prefixes -D__ANDROID_API__=30 --sysroot=../../android_toolchain_ARM_API30/sysroot
+	CFLAGS = -I. -Ilib/raylib/src/linux -I../../android-ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/android/ -I../../android-ndk/sources/android/native_app_glue -std=c99 -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wa,--noexecstack -Wformat -Werror=format-security -no-canonical-prefixes -D__ANDROID_API__=30 --sysroot=../../android_toolchain_ARM_API30/sysroot -Wl,--wrap=GetMousePosition
 endif
 LDFLAGS += 
 TARGET = Simple_TTT
