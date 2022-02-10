@@ -32,7 +32,7 @@ else ifeq ($(PLATFORM), web)
 	LDFLAGS = $(RAYLIB_PATH)/$(LIBRAYLIB)
 else ifeq ($(PLATFORM), android)
 	CC = ../../android_toolchain_ARM_API30/bin/arm-linux-androideabi-gcc
-	CFLAGS = -I. -I../../lib/raylib/src -I../../android-ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/android/ -I../../android-ndk/sources/android/native_app_glue -std=c99 -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wa,--noexecstack -Wformat -Werror=format-security -no-canonical-prefixes -D__ANDROID_API__=30 --sysroot=../../android_toolchain_ARM_API30/sysroot
+	CFLAGS = -I. -Ilib/raylib/src/linux -I../../android-ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/android/ -I../../android-ndk/sources/android/native_app_glue -std=c99 -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wa,--noexecstack -Wformat -Werror=format-security -no-canonical-prefixes -D__ANDROID_API__=30 --sysroot=../../android_toolchain_ARM_API30/sysroot
 endif
 LDFLAGS += 
 TARGET = Simple_TTT
@@ -49,12 +49,13 @@ all: $(info $(color_warn)You need to install and setup emsdk.) $(info On arch li
 else ifeq ($(PLATFORM), android)
 all: native_app_glue
 native_app_glue:
-	$(CC) $(CFLAGS) -c -o $(SRC)/$@.o ../../android-ndk/sources/android/native_app_glue/android_native_app_glue.c
-# all:
-# 	if [ ! -d "../obj/$(NAME)" ]; then mkdir ../obj/$(NAME); fi
-# 	mv *.o ../obj/$(NAME)
-endif
+	$(CC) $(CFLAGS) -c -o $(SRC_DIR)/$@.o ../../android-ndk/sources/android/native_app_glue/android_native_app_glue.c
+all: $(OBJS)
+	mkdir -pv ../obj/$(NAME)
+	mv $(OBJ_DIR)/*.o ../obj/$(NAME)
+else
 all: dirs $(TARGET)
+endif
 ifeq ($(PLATFORM), linux_win)
 all:
 	cp $(RAYLIB_PATH)/raylib.dll .
