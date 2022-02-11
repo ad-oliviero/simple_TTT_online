@@ -24,10 +24,10 @@ int main() {
 	SetConfigFlags(FLAG_MSAA_4X_HINT);
 	InitWindow(SCR_WIDTH, SCR_HEIGHT, "Game Mode Selection");
 	SetTargetFPS(GetMonitorRefreshRate(0));
-	/* #ifdef __ANDROID_API__
-		SCR_WIDTH  = GetScreenWidth();
-		SCR_HEIGHT = GetScreenHeight();
-	#endif */
+#ifdef __ANDROID_API__
+	SCR_WIDTH  = GetScreenWidth();
+	SCR_HEIGHT = GetScreenHeight();
+#endif
 	data->game_mode = join_window(server->IP_ADDRESS, &server->PORT, data);
 	pthread_t tid[4];
 	if (data->game_mode < 0)
@@ -57,6 +57,9 @@ int main() {
 		if (data->is_game_over == 1)
 			end_client_game(data);
 		matchInfo(data);
+#ifdef __ANDROID_API__
+		DrawFPS(10, 1900);
+#endif
 		EndDrawing();
 	}
 	// end of the program

@@ -39,9 +39,7 @@ else ifeq ($(PLATFORM), android)
 	SRC_DIR = src
 	LIB_DIR = lib/armeabi-v7a
 	ANDROID_TOOLCHAIN = $(ANDROID_NDK_PATH)/toolchains/llvm/prebuilt/linux-x86_64
-#android_toolchain_ARM_API30
 	CC = $(ANDROID_TOOLCHAIN)/bin/armv7a-linux-androideabi31-clang
-#arm-linux-androideabi-gcc
 	CFLAGS = -I$(RAYLIB_PATH) -I$(ANDROID_NDK_PATH)/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/android/ -I$(ANDROID_NDK_PATH)/sources/android/native_app_glue -std=c99 -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wa,--noexecstack -Wformat -Werror=format-security -no-canonical-prefixes -D__ANDROID_API__=32 --sysroot=$(ANDROID_TOOLCHAIN)/sysroot
 endif
 LDFLAGS += 
