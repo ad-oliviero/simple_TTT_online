@@ -62,19 +62,19 @@ all: $(OBJS)
 
 	$(CC) -o $(LIB_DIR)/lib$(TARGET).so $(OBJ_DIR)/*.o -shared -I. -I../raylib/release/include -I$(ANDROID_NDK_PATH)/sources/android/native_app_glue -Wl,-soname,lib$(TARGET).so -Wl,--exclude-libs,libatomic.a -Wl,--build-id -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,--warn-shared-textrel -Wl,--fatal-warnings -u ANativeActivity_onCreate -L. -L$(OBJ_DIR) -L$(LIB_DIR) -lraylib -lnative_app_glue -llog -landroid -lEGL -lGLESv2 -lOpenSLES -latomic -lc -lm -ldl
 
-	$(ANDROID_SDK_PATH)/build-tools/30.0.3/aapt package -f -m -S res -J src -M AndroidManifest.xml -I $(ANDROID_SDK_PATH)/platforms/android-30/android.jar
+	$(ANDROID_SDK_PATH)/build-tools/30.0.3/aapt package -f -m -S res -J src -M $(SRC_DIR)/AndroidManifest.xml -I $(ANDROID_SDK_PATH)/platforms/android-30/android.jar
 
 	$(JAVA_HOME)/javac -verbose -source 1.7 -target 1.7 -d $(OBJ_DIR) -bootclasspath /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/jre/lib/rt.jar -classpath $(ANDROID_SDK_PATH)/platforms/android-30/android.jar:$(OBJ_DIR) -sourcepath src src/com/$(TEAM_NAME)/$(TARGET)/R.java src/com/$(TEAM_NAME)/$(TARGET)/NativeLoader.java
 
 	$(ANDROID_SDK_PATH)/build-tools/30.0.3/dx --verbose --dex --output=dex/classes.dex $(OBJ_DIR) 
 
-	$(ANDROID_SDK_PATH)/build-tools/30.0.3/aapt package -f -M AndroidManifest.xml -S res -A assets -I $(ANDROID_SDK_PATH)/platforms/android-30/android.jar -F $(TARGET).unsigned.apk dex
+	$(ANDROID_SDK_PATH)/build-tools/30.0.3/aapt package -f -M $(SRC_DIR)/AndroidManifest.xml -S res -A assets -I $(ANDROID_SDK_PATH)/platforms/android-30/android.jar -F $(BUILD_DIR)/$(TARGET).unsigned.apk dex
 
-	$(ANDROID_SDK_PATH)/build-tools/30.0.3/aapt add $(TARGET).unsigned.apk $(LIB_DIR)/lib$(TARGET).so
+	$(ANDROID_SDK_PATH)/build-tools/30.0.3/aapt add $(BUILD_DIR)/$(TARGET).unsigned.apk $(LIB_DIR)/lib$(TARGET).so
 
-	$(JAVA_HOME)/jarsigner -keystore $(TARGET).keystore -storepass whatever -keypass whatever -signedjar $(TARGET).signed.apk $(TARGET).unsigned.apk $(TARGET)Key # generic keystore, will be distributed with a private one
+	$(JAVA_HOME)/jarsigner -keystore $(TARGET).keystore -storepass whatever -keypass whatever -signedjar $(BUILD_DIR)/$(TARGET).signed.apk $(BUILD_DIR)/$(TARGET).unsigned.apk $(TARGET)Key # generic keystore, will be distributed with a private one
 
-	$(ANDROID_SDK_PATH)/build-tools/30.0.3/zipalign -f 4 $(TARGET).signed.apk $(TARGET).apk
+	$(ANDROID_SDK_PATH)/build-tools/30.0.3/zipalign -f 4 $(BUILD_DIR)/$(TARGET).signed.apk $(BUILD_DIR)/$(TARGET).apk
 
 else
 all: dirs $(TARGET)
@@ -91,7 +91,7 @@ dirs:
 	IF not exist $(OBJ_DIR) ( mkdir $(OBJ_DIR) )
 else
 dirs:
-	mkdir -pv $(BUILD_DIR) $(OBJ_DIR) dex assets lib/armeabi-v7a
+	mkdir -pv $(BUILD_DIR) $(OBJ_DIR) dex assets $(LIB_DIR)
 endif
 
 $(TARGET): $(OBJS)
@@ -111,7 +111,7 @@ run: $(TARGET)
 	.\$(BUILD_DIR)\$(TARGET)
 else ifeq ($(PLATFORM), android)
 run: all
-	$(ANDROID_SDK_PATH)/platform-tools/adb install -r $(TARGET).apk
+	$(ANDROID_SDK_PATH)/platform-tools/adb install -r $(BUILD_DIR)/$(TARGET).apk
 	$(ANDROID_SDK_PATH)/platform-tools/adb shell am force-stop com.$(TEAM_NAME).$(TARGET)
 	$(ANDROID_SDK_PATH)/platform-tools/adb shell am start -n com.$(TEAM_NAME).$(TARGET)/com.$(TEAM_NAME).$(TARGET).NativeLoader
 
@@ -121,4 +121,4 @@ run: $(TARGET)
 endif
 
 clean:
-	rm -r $(BUILD_DIR) $(OBJ_DIR) dex *.apk
+	rm -r $(BUILD_DIR) $(OBJ_DIR) dex
