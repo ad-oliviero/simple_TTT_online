@@ -57,9 +57,6 @@ int main() {
 		if (data->is_game_over == 1)
 			end_client_game(data);
 		matchInfo(data);
-#ifdef __ANDROID_API__
-		DrawFPS(10, 1900);
-#endif
 		EndDrawing();
 	}
 	// end of the program
