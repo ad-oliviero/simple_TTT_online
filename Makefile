@@ -33,12 +33,12 @@ else ifeq ($(PLATFORM), web)
 else ifeq ($(PLATFORM), android)
 	TEAM_NAME = thedarkbug
 	JAVA_HOME = /usr/lib/jvm/java-17-openjdk/bin
-	ANDROID_SDK_PATH = ../android-sdk
-	ANDROID_NDK_PATH = ../android-ndk
+	ANDROID_SDK_PATH = android-sdk
+	ANDROID_NDK_PATH = android-ndk
 	OBJ_DIR = obj
 	SRC_DIR = src
 	LIB_DIR = lib/armeabi-v7a
-	ANDROID_TOOLCHAIN = ../android_toolchain_ARM_API30
+	ANDROID_TOOLCHAIN = android_toolchain_ARM_API30
 	CC = $(ANDROID_TOOLCHAIN)/bin/arm-linux-androideabi-gcc
 	CFLAGS = -I$(RAYLIB_PATH) -I$(ANDROID_NDK_PATH)/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/android/ -I$(ANDROID_NDK_PATH)/sources/android/native_app_glue -std=c99 -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wa,--noexecstack -Wformat -Werror=format-security -no-canonical-prefixes -D__ANDROID_API__=30 --sysroot=$(ANDROID_TOOLCHAIN)/sysroot
 endif
@@ -57,27 +57,18 @@ all: $(info $(color_warn)You need to install and setup emsdk.) $(info On arch li
 else ifeq ($(PLATFORM), android)
 all: $(OBJS)
 	$(CC) -c $(ANDROID_NDK_PATH)/sources/android/native_app_glue/android_native_app_glue.c -o $(OBJ_DIR)/native_app_glue.o -std=c99 -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wa,--noexecstack -Wformat -Werror=format-security -no-canonical-prefixes -DANDROID -DPLATFORM_ANDROID -D__ANDROID_API__=30
-
 	$(ANDROID_TOOLCHAIN)/bin/arm-linux-androideabi-ar rcs $(OBJ_DIR)/libnative_app_glue.a $(OBJ_DIR)/native_app_glue.o
-
 	$(CC) -o $(LIB_DIR)/lib$(TARGET).so $(OBJ_DIR)/*.o -shared -I. -I../raylib/release/include -I$(ANDROID_NDK_PATH)/sources/android/native_app_glue -Wl,-soname,lib$(TARGET).so -Wl,--exclude-libs,libatomic.a -Wl,--build-id -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,--warn-shared-textrel -Wl,--fatal-warnings -u ANativeActivity_onCreate -L. -L$(OBJ_DIR) -L$(LIB_DIR) -lraylib -lnative_app_glue -llog -landroid -lEGL -lGLESv2 -lOpenSLES -latomic -lc -lm -ldl
-
 	$(ANDROID_SDK_PATH)/build-tools/30.0.3/aapt package -f -m -S res -J src -M $(SRC_DIR)/AndroidManifest.xml -I $(ANDROID_SDK_PATH)/platforms/android-30/android.jar
-
 	$(JAVA_HOME)/javac -verbose -source 1.7 -target 1.7 -d $(OBJ_DIR) -bootclasspath /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/jre/lib/rt.jar -classpath $(ANDROID_SDK_PATH)/platforms/android-30/android.jar:$(OBJ_DIR) -sourcepath src src/com/$(TEAM_NAME)/$(TARGET)/R.java src/com/$(TEAM_NAME)/$(TARGET)/NativeLoader.java
-
 	$(ANDROID_SDK_PATH)/build-tools/30.0.3/dx --verbose --dex --output=dex/classes.dex $(OBJ_DIR) 
-
 	$(ANDROID_SDK_PATH)/build-tools/30.0.3/aapt package -f -M $(SRC_DIR)/AndroidManifest.xml -S res -A assets -I $(ANDROID_SDK_PATH)/platforms/android-30/android.jar -F $(BUILD_DIR)/$(TARGET).unsigned.apk dex
-
 	$(ANDROID_SDK_PATH)/build-tools/30.0.3/aapt add $(BUILD_DIR)/$(TARGET).unsigned.apk $(LIB_DIR)/lib$(TARGET).so
-
 	$(JAVA_HOME)/jarsigner -keystore $(TARGET).keystore -storepass whatever -keypass whatever -signedjar $(BUILD_DIR)/$(TARGET).signed.apk $(BUILD_DIR)/$(TARGET).unsigned.apk $(TARGET)Key # generic keystore, will be distributed with a private one
-
 	$(ANDROID_SDK_PATH)/build-tools/30.0.3/zipalign -f 4 $(BUILD_DIR)/$(TARGET).signed.apk $(BUILD_DIR)/$(TARGET).apk
 
 else
-all: dirs $(TARGET)
+all: $(TARGET)
 endif
 ifeq ($(PLATFORM), linux_win)
 all:
@@ -121,4 +112,4 @@ run: $(TARGET)
 endif
 
 clean:
-	rm -r $(BUILD_DIR) $(OBJ_DIR) dex
+	rm -r $(BUILD_DIR) $(OBJ_DIR) dex assets

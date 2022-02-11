@@ -62,4 +62,6 @@ lib/raylib-git/
 # other
 dex/
 src/com/thedarkbug/Simple_TTT/R.java
+android*
+commandlinetools*
 

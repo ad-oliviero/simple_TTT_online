@@ -20,8 +20,8 @@ mv libraylib.so linux
 printf "\x1b[32mBuilding for android...\x1b[0m\n"
 sleep 1
 make clean
-export ANDROID_SDK=../../../../android-sdk
-export ANDROID_NDK=../../../../android-ndk
+export ANDROID_SDK=../../../android-sdk
+export ANDROID_NDK=../../../android-ndk
 export ANDROID_ARCH=arm
 make PLATFORM=PLATFORM_ANDROID
 mkdir ../../armeabi-v7a
