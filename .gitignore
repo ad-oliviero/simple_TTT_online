@@ -29,8 +29,6 @@
 *.so
 
 # Executables
-server
-Simple_TTT
 *.exe
 *.out
 *.app
@@ -62,6 +60,7 @@ lib/raylib-git/
 # other
 dex/
 src/com/thedarkbug/Simple_TTT/R.java
+obj
 android*
 commandlinetools*
 
