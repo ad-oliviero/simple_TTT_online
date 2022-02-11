@@ -33,12 +33,12 @@ else ifeq ($(PLATFORM), web)
 else ifeq ($(PLATFORM), android)
 	TEAM_NAME = thedarkbug
 	JAVA_HOME = /usr/lib/jvm/java-17-openjdk/bin
-	ANDROID_SDK_PATH = ../../android-sdk
-	ANDROID_NDK_PATH = ../../android-ndk
+	ANDROID_SDK_PATH = ../android-sdk
+	ANDROID_NDK_PATH = ../android-ndk
 	OBJ_DIR = obj
 	SRC_DIR = src
 	LIB_DIR = lib/armeabi-v7a
-	ANDROID_TOOLCHAIN = ../../android_toolchain_ARM_API30
+	ANDROID_TOOLCHAIN = ../android_toolchain_ARM_API30
 	CC = $(ANDROID_TOOLCHAIN)/bin/arm-linux-androideabi-gcc
 	CFLAGS = -I$(RAYLIB_PATH) -I$(ANDROID_NDK_PATH)/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/android/ -I$(ANDROID_NDK_PATH)/sources/android/native_app_glue -std=c99 -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wa,--noexecstack -Wformat -Werror=format-security -no-canonical-prefixes -D__ANDROID_API__=30 --sysroot=$(ANDROID_TOOLCHAIN)/sysroot
 endif

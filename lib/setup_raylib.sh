@@ -3,7 +3,7 @@
 [ ! -d raylib ] && git clone https://github.com/raysan5/raylib.git raylib
 cd raylib/src
 
-[ -d linux ] && rm -r linux android windows web
+[ -d linux ] && rm -r linux windows web
 
 # building for linux
 printf "\x1b[32mBuilding for linux...\x1b[0m\n"
@@ -20,9 +20,8 @@ mv libraylib.so linux
 printf "\x1b[32mBuilding for android...\x1b[0m\n"
 sleep 1
 make clean
-mkdir android
-export ANDROID_SDK=../../../../../android-sdk
-export ANDROID_NDK=../../../../../android-ndk
+export ANDROID_SDK=../../../../android-sdk
+export ANDROID_NDK=../../../../android-ndk
 export ANDROID_ARCH=arm
 make PLATFORM=PLATFORM_ANDROID
 mkdir ../../armeabi-v7a

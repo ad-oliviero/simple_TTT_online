@@ -59,6 +59,7 @@ dkms.conf
 lib/raylib/
 lib/raylib-git/
 
-# other folders
+# other
 dex/
+src/com/thedarkbug/Simple_TTT/R.java
 
