@@ -25,7 +25,8 @@ export ANDROID_SDK=../../../../../android-sdk
 export ANDROID_NDK=../../../../../android-ndk
 export ANDROID_ARCH=arm
 make PLATFORM=PLATFORM_ANDROID
-mv libraylib.a android
+mkdir ../../armeabi-v7a
+mv libraylib.a ../../armeabi-v7a
 
 # building for windows
 printf "\x1b[32mBuilding for windows...\x1b[0m\n"

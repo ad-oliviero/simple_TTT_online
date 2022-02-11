@@ -37,6 +37,7 @@ Simple_TTT
 *.i*86
 *.x86_64
 *.hex
+*.apk
 
 # Debug files
 *.dSYM/
@@ -57,5 +58,7 @@ dkms.conf
 # raylib folders
 lib/raylib/
 lib/raylib-git/
-lib/raygui
-include/raylib.h
+
+# other folders
+dex/
+

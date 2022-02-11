@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding="utf-8" ?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package='com.thedarkbug.Simple_TTT' android:versionCode='0'
+    android:versionName='0' >
+    <supports-screens android:smallScreens="true" android:normalScreens="true" android:largeScreens="true" android:xlargeScreens="true" android:anyDensity="true" />
+    <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="30" />
+
+    <!-- permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    
+    <application    android:theme="@style/AppTheme"
+                    android:icon="@drawable/icon"
+                    android:label="@string/app_name"
+                    android:isGame="true"
+                    android:debuggable="false"
+                    android:networkSecurityConfig="@xml/network_security_config">
+
+        <activity   android:name="com.thedarkbug.Simple_TTT.NativeLoader"
+                    android:launchMode="singleTask"
+                    android:clearTaskOnLaunch="true"
+                    android:icon="@drawable/icon"
+                    android:label="@string/app_name"
+                    android:resizeableActivity="false"
+                    android:maxAspectRatio="21.9"
+                    android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale|layoutDirection">
+            <meta-data android:name="android.app.lib_name" android:value="Simple_TTT"/>
+            <intent-filter>
+                <action android:name='android.intent.action.MAIN'/>
+                <category android:name='android.intent.category.LAUNCHER'/>
+            </intent-filter>
+        </activity>
+    </application>
+    <supports-screens android:anyDensity="true"/>
+</manifest>
