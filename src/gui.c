@@ -57,7 +57,19 @@ bool GuiTextBox(Rectangle bounds, char *text, int textSize, bool editMode) {
 	return (current_key_press == KEY_ENTER);
 }
 
-bool GuiToggle(Rectangle bounds, const char *text, bool active) { return true; }
+bool GuiToggle(Rectangle bounds, const char *text, bool active) {
+	bool pressed	  = false;
+	bool selected	  = false;
+	Vector2 mouse_pos = get_touch_pos();
+	selected		  = CheckCollisionPointRec(mouse_pos, bounds);
+	pressed			  = IsMouseButtonReleased(MOUSE_LEFT_BUTTON);
+	DrawRectangleRec(bounds, LIGHTGRAY);
+	DrawRectangleLinesEx(bounds, 3, DARKGRAY);
+	DrawText(text, bounds.x + ((bounds.width - MeasureText(text, STTT_TEXT_SIZE)) / 2), bounds.y + ((bounds.height - STTT_TEXT_SIZE) / 2), STTT_TEXT_SIZE, BLACK);
+	DrawRectangleRec(bounds, Fade(BLUE, 0.3f * selected));
+	active = pressed && selected;
+	return active;
+}
 #else
 int SCR_WIDTH  = 450;
 int SCR_HEIGHT = 800;
@@ -95,13 +107,11 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 	Rectangle ipBox	  = {MeasureText("IP:", STTT_TEXT_SIZE) + 15, SCR_HEIGHT / 3, SCR_WIDTH - MeasureText("IP:", STTT_TEXT_SIZE) - 25, STTT_TEXT_SIZE * 1.3};
 	Rectangle portBox = {MeasureText("Port:", STTT_TEXT_SIZE) + 15, SCR_HEIGHT / 3, SCR_WIDTH - MeasureText("Port:", STTT_TEXT_SIZE) - 25, STTT_TEXT_SIZE * 1.3};
 	char *clipboard	  = malloc(17);
-	bool test_textbox = false;
-	char *test_text	  = malloc(128);
-	sprintf(test_text, "Test textbox");
 
 	bool nickbox_selected = false;
 	bool ipbox_selected	  = false;
 	bool portbox_selected = false;
+
 	while (!game_running && !WindowShouldClose()) {
 #ifndef __ANDROID_API__
 		const char *rawclipboard = GetClipboardText();
@@ -109,10 +119,6 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 			memcpy(clipboard, rawclipboard, 16);
 #endif
 		BeginDrawing();
-		// GuiTextBox((Rectangle){100, 100, 360, 60}, test_text, 16, test_textbox);
-		// test_textbox = CheckCollisionPointRec(GetMousePosition(), (Rectangle){100, 100, 360, 60});
-		// test_textbox = CheckCollisionPointRec(get_touch_pos(), (Rectangle){100, 100, 360, 60});
-		// DrawText(TextFormat("%d\n%d", GetMonitorHeight(0), GetMonitorWidth(0)), 20, 60, 40, BLACK);
 		if (selection_step == 0) { // starting selection
 			DrawText("Select Game Mode", (SCR_WIDTH - MeasureText("Select Game Mode", STTT_TEXT_SIZE)) / 2, (SCR_HEIGHT / 2) - (SCR_HEIGHT / 9) - 20, STTT_TEXT_SIZE, DARKGRAY);
 			if (GuiButton((Rectangle){10, (SCR_HEIGHT / 2) - 60, (SCR_WIDTH / 2) - 15, (SCR_HEIGHT / 18)}, "Single Player")) {
