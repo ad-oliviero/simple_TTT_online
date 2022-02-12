@@ -118,7 +118,7 @@ bool GuiToggle(Rectangle bounds, const char *text, bool active) {
 	DrawRectangleLinesEx(bounds, 3, DARKGRAY);
 	DrawText(text, bounds.x + ((bounds.width - MeasureText(text, STTT_TEXT_SIZE)) / 2), bounds.y + ((bounds.height - STTT_TEXT_SIZE) / 2), STTT_TEXT_SIZE, BLACK);
 	DrawRectangleRec(bounds, Fade(BLUE, 0.3f * selected));
-	active = pressed && selected;
+	active = pressed && selected && active;
 	return active;
 }
 #else

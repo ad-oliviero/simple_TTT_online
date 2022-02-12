@@ -9,6 +9,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <pthread.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -62,33 +63,26 @@ char *get_ip_addr(int id) {
 	return ip;
 }
 
-int main() {
-#ifdef __ANDROID_API__
-	app = GetAndroidApp();
-#endif
-	struct client_data *data   = calloc(1, sizeof(struct client_data));
-	struct server_data *server = calloc(1, sizeof(struct server_data));
-	data->click_position[0]	   = -1;
-	data->click_position[1]	   = -1;
-	data->uid				   = -1;
-	data->local_ip			   = calloc(1, 128);
-	server->PORT			   = 5555;
-	SetTraceLogLevel(LOG_NONE);
-	SetConfigFlags(FLAG_MSAA_4X_HINT);
-	InitWindow(SCR_WIDTH, SCR_HEIGHT, "Game Mode Selection");
-	SetTargetFPS(GetMonitorRefreshRate(0));
+void init_game(struct client_data *data, struct server_data *server) {
+	// resetting game data
 #ifdef __ANDROID_API__
 	SCR_WIDTH  = GetScreenWidth();
 	SCR_HEIGHT = GetScreenHeight();
 #endif
-	data->game_mode = join_window(server->IP_ADDRESS, &server->PORT, data);
+	data->click_position[0] = -1;
+	data->click_position[1] = -1;
+	data->uid				= -1;
+	data->local_ip			= calloc(1, 128);
+	server->PORT			= 5555;
+	data->game_mode			= join_window(server->IP_ADDRESS, &server->PORT, data);
 #ifdef __ANDROID_API__
 	toggleKeyboard(false);
 #endif
 	pthread_t tid[4];
-	if (data->game_mode < 0)
-		return 0;
-	else if (data->game_mode == 1 || data->game_mode == 2) {
+	if (data->game_mode < 0) {
+		LOGE("Failed to join game");
+		exit(1);
+	} else if (data->game_mode == 1 || data->game_mode == 2) {
 		pthread_create(&tid[2], 0, server_main, server);
 		while (client_connect(server->IP_ADDRESS, server->PORT, &data->sockfd))
 			;
@@ -115,7 +109,9 @@ int main() {
 		free(local_ip);
 #endif
 	}
+}
 
+void main_window(struct client_data *data) {
 	// main window
 	initHitBox();
 	SetWindowTitle(TextFormat("Simple TTT - %s", data->username));
@@ -132,6 +128,26 @@ int main() {
 		matchInfo(data);
 		EndDrawing();
 	}
+}
+
+void sigpipe_handler(int signum) {
+	LOGE("Client disconnected: %d", signum);
+	exit(1);
+}
+
+int main() {
+	signal(SIGPIPE, sigpipe_handler);
+#ifdef __ANDROID_API__
+	app = GetAndroidApp();
+#endif
+	struct client_data *data   = calloc(1, sizeof(struct client_data));
+	struct server_data *server = calloc(1, sizeof(struct server_data));
+	SetTraceLogLevel(LOG_NONE);
+	SetConfigFlags(FLAG_MSAA_4X_HINT);
+	InitWindow(SCR_WIDTH, SCR_HEIGHT, "Game Mode Selection");
+	SetTargetFPS(GetMonitorRefreshRate(0));
+	init_game(data, server);
+	main_window(data);
 	// end of the program
 	game_running = 0;
 	CloseWindow();
