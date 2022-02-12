@@ -10,6 +10,7 @@ void matchInfo(struct client_data *data);
 #ifdef __ANDROID_API__
 	#define STTT_TEXT_SIZE 50
 	#include "../../lib/raylib/src/raylib.h"
+void toggleKeyboard(bool show);
 Vector2 get_touch_pos();
 bool GuiButton(Rectangle bounds, const char *text);
 bool GuiTextBox(Rectangle bounds, char *text, int textSize, bool editMode);

@@ -20,8 +20,38 @@ extern int game_running;
 extern Rectangle game[3][3];
 
 #ifdef __ANDROID_API__
-// some raygui reimplementation that did not work for android
+	#include <android_native_app_glue.h>
+	#include <jni.h>
+void toggleKeyboard(bool show) {
+	// some "aliases"
+	JavaVM *lJavaVM = app->activity->vm;
+	JNIEnv *lJNIEnv = app->activity->env;
 
+	// java vm args
+	JavaVMAttachArgs lJavaVMAttachArgs;
+	lJavaVMAttachArgs.version = JNI_VERSION_1_6;
+	lJavaVMAttachArgs.name	  = "NativeThread";
+	lJavaVMAttachArgs.group	  = NULL;
+
+	// attaching to the java vm
+	if ((*lJavaVM)->AttachCurrentThread(lJavaVM, &lJNIEnv, &lJavaVMAttachArgs) == JNI_ERR) return;
+
+	// get native activity class and the method that we need
+	jobject lNativeActivity	   = app->activity->clazz;
+	jclass ClassNativeActivity = (*lJNIEnv)->GetObjectClass(lJNIEnv, lNativeActivity);
+	// method name depending on the show parameter
+	char *lMethodName = NULL;
+	if (show)
+		lMethodName = "showKeyboard";
+	else
+		lMethodName = "hideKeyboard";
+	jmethodID _method = (*lJNIEnv)->GetMethodID(lJNIEnv, ClassNativeActivity, lMethodName, "()V");
+
+	// call that method
+	(*lJNIEnv)->CallVoidMethod(lJNIEnv, lNativeActivity, _method);
+}
+
+// some raygui reimplementations that did not work for android
 int SCR_HEIGHT = 0;
 int SCR_WIDTH  = 0;
 Vector2 get_touch_pos() {
@@ -44,19 +74,40 @@ bool GuiButton(Rectangle bounds, const char *text) {
 	return pressed && selected;
 }
 
+bool is_shift_pressed = false;
 bool GuiTextBox(Rectangle bounds, char *text, int textSize, bool editMode) {
-	Vector2 mouse_pos = get_touch_pos();
 	DrawRectangleRec(bounds, RAYWHITE);
 	DrawRectangleLinesEx(bounds, 3, LIGHTGRAY);
-	char current_key_press = GetKeyPressed();
-	DrawText(text, bounds.x + 10, bounds.y + 2, bounds.height, BLACK);
+	int current_key_press;
 	if (editMode) {
+		current_key_press = GetKeyPressed();
 		DrawRectangleRec(bounds, Fade(BLUE, 0.3f));
-		strcat(text, TextFormat("%c", current_key_press)); // does not work with "adb shell input text 'Test'", need to use the actual keyboard
+		if (current_key_press != 0) {
+			int txt_len = strlen(text);
+			if (current_key_press == 67 && txt_len > 0)
+				text[txt_len - 1] = '\0';
+			if (txt_len < textSize) {
+				if (current_key_press >= 7 && current_key_press <= 16) { // numbers
+					text[txt_len]	  = current_key_press + 41;
+					text[txt_len + 1] = '\0';
+				} else { // letters
+					if (current_key_press == 59)
+						is_shift_pressed = true;
+					else {
+						text[txt_len] = current_key_press +
+										(68 * !is_shift_pressed) +		   // not shift
+										(36 * is_shift_pressed) +		   // shift
+										(-78 * (current_key_press == 56)); // . character
+						text[txt_len + 1] = '\0';
+						is_shift_pressed  = false;
+					}
+				}
+			}
+		}
 	}
-	return (current_key_press == KEY_ENTER);
+	DrawText(text, bounds.x + 10, bounds.y + 2, textSize, BLACK);
+	return current_key_press == 66;
 }
-
 bool GuiToggle(Rectangle bounds, const char *text, bool active) {
 	bool pressed	  = false;
 	bool selected	  = false;
@@ -112,8 +163,14 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 	bool ipbox_selected	  = false;
 	bool portbox_selected = false;
 
+#ifdef __ANDROID_API__
+	bool is_keyboard_open = false;
+#endif
 	while (!game_running && !WindowShouldClose()) {
-#ifndef __ANDROID_API__
+#ifdef __ANDROID_API__
+		if ((nickbox_selected || portbox_selected || ipbox_selected) && IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
+			toggleKeyboard(is_keyboard_open = true);
+#else
 		const char *rawclipboard = GetClipboardText();
 		if (rawclipboard)
 			memcpy(clipboard, rawclipboard, 16);
@@ -136,7 +193,7 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 			ret			 = 2;
 		} else if (selection_step == 1 && game_mode == 2) // multi player
 		{
-			DrawText("Select Game Hosting", (SCR_WIDTH - MeasureText("Select Game Hosting", STTT_TEXT_SIZE)) / 2, (SCR_HEIGHT / 2) - (STTT_TEXT_SIZE * 3), STTT_TEXT_SIZE, DARKGRAY);
+			DrawText("Select Game Hosting", (SCR_WIDTH - MeasureText("Select Game Hosting", STTT_TEXT_SIZE)) / 2, (SCR_HEIGHT / 2) - (SCR_HEIGHT / 9) - 20, STTT_TEXT_SIZE, DARKGRAY);
 			if (GuiButton((Rectangle){10, (SCR_HEIGHT / 2) - 60, (SCR_WIDTH / 2) - 15, (SCR_HEIGHT / 18)}, "Host")) {
 				selection_step++;
 				game_hosting = 1;
@@ -149,11 +206,6 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 #ifdef __ANDROID_API__
 			nickbox_selected = CheckCollisionPointRec(get_touch_pos(), nickBox) || !portbox_selected;
 			portbox_selected = CheckCollisionPointRec(get_touch_pos(), portBox) || !nickbox_selected;
-			// sprintf(data->username, "Android");
-			// *PORT = atoi(portchar);
-			// sprintf(IP_ADDRESS, "127.0.0.1");
-			// game_running = 1;
-			// ret			 = 1;
 #else
 			nickbox_selected = CheckCollisionPointRec(GetMousePosition(), nickBox) || !portbox_selected;
 			portbox_selected = CheckCollisionPointRec(GetMousePosition(), portBox) || !nickbox_selected;
@@ -162,11 +214,12 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 				sprintf(data->username, "%s", clipboard);
 			else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && portbox_selected)
 				sprintf(portchar, "%s", clipboard);
-			if (GuiTextBox(nickBox, data->username, STTT_TEXT_SIZE, nickbox_selected) || GuiTextBox(portBox, portchar, STTT_TEXT_SIZE, portbox_selected)
+			bool enter_pressed = GuiTextBox(nickBox, data->username, STTT_TEXT_SIZE, nickbox_selected);
+			enter_pressed |= GuiTextBox(portBox, portchar, STTT_TEXT_SIZE, portbox_selected);
 #ifdef __ANDROID_API__
-				|| GuiButton((Rectangle){(SCR_WIDTH - 30) / 4, (SCR_HEIGHT / 2) - 140, (SCR_WIDTH / 2) - 15, (SCR_HEIGHT / 18)}, "Host")
+			enter_pressed |= GuiButton((Rectangle){(SCR_WIDTH - 30) / 4, (SCR_HEIGHT / 2) - 140, (SCR_WIDTH / 2) - 15, (SCR_HEIGHT / 18)}, "Host");
 #endif
-			) {
+			if (enter_pressed) {
 				*PORT = atoi(portchar);
 				sprintf(IP_ADDRESS, "127.0.0.1");
 				game_running = 1;
@@ -179,12 +232,6 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 #ifdef __ANDROID_API__
 			nickbox_selected = CheckCollisionPointRec(get_touch_pos(), nickBox) || !ipbox_selected;
 			ipbox_selected	 = CheckCollisionPointRec(get_touch_pos(), ipBox) || !nickbox_selected;
-			// sprintf(IP_ADDRESS, "192.168.1.222");
-			// sprintf(data->username, "Android");
-			// if (client_connect(IP_ADDRESS, 5555, &data->sockfd) != -1) {
-			// 	game_running = 1;
-			// 	ret			 = 0;
-			// }
 #else
 			nickbox_selected = CheckCollisionPointRec(GetMousePosition(), nickBox) || !ipbox_selected;
 			ipbox_selected	 = CheckCollisionPointRec(GetMousePosition(), ipBox) || !nickbox_selected;
@@ -193,11 +240,12 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 				sprintf(data->username, "%s", clipboard);
 			else if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_V) && ipbox_selected)
 				sprintf(IP_ADDRESS, "%s", clipboard);
-			if (GuiTextBox(nickBox, data->username, STTT_TEXT_SIZE, nickbox_selected) || GuiTextBox(ipBox, IP_ADDRESS, 16, ipbox_selected)
+			bool enter_pressed = GuiTextBox(nickBox, data->username, STTT_TEXT_SIZE, nickbox_selected);
+			enter_pressed |= GuiTextBox(ipBox, IP_ADDRESS, STTT_TEXT_SIZE, ipbox_selected);
 #ifdef __ANDROID_API__
-				|| GuiButton((Rectangle){(SCR_WIDTH - 30) / 4, (SCR_HEIGHT / 2) - 140, (SCR_WIDTH / 2) - 15, (SCR_HEIGHT / 18)}, "Connect")
+			enter_pressed |= GuiButton((Rectangle){(SCR_WIDTH - 30) / 4, (SCR_HEIGHT / 2) - 140, (SCR_WIDTH / 2) - 15, (SCR_HEIGHT / 18)}, "Connect");
 #endif
-			) {
+			if (enter_pressed) {
 				if (strlen(IP_ADDRESS) <= 1)
 					sprintf(IP_ADDRESS, "127.0.0.1");
 				if (client_connect(IP_ADDRESS, 5555, &data->sockfd) != -1) {
@@ -228,4 +276,5 @@ void matchInfo(struct client_data *data) { // draw match info
 	const char *info_text = TextFormat("It's %s %s turn!", data->turn ? data->users[0] : data->users[1], data->turn ? "(x)" : "(O)");
 	DrawText(info_text, (SCR_WIDTH - MeasureText(info_text, STTT_TEXT_SIZE)) / 2, BLOCK * 3 + 10, STTT_TEXT_SIZE, BLACK);
 	DrawText(TextFormat("%s: %i\n%s: %i\n", data->users[0], data->winsP[0], data->users[1], data->winsP[1]), 10, BLOCK * 3 + 40, STTT_TEXT_SIZE, BLACK);
+	DrawText(TextFormat("%s\n", data->local_ip), 10, SCR_HEIGHT - STTT_TEXT_SIZE * 2, STTT_TEXT_SIZE, BLACK);
 }

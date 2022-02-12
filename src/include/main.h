@@ -11,13 +11,22 @@ extern int SCR_WIDTH, SCR_HEIGHT;
 #endif
 
 #ifdef __ANDROID_API__
-	#include <android/log.h> // for android debugging
-	#define LOGI(...)                                                                          \
+	#include <jni.h>
+	#include <android/log.h>
+extern struct android_app *app;
+	#define LOGV(...)                                                                          \
 		{                                                                                      \
 			char *log_msg = calloc(1, 1024);                                                   \
 			sprintf(log_msg, __VA_ARGS__);                                                     \
 			__android_log_print(ANDROID_LOG_VERBOSE, "Simple_TTT", "Simple TTT: %s", log_msg); \
 			free(log_msg);                                                                     \
+		}
+	#define LOGI(...)                                                                       \
+		{                                                                                   \
+			char *log_msg = calloc(1, 1024);                                                \
+			sprintf(log_msg, __VA_ARGS__);                                                  \
+			__android_log_print(ANDROID_LOG_INFO, "Simple_TTT", "Simple TTT: %s", log_msg); \
+			free(log_msg);                                                                  \
 		}
 	#define LOGW(...)                                                                       \
 		{                                                                                   \
@@ -33,7 +42,15 @@ extern int SCR_WIDTH, SCR_HEIGHT;
 			__android_log_print(ANDROID_LOG_ERROR, "Simple_TTT", "Simple TTT: %s", log_msg); \
 			free(log_msg);                                                                   \
 		}
+struct android_app *GetAndroidApp(void);
 #else
+	#define LOGV(...)                         \
+		{                                     \
+			char *log_msg = calloc(1, 1024);  \
+			sprintf(log_msg, __VA_ARGS__);    \
+			fprintf(stdout, "%s\n", log_msg); \
+			free(log_msg);                    \
+		}
 	#define LOGI(...)                         \
 		{                                     \
 			char *log_msg = calloc(1, 1024);  \
@@ -70,6 +87,7 @@ struct client_data {
 	char users[4][32];
 	char username[32];
 	int game_mode;
+	char *local_ip;
 	SOCK sockfd;
 };
 
