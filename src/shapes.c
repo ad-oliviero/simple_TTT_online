@@ -37,7 +37,5 @@ void shape(int idx[2], int type) {
 		float radius   = (BLOCK / 2) - (BLOCK / 6);
 		DrawCircleV(center, radius, BLACK);
 		DrawCircleV(center, radius - THICKNESS, RAYWHITE);
-		// DrawCircle(game[idx[0]][idx[1]].x + BLOCK / 2, game[idx[0]][idx[1]].y + BLOCK / 2, BLOCK / THICKNESS + 10, BLACK);
-		// DrawCircle(game[idx[0]][idx[1]].x + BLOCK / 2, game[idx[0]][idx[1]].y + BLOCK / 2, BLOCK / THICKNESS + 7, RAYWHITE);
 	}
 }
