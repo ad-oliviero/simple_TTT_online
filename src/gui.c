@@ -109,16 +109,13 @@ bool GuiTextBox(Rectangle bounds, char *text, int textSize, bool editMode) {
 	return current_key_press == 66;
 }
 bool GuiToggle(Rectangle bounds, const char *text, bool active) {
-	bool pressed	  = false;
-	bool selected	  = false;
 	Vector2 mouse_pos = get_touch_pos();
-	selected		  = CheckCollisionPointRec(mouse_pos, bounds);
-	pressed			  = IsMouseButtonReleased(MOUSE_LEFT_BUTTON);
+	if (CheckCollisionPointRec(mouse_pos, bounds) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+		active = !active;
 	DrawRectangleRec(bounds, LIGHTGRAY);
 	DrawRectangleLinesEx(bounds, 3, DARKGRAY);
 	DrawText(text, bounds.x + ((bounds.width - MeasureText(text, STTT_TEXT_SIZE)) / 2), bounds.y + ((bounds.height - STTT_TEXT_SIZE) / 2), STTT_TEXT_SIZE, BLACK);
-	DrawRectangleRec(bounds, Fade(BLUE, 0.3f * selected));
-	active = pressed && selected && active;
+	DrawRectangleRec(bounds, Fade(BLUE, 0.3f * active));
 	return active;
 }
 #else
