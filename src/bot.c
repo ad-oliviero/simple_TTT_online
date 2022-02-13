@@ -33,6 +33,7 @@ void minimax(struct client_data *data) { // needs an actual implementation
 			data->click_position[0] = rand_num[0];
 			data->click_position[1] = rand_num[1];
 		}
+		data->ready = 1;
 	}
 	return;
 }

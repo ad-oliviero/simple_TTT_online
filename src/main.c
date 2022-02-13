@@ -122,7 +122,7 @@ void main_window(struct client_data *data) {
 		grid();
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
-				shape((int[2]){i, j}, &data->game_grid[i][j]);
+				shape((int[2]){i, j}, data->game_grid[i][j]);
 		if (data->is_game_over == 1)
 			end_client_game(data);
 		matchInfo(data);

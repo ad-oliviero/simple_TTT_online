@@ -2,7 +2,6 @@
 #define __MAIN_H__
 
 extern int SCR_WIDTH, SCR_HEIGHT;
-#define THICKNESS 3.0f
 #define BLOCK SCR_WIDTH / 3
 #ifdef _WIN32
 	#define SOCK unsigned int
@@ -13,7 +12,7 @@ extern int SCR_WIDTH, SCR_HEIGHT;
 #ifdef __ANDROID_API__
 	#include <jni.h>
 	#include <android/log.h>
-extern struct android_app *app;
+	#define THICKNESS 7.0f
 	#define LOGV(...)                                                                          \
 		{                                                                                      \
 			char *log_msg = calloc(1, 1024);                                                   \
@@ -42,8 +41,10 @@ extern struct android_app *app;
 			__android_log_print(ANDROID_LOG_ERROR, "Simple_TTT", "Simple TTT: %s", log_msg); \
 			free(log_msg);                                                                   \
 		}
+extern struct android_app *app;
 struct android_app *GetAndroidApp(void);
 #else
+	#define THICKNESS 3.0f
 	#define LOGV(...)                         \
 		{                                     \
 			char *log_msg = calloc(1, 1024);  \
