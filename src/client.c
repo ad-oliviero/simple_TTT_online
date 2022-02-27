@@ -9,6 +9,8 @@
 #elif _WIN32
 	#include <winsock2.h>
 #endif
+#include "../lib/raylib/src/raylib.h"
+#include "include/gui.h"
 #include "include/main.h"
 
 extern int game_running;
@@ -30,8 +32,11 @@ void *client_comm(void *arg) { // communicating data with the server (mostly rec
 	// initializing the game
 	struct client_data *data = (struct client_data *)arg;
 	listen(data->sockfd, 1);
-	send(data->sockfd, &data->username, sizeof(data->username), 0);
-	recv(data->sockfd, &data->uid, sizeof(data->uid), 0);
+	for (int i = 0; i < 32; i++)
+		send(data->sockfd, &(data->username[i]), sizeof(data->username[i]), 0);
+	int ibuf = 0;
+	recv(data->sockfd, &ibuf, sizeof(ibuf), 0);
+	data->uid = ntohl(ibuf);
 
 	int recv_flags = 0;
 	int send_flags = 0;
@@ -39,24 +44,40 @@ void *client_comm(void *arg) { // communicating data with the server (mostly rec
 	// communication loop
 	while (game_running) {
 		// recv game data
-		recv(data->sockfd, &data->users, sizeof(data->users), recv_flags);
-		recv(data->sockfd, &data->is_game_over, sizeof(data->is_game_over), recv_flags);
-		recv(data->sockfd, &data->turn, sizeof(data->turn), recv_flags);
-		recv(data->sockfd, &data->winsP, sizeof(data->winsP), recv_flags);
-		recv(data->sockfd, &data->winner, sizeof(data->winner), recv_flags);
-		recv(data->sockfd, &data->game_grid, sizeof(data->game_grid), recv_flags);
+		for (int i = 0; i < 4; i++)
+			recv(data->sockfd, &(data->users[i]), 32, recv_flags);
+		// receive data in network byte order and convert it to host byte order
+		recv(data->sockfd, &ibuf, sizeof(ibuf), recv_flags);
+		data->is_game_over = ntohl(ibuf);
+		recv(data->sockfd, &ibuf, sizeof(ibuf), recv_flags);
+		data->turn = ntohl(ibuf);
+		recv(data->sockfd, &ibuf, sizeof(ibuf), recv_flags);
+		data->winsP[0] = ntohl(ibuf);
+		recv(data->sockfd, &ibuf, sizeof(ibuf), recv_flags);
+		data->winsP[1] = ntohl(ibuf);
+		recv(data->sockfd, &ibuf, sizeof(ibuf), recv_flags);
+		data->winner = ntohl(ibuf);
+		for (int i = 0; i < 3; i++)
+			for (int j = 0; j < 3; j++) {
+				recv(data->sockfd, &(ibuf), sizeof(ibuf), recv_flags);
+				data->game_grid[i][j] = ntohl(ibuf);
+			}
 
 		// checking if client has permission to play and sending data
 		if (data->turn == data->uid) {
 			data->click_position[0] = -1; // set click only if it's client's turn
 			data->click_position[1] = -1;
 		}
-		send(data->sockfd, &data->click_position, sizeof(data->click_position), send_flags);
-		if ((data->click_position[0] >= 0 && data->click_position[1] >= 0) || data->is_game_over) {
+		ibuf = htonl(data->click_position[0]);
+		send(data->sockfd, &ibuf, sizeof(ibuf), send_flags);
+		ibuf = htonl(data->click_position[1]);
+		send(data->sockfd, &ibuf, sizeof(ibuf), send_flags);
+		if ((data->click_position[0] != -1 && data->click_position[1] != -1) || data->is_game_over == 1) {
 			data->click_position[0] = -1;
 			data->click_position[1] = -1;
 		}
-		send(data->sockfd, &data->ready, sizeof(data->ready), send_flags);
+		ibuf = htonl(data->ready);
+		send(data->sockfd, &ibuf, sizeof(ibuf), send_flags);
 		if (data->ready == 1 && data->is_game_over == 0)
 			data->ready = 0;
 	}

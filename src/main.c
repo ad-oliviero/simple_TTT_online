@@ -42,7 +42,7 @@ char *get_ip_addr(int id) {
 		}
 		ip = calloc(1, 48);
 		fgets(ip, 48, ip_fp);
-		fclose(ip_fp);
+		pclose(ip_fp);
 		// for some reason, on android a \n gets added
 		char *ipp = strchr(ip, '\n');
 		while (ipp) {
@@ -58,7 +58,7 @@ char *get_ip_addr(int id) {
 		}
 		ip = calloc(1, 48);
 		fgets(ip, 48, ip_fp);
-		fclose(ip_fp);
+		pclose(ip_fp);
 	}
 	return ip;
 }
@@ -120,6 +120,7 @@ void main_window(struct client_data *data) {
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 		grid();
+		DrawCircleV((Vector2){data->click_position[0], data->click_position[1]}, 50, GREEN);
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
 				shape((int[2]){i, j}, data->game_grid[i][j]);

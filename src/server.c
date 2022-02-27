@@ -16,6 +16,11 @@
 #include <string.h>
 #include <sys/types.h>
 
+#ifdef __ANDROID_API__
+	#include <android_native_app_glue.h>
+	#include <jni.h>
+#endif
+
 extern int game_running;
 
 void *communication(void *arg) { // communicating servdata->data with the client (mostly sending)
@@ -27,18 +32,33 @@ void *communication(void *arg) { // communicating servdata->data with the client
 	int send_flags				 = 0;
 	while (game_running) {
 		servdata->data.winner = checkwinner(&servdata->data);
-
-		// send servdata->data to client
-		send(servdata->clifd[client_id], &servdata->data.users, sizeof(servdata->data.users), send_flags);
-		send(servdata->clifd[client_id], &servdata->data.is_game_over, sizeof(servdata->data.is_game_over), send_flags);
-		send(servdata->clifd[client_id], &servdata->data.turn, sizeof(servdata->data.turn), send_flags);
-		send(servdata->clifd[client_id], &servdata->data.winsP, sizeof(servdata->data.winsP), send_flags);
-		send(servdata->clifd[client_id], &servdata->data.winner, sizeof(servdata->data.winner), send_flags);
-		send(servdata->clifd[client_id], &servdata->data.game_grid, sizeof(servdata->data.game_grid), send_flags);
+		for (int i = 0; i < 4; i++)
+			send(servdata->clifd[client_id], &(servdata->data.users[i]), sizeof(servdata->data.users[i]), send_flags);
+		int ibuf = 0;
+		// send data in network byte order
+		ibuf = htonl(servdata->data.is_game_over);
+		send(servdata->clifd[client_id], &ibuf, sizeof(ibuf), send_flags);
+		ibuf = htonl(servdata->data.turn);
+		send(servdata->clifd[client_id], &ibuf, sizeof(ibuf), send_flags);
+		ibuf = htonl(servdata->data.winsP[0]);
+		send(servdata->clifd[client_id], &ibuf, sizeof(ibuf), send_flags);
+		ibuf = htonl(servdata->data.winsP[1]);
+		send(servdata->clifd[client_id], &ibuf, sizeof(ibuf), send_flags);
+		ibuf = htonl(servdata->data.winner);
+		send(servdata->clifd[client_id], &ibuf, sizeof(ibuf), send_flags);
+		for (int i = 0; i < 3; i++)
+			for (int j = 0; j < 3; j++) {
+				ibuf = htonl(servdata->data.game_grid[i][j]);
+				send(servdata->clifd[client_id], &ibuf, sizeof(ibuf), send_flags);
+			}
 
 		// recv client events
-		recv(servdata->clifd[client_id], &servdata->data.click_position, sizeof(servdata->data.click_position), recv_flags);
-		recv(servdata->clifd[client_id], &servdata->ready_check[client_id], sizeof(servdata->ready_check[client_id]), recv_flags);
+		recv(servdata->clifd[client_id], &ibuf, sizeof(ibuf), recv_flags);
+		servdata->data.click_position[0] = ntohl(ibuf);
+		recv(servdata->clifd[client_id], &ibuf, sizeof(ibuf), recv_flags);
+		servdata->data.click_position[1] = ntohl(ibuf);
+		recv(servdata->clifd[client_id], &ibuf, sizeof(ibuf), recv_flags);
+		servdata->ready_check[client_id] = ntohl(ibuf);
 
 		// check if client has permission to play
 		if (servdata->data.turn == client_id) {
@@ -63,7 +83,6 @@ void *server_main(void *arg) {
 #ifndef __EMSCRIPTEN__
 	struct server_data *servdata = (struct server_data *)arg;
 	pthread_t tid[128];
-
 	// creating socket and connecting to it
 	#ifdef _WIN32
 	WSADATA Data;
@@ -85,8 +104,10 @@ void *server_main(void *arg) {
 	servdata->client_count = 0;
 	while (servdata->client_count < 2) {
 		servdata->clifd[servdata->client_count] = accept(servfd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
-		recv(servdata->clifd[servdata->client_count], &servdata->data.users[servdata->client_count], sizeof(servdata->data.users[servdata->client_count]), 0);
-		send(servdata->clifd[servdata->client_count], &servdata->client_count, sizeof(servdata->client_count), 0);
+		for (int i = 0; i < 32; i++)
+			recv(servdata->clifd[servdata->client_count], &servdata->data.users[servdata->client_count][i], sizeof(servdata->data.users[servdata->client_count][i]), 0);
+		int ibuf = htonl(servdata->client_count);
+		send(servdata->clifd[servdata->client_count], &ibuf, sizeof(ibuf), 0);
 		servdata->client_running = 0;
 		pthread_create(&tid[servdata->client_count], 0, communication, servdata);
 		while (servdata->client_running == 0)
