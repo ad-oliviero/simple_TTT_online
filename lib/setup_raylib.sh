@@ -33,10 +33,8 @@ sleep 1
 make clean
 mkdir windows
 make PLATFORM=PLATFORM_DESKTOP BUILD_MODE=RELEASE CC=x86_64-w64-mingw32-gcc
-mv libraylib.a windows
-make clean
 make PLATFORM=PLATFORM_DESKTOP BUILD_MODE=RELEASE CC=x86_64-w64-mingw32-gcc RAYLIB_LIBTYPE=SHARED PLATFORM_OS=WINDOWS RAYLIB_RES_FILE=
-mv raylib.dll windows
+mv -t windows raylib.dll libraylib.a libraylibdll.a
 
 # building for web
 printf "\x1b[32mBuilding for web...\x1b[0m\n"
