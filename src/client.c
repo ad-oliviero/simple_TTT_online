@@ -9,8 +9,6 @@
 #elif _WIN32
 	#include <winsock2.h>
 #endif
-#include "../lib/raylib/src/raylib.h"
-#include "include/gui.h"
 #include "include/main.h"
 
 extern int game_running;

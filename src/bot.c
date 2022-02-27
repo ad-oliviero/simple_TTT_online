@@ -43,7 +43,6 @@ void *bot_ai(void *arg) {
 	srand(time(NULL));
 	while (game_running) {
 		if (!data->is_game_over && !data->turn) {
-			// usleep(rand() % 100000);
 			minimax(data);
 		}
 		data->ready = 1;

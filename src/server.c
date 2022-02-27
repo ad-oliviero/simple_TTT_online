@@ -16,11 +16,6 @@
 #include <string.h>
 #include <sys/types.h>
 
-#ifdef __ANDROID_API__
-	#include <android_native_app_glue.h>
-	#include <jni.h>
-#endif
-
 extern int game_running;
 
 void *communication(void *arg) { // communicating servdata->data with the client (mostly sending)
@@ -92,7 +87,6 @@ void *server_main(void *arg) {
 	int flags = 1, addrlen = sizeof(address);
 	SOCK servfd = socket(AF_INET, SOCK_STREAM, 6); // 6 = tcp protocol
 	setsockopt(servfd, SOL_SOCKET, SO_REUSEADDR, &flags, sizeof(flags));
-	// setsockopt(servfd, IPPROTO_TCP, TCP_NODELAY, &flags, sizeof(flags));
 	address.sin_family		= AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port		= htons(servdata->PORT);

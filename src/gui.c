@@ -78,7 +78,7 @@ bool is_shift_pressed = false;
 bool GuiTextBox(Rectangle bounds, char *text, int textSize, bool editMode) {
 	DrawRectangleRec(bounds, RAYWHITE);
 	DrawRectangleLinesEx(bounds, 3, LIGHTGRAY);
-	int current_key_press;
+	int current_key_press = 0;
 	if (editMode) {
 		current_key_press = GetKeyPressed();
 		DrawRectangleRec(bounds, Fade(BLUE, 0.3f));

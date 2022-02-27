@@ -120,7 +120,6 @@ void main_window(struct client_data *data) {
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 		grid();
-		DrawCircleV((Vector2){data->click_position[0], data->click_position[1]}, 50, GREEN);
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
 				shape((int[2]){i, j}, data->game_grid[i][j]);
