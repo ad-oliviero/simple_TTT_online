@@ -1,3 +1,4 @@
+
 #include "include/main.h"
 #include "../lib/raylib/src/raylib.h"
 #include "include/bot.h"
@@ -6,9 +7,13 @@
 #include "include/gui.h"
 #include "include/server.h"
 #include "include/shapes.h"
-#include <arpa/inet.h>
-#include <netdb.h>
 #include <pthread.h>
+#if defined(__linux__) || defined(__EMSCRIPTEN__)
+	#include <arpa/inet.h>
+	#include <netdb.h>
+#elif _WIN32
+// #include <winsock2.h>
+#endif
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,6 +31,7 @@ char *get_ip_addr(int id) {
 	char *ip = NULL;
 	if (id == 0) { // local ip
 #ifndef __ANDROID_API__
+	#ifndef _WIN32
 		char hostbuffer[256];
 		struct hostent *host_entry;
 		int hostname = gethostname(hostbuffer, sizeof(hostbuffer));
@@ -34,6 +40,7 @@ char *get_ip_addr(int id) {
 			if (host_entry)
 				ip = inet_ntoa(*((struct in_addr *)host_entry->h_addr_list[0]));
 		}
+	#endif
 #else
 		FILE *ip_fp = popen("ifconfig $(getprop wifi.interface) | grep -Eo 'addr:[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}' | sed \"s/addr://g\"", "r");
 		if (ip_fp == NULL) {
@@ -136,7 +143,9 @@ void sigpipe_handler(int signum) {
 }
 
 int main() {
+#ifndef _WIN32
 	signal(SIGPIPE, sigpipe_handler);
+#endif
 #ifdef __ANDROID_API__
 	app = GetAndroidApp();
 #endif
