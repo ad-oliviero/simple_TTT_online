@@ -46,6 +46,29 @@ void toggleKeyboard(bool show) {
 	// call that method
 	(*lJNIEnv)->CallVoidMethod(lJNIEnv, lNativeActivity, _method);
 }
+bool getKeyboardState() {
+	// some "aliases"
+	JavaVM *lJavaVM = app->activity->vm;
+	JNIEnv *lJNIEnv = app->activity->env;
+
+	// java vm args
+	JavaVMAttachArgs lJavaVMAttachArgs;
+	lJavaVMAttachArgs.version = JNI_VERSION_1_6;
+	lJavaVMAttachArgs.name	  = "NativeThread";
+	lJavaVMAttachArgs.group	  = NULL;
+
+	// attaching to the java vm
+	if ((*lJavaVM)->AttachCurrentThread(lJavaVM, &lJNIEnv, &lJavaVMAttachArgs) == JNI_ERR) return false;
+
+	// get native activity class and the method that we need
+	jobject lNativeActivity	   = app->activity->clazz;
+	jclass ClassNativeActivity = (*lJNIEnv)->GetObjectClass(lJNIEnv, lNativeActivity);
+	// method name depending on the show parameter
+	jmethodID _method = (*lJNIEnv)->GetMethodID(lJNIEnv, ClassNativeActivity, "getKeyboardState", "()Z");
+
+	// call that method
+	return (*lJNIEnv)->CallBooleanMethod(lJNIEnv, lNativeActivity, _method);
+}
 
 int SCR_HEIGHT = 0;
 int SCR_WIDTH  = 0;
@@ -83,14 +106,17 @@ void grid() {
 
 int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data, struct nk_context *ctx) {
 	int selection_step = 0, game_mode = -1;
-	bool game_hosting = false;
+	bool game_hosting	  = false;
+	nk_flags nkedit_event = 0;
+	char *title_label[4]  = {"Select game mode", "Select Game Hosting", "Join match", "Host match"};
+	char *btn_label[4]	  = {"Single Player", "Multi Player", "Host", "Join"};
 #ifdef ANDROID
-	bool is_keyboard_open = false;
-#endif
-	char *title_label[4]	  = {"Select game mode", "Select Game Hosting", "Join match", "Host match"};
-	char *btn_label[4]		  = {"Single Player", "Multi Player", "Host", "Join"};
+	struct nk_rect wg_push[2] = {{15, (SCR_HEIGHT / 2) - 180, SCR_WIDTH - 35, (SCR_HEIGHT / 18)},
+								 {15, (SCR_HEIGHT / 2), SCR_WIDTH - 35, (SCR_HEIGHT / 18)}};
+#else
 	struct nk_rect wg_push[2] = {{15, (SCR_HEIGHT / 2) - 60, SCR_WIDTH - 35, (SCR_HEIGHT / 18)},
 								 {15, (SCR_HEIGHT / 2), SCR_WIDTH - 35, (SCR_HEIGHT / 18)}};
+#endif
 	sprintf(data->username, "Nickname");
 	sprintf(IP_ADDRESS, "127.0.0.1:5555");
 	*PORT = 5555;
@@ -114,9 +140,15 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data, struct nk
 					selection_step++;
 					game_hosting = true;
 				}
-			} else if (selection_step == 2) // username
-				nk_edit_string_zero_terminated(ctx, NK_EDIT_BOX | NK_EDIT_AUTO_SELECT, data->username, sizeof(data->username), nk_filter_ascii);
-			// widget 2
+			} else if (selection_step == 2) { // username
+				nkedit_event = nk_edit_string_zero_terminated(ctx, NK_EDIT_BOX | NK_EDIT_AUTO_SELECT, data->username, sizeof(data->username), nk_filter_ascii);
+#ifdef ANDROID
+				if (nkedit_event & NK_EDIT_ACTIVATED)
+					toggleKeyboard(true);
+				else if (nkedit_event & NK_EDIT_DEACTIVATED)
+					toggleKeyboard(false);
+#endif
+			} // widget 2
 			nk_layout_space_push(ctx, wg_push[1]);
 			if (selection_step == 0) { // multi player
 				if (nk_button_label(ctx, btn_label[selection_step * 2 + 1])) {
@@ -128,8 +160,15 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data, struct nk
 					selection_step++;
 					game_hosting = false;
 				}
-			} else if (selection_step == 2)
-				nk_edit_string_zero_terminated(ctx, NK_EDIT_BOX | NK_EDIT_AUTO_SELECT, IP_ADDRESS, 32, nk_filter_ascii);
+			} else if (selection_step == 2) {
+				nkedit_event = nk_edit_string_zero_terminated(ctx, NK_EDIT_BOX | NK_EDIT_AUTO_SELECT, IP_ADDRESS, 32, nk_filter_ascii);
+#ifdef ANDROID
+				if (nkedit_event & NK_EDIT_ACTIVATED)
+					toggleKeyboard(true);
+				else if (nkedit_event & NK_EDIT_DEACTIVATED)
+					toggleKeyboard(false);
+#endif
+			}
 			nk_layout_space_end(ctx);
 			// end selection if multiplayer
 			if (GetKeyPressed() == KEY_ENTER)

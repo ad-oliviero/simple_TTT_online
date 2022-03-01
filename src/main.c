@@ -89,6 +89,7 @@ void init_game(struct client_data *data, struct server_data *server, struct nk_c
 	 */
 	if (data->game_mode < 0) {
 		CloseWindow();
+		UnloadNuklear(ctx);
 		exit(0);
 	}
 #ifdef ANDROID
@@ -169,6 +170,7 @@ int main() {
 	// end of the program
 	game_running = 0;
 	CloseWindow();
+	UnloadNuklear(ctx);
 	close(data->sockfd);
 	return 0;
 }

@@ -33,6 +33,11 @@ public class NativeLoader extends android.app.NativeActivity {
         }).start();
     }
 
+    public boolean getKeyboardState() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
+        return imm.isActive();
+    }
+
     public void serverMain() throws IOException {
         ServerSocket servfd = new ServerSocket(5555);
         while (servdata.client_count < 2) {
