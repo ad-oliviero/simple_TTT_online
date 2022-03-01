@@ -23,12 +23,12 @@ void shape(int idx[2], int type) {
 	if (type == 1) {
 		Vector2 dlen  = (Vector2){(BLOCK * (idx[0] + 1)) - pos.y, (BLOCK * (idx[1] + 1)) - pos.x};
 		Vector2 dlend = (Vector2){dlen.x / 4, dlen.y / 4};
-		DrawLineEx((Vector2){pos.x + dlend.x, pos.y + dlend.y}, (Vector2){pos.x + dlen.x - dlend.x, pos.y + dlen.y - dlend.y}, THICKNESS, BLACK);
-		DrawLineEx((Vector2){pos.x + dlen.x - dlend.x, pos.y + dlend.y}, (Vector2){pos.x + dlend.x, pos.y + dlen.y - dlend.y}, THICKNESS, BLACK);
+		DrawLineEx((Vector2){pos.x + dlend.x, pos.y + dlend.y}, (Vector2){pos.x + dlen.x - dlend.x, pos.y + dlen.y - dlend.y}, THICKNESS, FG_COLOR);
+		DrawLineEx((Vector2){pos.x + dlen.x - dlend.x, pos.y + dlend.y}, (Vector2){pos.x + dlend.x, pos.y + dlen.y - dlend.y}, THICKNESS, FG_COLOR);
 	} else if (type == 2) {
 		Vector2 center = (Vector2){pos.x + (BLOCK / 2), pos.y + (BLOCK / 2)};
 		float radius   = (BLOCK / 2) - (BLOCK / 6);
-		DrawCircleV(center, radius, BLACK);
-		DrawCircleV(center, radius - THICKNESS, RAYWHITE);
+		DrawCircleV(center, radius, FG_COLOR);
+		DrawCircleV(center, radius - THICKNESS, BG_COLOR);
 	}
 }

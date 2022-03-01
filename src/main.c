@@ -133,7 +133,7 @@ void main_window(struct client_data *data, struct nk_context *ctx) {
 			end_client_game(data, ctx);
 		place(data);
 		BeginDrawing();
-		ClearBackground(RAYWHITE);
+		ClearBackground(BG_COLOR);
 		grid();
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)

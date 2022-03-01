@@ -53,6 +53,8 @@ int SCR_WIDTH  = 0;
 int SCR_WIDTH  = 450;
 int SCR_HEIGHT = 800;
 #endif
+Color BG_COLOR = (Color){45, 45, 45, 255};
+Color FG_COLOR = (Color){175, 175, 175, 255};
 
 void initHitBox() { // creating boxes to detect touch or mouse clicks
 	for (int i = 0; i < 9; i++) {
@@ -65,18 +67,18 @@ void initHitBox() { // creating boxes to detect touch or mouse clicks
 
 void grid() {
 	// Borders
-	DrawLineEx((Vector2){0, 1}, (Vector2){SCR_WIDTH, 1}, THICKNESS + 1, BLACK);
-	DrawLineEx((Vector2){1, 1}, (Vector2){1, SCR_WIDTH}, THICKNESS + 1, BLACK);
-	DrawLineEx((Vector2){0, SCR_WIDTH}, (Vector2){SCR_WIDTH, SCR_WIDTH}, THICKNESS + 1, BLACK);
-	DrawLineEx((Vector2){SCR_WIDTH, 0}, (Vector2){SCR_WIDTH, SCR_WIDTH}, THICKNESS + 1, BLACK);
+	DrawLineEx((Vector2){0, 1}, (Vector2){SCR_WIDTH, 1}, THICKNESS + 1, FG_COLOR);
+	DrawLineEx((Vector2){1, 1}, (Vector2){1, SCR_WIDTH}, THICKNESS + 1, FG_COLOR);
+	DrawLineEx((Vector2){0, SCR_WIDTH}, (Vector2){SCR_WIDTH, SCR_WIDTH}, THICKNESS + 1, FG_COLOR);
+	DrawLineEx((Vector2){SCR_WIDTH, 0}, (Vector2){SCR_WIDTH, SCR_WIDTH}, THICKNESS + 1, FG_COLOR);
 
 	// vertical grid
-	DrawLineEx((Vector2){BLOCK, 0}, (Vector2){BLOCK, SCR_WIDTH}, THICKNESS + 1, BLACK);
-	DrawLineEx((Vector2){BLOCK * 2, 0}, (Vector2){BLOCK * 2, SCR_WIDTH}, THICKNESS + 1, BLACK);
+	DrawLineEx((Vector2){BLOCK, 0}, (Vector2){BLOCK, SCR_WIDTH}, THICKNESS + 1, FG_COLOR);
+	DrawLineEx((Vector2){BLOCK * 2, 0}, (Vector2){BLOCK * 2, SCR_WIDTH}, THICKNESS + 1, FG_COLOR);
 
 	// horizontal grid
-	DrawLineEx((Vector2){0, BLOCK}, (Vector2){SCR_WIDTH, BLOCK}, THICKNESS + 1, BLACK);
-	DrawLineEx((Vector2){0, BLOCK * 2}, (Vector2){SCR_WIDTH, BLOCK * 2}, THICKNESS + 1, BLACK);
+	DrawLineEx((Vector2){0, BLOCK}, (Vector2){SCR_WIDTH, BLOCK}, THICKNESS + 1, FG_COLOR);
+	DrawLineEx((Vector2){0, BLOCK * 2}, (Vector2){SCR_WIDTH, BLOCK * 2}, THICKNESS + 1, FG_COLOR);
 }
 
 int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data, struct nk_context *ctx) {
@@ -154,7 +156,7 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data, struct nk
 
 void matchInfo(struct client_data *data) { // draw match info
 	const char *info_text = TextFormat("It's %s %s turn!", data->turn ? data->users[0] : data->users[1], data->turn ? "(x)" : "(O)");
-	DrawText(info_text, (SCR_WIDTH - MeasureText(info_text, STTT_TEXT_SIZE)) / 2, BLOCK * 3 + 10, STTT_TEXT_SIZE, BLACK);
-	DrawText(TextFormat("%s: %i\n%s: %i\n", data->users[0], data->winsP[0], data->users[1], data->winsP[1]), 10, BLOCK * 3 + 40, STTT_TEXT_SIZE, BLACK);
-	DrawText(TextFormat("%s\n", data->local_ip), 10, SCR_HEIGHT - STTT_TEXT_SIZE * 2, STTT_TEXT_SIZE, BLACK);
+	DrawText(info_text, (SCR_WIDTH - MeasureText(info_text, STTT_TEXT_SIZE)) / 2, BLOCK * 3 + 10, STTT_TEXT_SIZE, FG_COLOR);
+	DrawText(TextFormat("%s: %i\n%s: %i\n", data->users[0], data->winsP[0], data->users[1], data->winsP[1]), 10, BLOCK * 3 + 40, STTT_TEXT_SIZE, FG_COLOR);
+	DrawText(TextFormat("%s\n", data->local_ip), 10, SCR_HEIGHT - STTT_TEXT_SIZE * 2, STTT_TEXT_SIZE, FG_COLOR);
 }
