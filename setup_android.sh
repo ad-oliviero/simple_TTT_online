@@ -2,11 +2,10 @@
 set -e
 
 export START_DIR=$(pwd)
-export SDK_REL_NUM=28
+export SDK_VER=28
 
 printf "Installing android sdkmanager...\n"
-if [ ! -d android-sdk ]
-then
+if [ ! -d android-sdk ]; then
 	sleep 1
 	mkdir -v android-sdk
 	[ ! -f commandlinetools-linux-8092744_latest.zip ] && wget "https://dl.google.com/android/repository/commandlinetools-linux-8092744_latest.zip"
@@ -18,22 +17,21 @@ then
 	export ANDROID_SDK=$(pwd)
 	cd tools/bin
 	./sdkmanager --update --sdk_root=$ANDROID_SDK
-	./sdkmanager --install "build-tools;$SDK_REL_NUM.0.0" --sdk_root=$ANDROID_SDK
+	./sdkmanager --install "build-tools;$SDK_VER.0.0" --sdk_root=$ANDROID_SDK
 	./sdkmanager --install platform-tools --sdk_root=$ANDROID_SDK
-	./sdkmanager --install "platforms;android-$SDK_REL_NUM" --sdk_root=$ANDROID_SDK
+	./sdkmanager --install "platforms;android-$SDK_VER" --sdk_root=$ANDROID_SDK
 	unset ANDROID_SDK
 	cd $START_DIR
 fi
 
 printf "\nInstalling ndk...\n"
-if [ ! -d android-ndk ]
-then
+if [ ! -d android-ndk ]; then
 	sleep 1
 	[ ! -f android-ndk-r23b-linux.zip ] && wget "https://dl.google.com/android/repository/android-ndk-r23b-linux.zip"
 	unzip android-ndk-r23b-linux.zip
 	mv android-ndk-r23b android-ndk
-	cp dx android-sdk/build-tools/$SDK_REL_NUM.0.0/dx
-	cp dx.jar android-sdk/build-tools/$SDK_REL_NUM.0.0/lib/dx.jar
+	cp dx android-sdk/build-tools/$SDK_VER.0.0/dx
+	cp dx.jar android-sdk/build-tools/$SDK_VER.0.0/lib/dx.jar
 	cd $START_DIR
 fi
 

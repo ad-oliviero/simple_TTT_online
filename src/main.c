@@ -20,7 +20,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifdef __ANDROID_API__
+#ifdef ANDROID
 	#include <jni.h>
 struct android_app *app;
 #endif
@@ -30,7 +30,7 @@ int game_running = 0;
 char *get_ip_addr(int id) {
 	char *ip = NULL;
 	if (id == 0) { // local ip
-#ifndef __ANDROID_API__
+#ifndef ANDROID
 	#ifndef _WIN32
 		char hostbuffer[256];
 		struct hostent *host_entry;
@@ -70,34 +70,39 @@ char *get_ip_addr(int id) {
 	return ip;
 }
 
-void init_game(struct client_data *data, struct server_data *server) {
-	// resetting game data
-#ifdef __ANDROID_API__
+void init_game(struct client_data *data, struct server_data *server, struct nk_context *ctx) {
+#ifdef ANDROID
 	SCR_WIDTH  = GetScreenWidth();
 	SCR_HEIGHT = GetScreenHeight();
 #endif
+	// resetting game data
 	data->click_position[0] = -1;
 	data->click_position[1] = -1;
 	data->uid				= -1;
 	data->local_ip			= calloc(1, 128);
 	server->PORT			= 5555;
-	data->game_mode			= join_window(server->IP_ADDRESS, &server->PORT, data);
-#ifdef __ANDROID_API__
+	data->game_mode			= join_window(server->IP_ADDRESS, &server->PORT, data, ctx);
+	/*
+	 * 0 = single player
+	 * 1 = join online
+	 * 2 = host online
+	 */
+	if (data->game_mode < 0) {
+		CloseWindow();
+		exit(0);
+	}
+#ifdef ANDROID
 	toggleKeyboard(false);
 #endif
 	pthread_t tid[4];
-	if (data->game_mode < 0) {
-		LOGE("Failed to join game");
-		exit(1);
-	} else if (data->game_mode == 1 || data->game_mode == 2) {
-		pthread_create(&tid[2], 0, server_main, server);
-		while (client_connect(server->IP_ADDRESS, server->PORT, &data->sockfd))
-			;
-	}
-	if (data->game_mode == 2)
+	// if (data->game_mode == 0 || data->game_mode == 2)
+	pthread_create(&tid[2], 0, server_main, server);
+	if (data->game_mode == 0)
 		sprintf(data->username, "Me");
+	while (client_connect(server->IP_ADDRESS, server->PORT, &data->sockfd))
+		LOGE("%s:%d", server->IP_ADDRESS, server->PORT);
 	pthread_create(&tid[0], 0, client_comm, data);
-	if (data->game_mode == 2)
+	if (data->game_mode == 0)
 		pthread_create(&tid[3], 0, bot_main, NULL);
 	else {
 		// get addresses
@@ -112,17 +117,20 @@ void init_game(struct client_data *data, struct server_data *server) {
 				sprintf(data->local_ip, "IP: %s", external_ip);
 		}
 		free(external_ip);
-#ifdef __ANDROID_API__
+#ifdef ANDROID
 		free(local_ip);
 #endif
 	}
 }
 
-void main_window(struct client_data *data) {
+void main_window(struct client_data *data, struct nk_context *ctx) {
 	// main window
 	initHitBox();
 	SetWindowTitle(TextFormat("Simple TTT - %s", data->username));
 	while (!WindowShouldClose() && game_running) {
+		UpdateNuklear(ctx);
+		if (data->is_game_over == 1)
+			end_client_game(data, ctx);
 		place(data);
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
@@ -130,9 +138,8 @@ void main_window(struct client_data *data) {
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
 				shape((int[2]){i, j}, data->game_grid[i][j]);
-		if (data->is_game_over == 1)
-			end_client_game(data);
 		matchInfo(data);
+		DrawNuklear(ctx);
 		EndDrawing();
 	}
 }
@@ -146,17 +153,19 @@ int main() {
 #ifndef _WIN32
 	signal(SIGPIPE, sigpipe_handler);
 #endif
-#ifdef __ANDROID_API__
+#ifdef ANDROID
 	app = GetAndroidApp();
 #endif
+	struct nk_context *ctx	   = NULL;
 	struct client_data *data   = calloc(1, sizeof(struct client_data));
 	struct server_data *server = calloc(1, sizeof(struct server_data));
 	SetTraceLogLevel(LOG_NONE);
+	ctx = InitNuklear(STTT_TEXT_SIZE);
 	SetConfigFlags(FLAG_MSAA_4X_HINT);
 	InitWindow(SCR_WIDTH, SCR_HEIGHT, "Game Mode Selection");
 	SetTargetFPS(GetMonitorRefreshRate(0));
-	init_game(data, server);
-	main_window(data);
+	init_game(data, server, ctx);
+	main_window(data, ctx);
 	// end of the program
 	game_running = 0;
 	CloseWindow();

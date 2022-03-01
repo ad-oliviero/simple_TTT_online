@@ -52,15 +52,15 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-
-# raylib folders
-lib/raylib/
-lib/raylib-git/
+# lib folders
+lib/raylib
+lib/raylib-git
+lib/nuklear
+lib/raylib-nuklear
 
 # other
-dex/
+dex
 src/com/thedarkbug/Simple_TTT/R.java
 obj
 android*
 commandlinetools*
-

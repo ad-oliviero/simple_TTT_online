@@ -1,7 +1,10 @@
 # this is a script to download and build raylib for the chosen platform
 
 [ ! -d raylib ] && git clone https://github.com/raysan5/raylib.git raylib
-cd raylib/src
+cd raylib
+# apply a patch to fix android touch
+git apply ../android-touch-fix.diff
+cd src
 
 [ -d linux ] && rm -r linux windows web
 
@@ -46,4 +49,13 @@ mkdir web
 make EMSDK_PATH=/usr/lib/emsdk EMSCRIPTEN_PATH=\$\(EMSDK_PATH\)/upstream/emscripten PYTHON_PATH=/usr/lib/python3.10 CC=\$\(EMSCRIPTEN_PATH\)/emcc AR=\$\(EMSCRIPTEN_PATH\)/emar PLATFORM=PLATFORM_WEB PATH=\$\(shell\ printenv\ PATH\):\$\(EMSDK_PATH\):\$\(EMSCRIPTEN_PATH\):\$\(CLANG_PATH\):\$\(NODE_PATH\):\$\(PYTHON_PATH\) -B
 mv libraylib.a web
 
-cp raylib.h extras
+# downloading nuklear for the gui
+printf "\x1b[32mDownloading nuklear\x1b[0m\n"
+cd ../..
+git clone https://github.com/Immediate-Mode-UI/Nuklear.git nuklear
+
+downloading nuklear raylib bindings
+printf "\x1b[32mDownloading nuklear-raylib\x1b[0m\n"
+git clone https://github.com/RobLoach/raylib-nuklear.git
+
+cp raylib/src/raylib.h raylib-nuklear/include

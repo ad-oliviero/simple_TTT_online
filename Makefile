@@ -39,9 +39,9 @@ else ifeq ($(PLATFORM), android)
 	SRC_DIR = src
 	LIB_DIR = lib/armeabi-v7a
 	ANDROID_TOOLCHAIN = $(ANDROID_NDK_PATH)/toolchains/llvm/prebuilt/linux-x86_64
-	SDK_REL_NUM = 28
+	SDK_VER = 28
 	CC = $(ANDROID_TOOLCHAIN)/bin/armv7a-linux-androideabi31-clang
-	CFLAGS = -I$(RAYLIB_PATH) -I$(ANDROID_NDK_PATH)/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/android/ -I$(ANDROID_NDK_PATH)/sources/android/native_app_glue -std=c99 -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wa,--noexecstack -Wformat -Werror=format-security -no-canonical-prefixes -D__ANDROID_API__=$(SDK_REL_NUM) --sysroot=$(ANDROID_TOOLCHAIN)/sysroot
+	CFLAGS = -I$(RAYLIB_PATH) -I$(ANDROID_NDK_PATH)/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/android/ -I$(ANDROID_NDK_PATH)/sources/android/native_app_glue -std=c99 -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wa,--noexecstack -Wformat -Werror=format-security -no-canonical-prefixes -DANDROID=$(SDK_VER) --sysroot=$(ANDROID_TOOLCHAIN)/sysroot
 endif
 LDFLAGS += 
 TARGET = Simple_TTT
@@ -57,16 +57,17 @@ color_reset=$(shell echo -e "\033[0;0m")
 all: $(info $(color_warn)You need to install and setup emsdk.) $(info On arch linux you can use the emsdk aur package and it's path will be "/usr/lib/emsdk/upstream/emscripten" $(color_reset))
 else ifeq ($(PLATFORM), android)
 all: $(OBJS)
-	$(CC) -c $(ANDROID_NDK_PATH)/sources/android/native_app_glue/android_native_app_glue.c -o $(OBJ_DIR)/native_app_glue.o -std=c99 -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wa,--noexecstack -Wformat -Werror=format-security -no-canonical-prefixes -DANDROID -DPLATFORM_ANDROID -D__ANDROID_API__=$(SDK_REL_NUM)
+	$(CC) -c $(ANDROID_NDK_PATH)/sources/android/native_app_glue/android_native_app_glue.c -o $(OBJ_DIR)/native_app_glue.o -std=c99 -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wa,--noexecstack -Wformat -Werror=format-security -no-canonical-prefixes -DANDROID=$(SDK_VER) -DPLATFORM_ANDROID -DANDROID=$(SDK_VER)
 	$(ANDROID_TOOLCHAIN)/bin/llvm-ar rcs $(OBJ_DIR)/libnative_app_glue.a $(OBJ_DIR)/native_app_glue.o
 	$(CC) -o $(LIB_DIR)/lib$(TARGET).so $(OBJ_DIR)/*.o -shared -I. -I../raylib/release/include -I$(ANDROID_NDK_PATH)/sources/android/native_app_glue -Wl,-soname,lib$(TARGET).so -Wl,--exclude-libs,libatomic.a -Wl,--build-id -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,--warn-shared-textrel -Wl,--fatal-warnings -u ANativeActivity_onCreate -L. -L$(OBJ_DIR) -L$(LIB_DIR) -lraylib -lnative_app_glue -llog -landroid -lEGL -lGLESv2 -lOpenSLES -latomic -lc -lm -ldl
-	$(ANDROID_SDK_PATH)/build-tools/$(SDK_REL_NUM).0.0/aapt package -f -m -S res -J src -M $(SRC_DIR)/AndroidManifest.xml -I $(ANDROID_SDK_PATH)/platforms/android-$(SDK_REL_NUM)/android.jar
-	$(JAVA_HOME)/javac -Xlint:deprecation -verbose -source 1.7 -target 1.7 -d $(OBJ_DIR) -bootclasspath /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/jre/lib/rt.jar -classpath $(ANDROID_SDK_PATH)/platforms/android-$(SDK_REL_NUM)/android.jar:$(OBJ_DIR) -sourcepath src src/com/$(TEAM_NAME)/$(TARGET)/R.java src/com/$(TEAM_NAME)/$(TARGET)/NativeLoader.java
-	$(ANDROID_SDK_PATH)/build-tools/$(SDK_REL_NUM).0.0/dx --verbose --dex --output=dex/classes.dex $(OBJ_DIR) 
-	$(ANDROID_SDK_PATH)/build-tools/$(SDK_REL_NUM).0.0/aapt package -f -M $(SRC_DIR)/AndroidManifest.xml -S res -A assets -I $(ANDROID_SDK_PATH)/platforms/android-$(SDK_REL_NUM)/android.jar -F $(BUILD_DIR)/$(TARGET).unsigned.apk dex
-	$(ANDROID_SDK_PATH)/build-tools/$(SDK_REL_NUM).0.0/aapt add $(BUILD_DIR)/$(TARGET).unsigned.apk $(LIB_DIR)/lib$(TARGET).so
+	$(ANDROID_SDK_PATH)/build-tools/$(SDK_VER).0.0/aapt package -f -m -S res -J src -M $(SRC_DIR)/AndroidManifest.xml -I $(ANDROID_SDK_PATH)/platforms/android-$(SDK_VER)/android.jar
+	$(JAVA_HOME)/javac -Xlint:deprecation -verbose -source 1.7 -target 1.7 -d $(OBJ_DIR) -bootclasspath /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/jre/lib/rt.jar -classpath $(ANDROID_SDK_PATH)/platforms/android-$(SDK_VER)/android.jar:$(OBJ_DIR) -sourcepath src src/com/$(TEAM_NAME)/$(TARGET)/R.java src/com/$(TEAM_NAME)/$(TARGET)/NativeLoader.java
+	$(ANDROID_SDK_PATH)/build-tools/$(SDK_VER).0.0/dx --verbose --dex --output=dex/classes.dex $(OBJ_DIR) 
+	$(ANDROID_SDK_PATH)/build-tools/$(SDK_VER).0.0/aapt package -f -M $(SRC_DIR)/AndroidManifest.xml -S res -A assets -I $(ANDROID_SDK_PATH)/platforms/android-$(SDK_VER)/android.jar -F $(BUILD_DIR)/$(TARGET).unsigned.apk dex
+	$(ANDROID_SDK_PATH)/build-tools/$(SDK_VER).0.0/aapt add $(BUILD_DIR)/$(TARGET).unsigned.apk $(LIB_DIR)/lib$(TARGET).so
+	@echo You can generate a keystore with: keytool -genkeypair -validity 1000 -dname "CN=seth,O=Android,C=ES" -keystore $(TARGET).keystore -storepass '$(ANDROID_KPASS)' -keypass '$(ANDROID_KPASS)' -alias $(TARGET)Key -keyalg RSA -deststoretype pkcs12
 	$(JAVA_HOME)/jarsigner -keystore $(TARGET).keystore -storepass whatever -keypass whatever -signedjar $(BUILD_DIR)/$(TARGET).signed.apk $(BUILD_DIR)/$(TARGET).unsigned.apk $(TARGET)Key # generic keystore, will be distributed with a private one
-	$(ANDROID_SDK_PATH)/build-tools/$(SDK_REL_NUM).0.0/zipalign -f 4 $(BUILD_DIR)/$(TARGET).signed.apk $(BUILD_DIR)/$(TARGET).apk
+	$(ANDROID_SDK_PATH)/build-tools/$(SDK_VER).0.0/zipalign -f 4 $(BUILD_DIR)/$(TARGET).signed.apk $(BUILD_DIR)/$(TARGET).apk
 
 else
 all: $(TARGET)

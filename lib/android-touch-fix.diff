@@ -1,0 +1,40 @@
+diff --git a/src/rcore.c b/src/rcore.c
+index 58c8c4ce..ced0fe20 100644
+--- a/src/rcore.c
++++ b/src/rcore.c
+@@ -3714,7 +3714,7 @@ bool IsMouseButtonUp(int button)
+ int GetMouseX(void)
+ {
+ #if defined(PLATFORM_ANDROID)
+-    return (int)CORE.Input.Touch.position[0].x;
++    return (int)(CORE.Input.Touch.position[0].x*CORE.Window.screen.width - CORE.Window.renderOffset.x/2);
+ #else
+     return (int)((CORE.Input.Mouse.currentPosition.x + CORE.Input.Mouse.offset.x)*CORE.Input.Mouse.scale.x);
+ #endif
+@@ -3724,7 +3724,7 @@ int GetMouseX(void)
+ int GetMouseY(void)
+ {
+ #if defined(PLATFORM_ANDROID)
+-    return (int)CORE.Input.Touch.position[0].y;
++    return (int)(CORE.Input.Touch.position[0].y*CORE.Window.screen.height - CORE.Window.renderOffset.y/2);
+ #else
+     return (int)((CORE.Input.Mouse.currentPosition.y + CORE.Input.Mouse.offset.y)*CORE.Input.Mouse.scale.y);
+ #endif
+@@ -3846,13 +3846,13 @@ Vector2 GetTouchPosition(int index)
+ 
+     if ((CORE.Window.screen.width > CORE.Window.display.width) || (CORE.Window.screen.height > CORE.Window.display.height))
+     {
+-        position.x = position.x*((float)CORE.Window.screen.width/(float)(CORE.Window.display.width - CORE.Window.renderOffset.x)) - CORE.Window.renderOffset.x/2;
+-        position.y = position.y*((float)CORE.Window.screen.height/(float)(CORE.Window.display.height - CORE.Window.renderOffset.y)) - CORE.Window.renderOffset.y/2;
++        position.x = position.x*(float)CORE.Window.screen.width - CORE.Window.renderOffset.x/2;
++        position.y = position.y*(float)CORE.Window.screen.height - CORE.Window.renderOffset.y/2;
+     }
+     else
+     {
+-        position.x = position.x*((float)CORE.Window.render.width/(float)CORE.Window.display.width) - CORE.Window.renderOffset.x/2;
+-        position.y = position.y*((float)CORE.Window.render.height/(float)CORE.Window.display.height) - CORE.Window.renderOffset.y/2;
++        position.x = position.x*(float)CORE.Window.render.width - CORE.Window.renderOffset.x/2;
++        position.y = position.y*(float)CORE.Window.render.height - CORE.Window.renderOffset.y/2;
+     }
+ #endif
+ #if defined(PLATFORM_WEB) || defined(PLATFORM_RPI) || defined(PLATFORM_DRM)

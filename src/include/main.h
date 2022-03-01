@@ -9,7 +9,7 @@ extern int SCR_WIDTH, SCR_HEIGHT;
 	#define SOCK int
 #endif
 
-#ifdef __ANDROID_API__
+#ifdef ANDROID
 	#include <jni.h>
 	#include <android/log.h>
 	#define THICKNESS 7.0f
