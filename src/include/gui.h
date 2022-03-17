@@ -1,7 +1,7 @@
 #ifndef __GUI_H__
 #define __GUI_H__
 
-#include "../../lib/raylib-nuklear/include/raylib-nuklear.h"
+#include "../../lib/raylib/src/raylib.h"
 #include "main.h"
 
 extern Color BG_COLOR;
@@ -9,7 +9,7 @@ extern Color FG_COLOR;
 
 void initHitBox();
 void grid();
-int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data, struct nk_context *ctx);
+int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data);
 void matchInfo(struct client_data *data);
 
 #ifdef ANDROID

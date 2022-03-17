@@ -1,33 +1,17 @@
 diff --git a/src/rcore.c b/src/rcore.c
-index 58c8c4ce..d948fc90 100644
+index 58c8c4ce..641f6512 100644
 --- a/src/rcore.c
 +++ b/src/rcore.c
-@@ -3469,16 +3469,23 @@ bool IsKeyPressed(int key)
- {
-     bool pressed = false;
- 
-+#if defined(PLATFORM_ANDROID)
-+    pressed = (GetKeyPressed() == key);
-+#else
-     if ((CORE.Input.Keyboard.previousKeyState[key] == 0) && (CORE.Input.Keyboard.currentKeyState[key] == 1)) pressed = true;
--
-+#endif
-     return pressed;
- }
- 
- // Check if a key is being pressed (key held down)
- bool IsKeyDown(int key)
- {
-+#if defined(PLATFORM_ANDROID)
-+    return IsKeyPressed(key);
-+#else
-     if (CORE.Input.Keyboard.currentKeyState[key] == 1) return true;
-     else return false;
-+#endif
- }
- 
- // Check if a key has been released once
-@@ -3714,7 +3721,7 @@ bool IsMouseButtonUp(int button)
+@@ -1647,7 +1647,7 @@ void *GetWindowHandle(void)
+     // typedef unsigned long XID;
+     // typedef XID Window;
+     //unsigned long id = (unsigned long)glfwGetX11Window(window);
+-    return NULL;    // TODO: Find a way to return value... cast to void *?
++    return CORE.Window.handle;    // TODO: Find a way to return value... cast to void *?
+ #endif
+ #if defined(__APPLE__)
+     // NOTE: Returned handle is: (objc_object *)
+@@ -3714,7 +3714,7 @@ bool IsMouseButtonUp(int button)
  int GetMouseX(void)
  {
  #if defined(PLATFORM_ANDROID)
@@ -36,7 +20,7 @@ index 58c8c4ce..d948fc90 100644
  #else
      return (int)((CORE.Input.Mouse.currentPosition.x + CORE.Input.Mouse.offset.x)*CORE.Input.Mouse.scale.x);
  #endif
-@@ -3724,7 +3731,7 @@ int GetMouseX(void)
+@@ -3724,7 +3724,7 @@ int GetMouseX(void)
  int GetMouseY(void)
  {
  #if defined(PLATFORM_ANDROID)
@@ -45,7 +29,7 @@ index 58c8c4ce..d948fc90 100644
  #else
      return (int)((CORE.Input.Mouse.currentPosition.y + CORE.Input.Mouse.offset.y)*CORE.Input.Mouse.scale.y);
  #endif
-@@ -3846,13 +3853,13 @@ Vector2 GetTouchPosition(int index)
+@@ -3846,13 +3846,13 @@ Vector2 GetTouchPosition(int index)
  
      if ((CORE.Window.screen.width > CORE.Window.display.width) || (CORE.Window.screen.height > CORE.Window.display.height))
      {

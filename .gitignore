@@ -55,8 +55,7 @@ dkms.conf
 # lib folders
 lib/raylib
 lib/raylib-git
-lib/nuklear
-lib/raylib-nuklear
+lib/imgui
 
 # other
 dex

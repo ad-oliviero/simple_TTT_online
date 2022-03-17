@@ -1,7 +1,7 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
-extern int SCR_WIDTH, SCR_HEIGHT;
+extern float SCR_WIDTH, SCR_HEIGHT;
 #define BLOCK SCR_WIDTH / 3
 #ifdef _WIN32
 	#define SOCK unsigned int
@@ -15,60 +15,60 @@ extern int SCR_WIDTH, SCR_HEIGHT;
 	#define THICKNESS 7.0f
 	#define LOGV(...)                                                                          \
 		{                                                                                      \
-			char *log_msg = calloc(1, 1024);                                                   \
+			char *log_msg = (char *)calloc(1, 1024);                                           \
 			sprintf(log_msg, __VA_ARGS__);                                                     \
 			__android_log_print(ANDROID_LOG_VERBOSE, "Simple_TTT", "Simple TTT: %s", log_msg); \
 			free(log_msg);                                                                     \
 		}
 	#define LOGI(...)                                                                       \
 		{                                                                                   \
-			char *log_msg = calloc(1, 1024);                                                \
+			char *log_msg = (char *)calloc(1, 1024);                                        \
 			sprintf(log_msg, __VA_ARGS__);                                                  \
 			__android_log_print(ANDROID_LOG_INFO, "Simple_TTT", "Simple TTT: %s", log_msg); \
 			free(log_msg);                                                                  \
 		}
 	#define LOGW(...)                                                                       \
 		{                                                                                   \
-			char *log_msg = calloc(1, 1024);                                                \
+			char *log_msg = (char *)calloc(1, 1024);                                        \
 			sprintf(log_msg, __VA_ARGS__);                                                  \
 			__android_log_print(ANDROID_LOG_WARN, "Simple_TTT", "Simple TTT: %s", log_msg); \
 			free(log_msg);                                                                  \
 		}
 	#define LOGE(...)                                                                        \
 		{                                                                                    \
-			char *log_msg = calloc(1, 1024);                                                 \
+			char *log_msg = (char *)calloc(1, 1024);                                         \
 			sprintf(log_msg, __VA_ARGS__);                                                   \
 			__android_log_print(ANDROID_LOG_ERROR, "Simple_TTT", "Simple TTT: %s", log_msg); \
 			free(log_msg);                                                                   \
 		}
 extern struct android_app *app;
-struct android_app *GetAndroidApp(void);
+extern "C" struct android_app *GetAndroidApp();
 #else
 	#define THICKNESS 3.0f
-	#define LOGV(...)                         \
-		{                                     \
-			char *log_msg = calloc(1, 1024);  \
-			sprintf(log_msg, __VA_ARGS__);    \
-			fprintf(stdout, "%s\n", log_msg); \
-			free(log_msg);                    \
+	#define LOGV(...)                                \
+		{                                            \
+			char *log_msg = (char *)calloc(1, 1024); \
+			sprintf(log_msg, __VA_ARGS__);           \
+			fprintf(stdout, "%s\n", log_msg);        \
+			free(log_msg);                           \
 		}
-	#define LOGI(...)                         \
-		{                                     \
-			char *log_msg = calloc(1, 1024);  \
-			sprintf(log_msg, __VA_ARGS__);    \
-			fprintf(stdout, "%s\n", log_msg); \
-			free(log_msg);                    \
+	#define LOGI(...)                                \
+		{                                            \
+			char *log_msg = (char *)calloc(1, 1024); \
+			sprintf(log_msg, __VA_ARGS__);           \
+			fprintf(stdout, "%s\n", log_msg);        \
+			free(log_msg);                           \
 		}
 	#define LOGW(...)                                        \
 		{                                                    \
-			char *log_msg = calloc(1, 1024);                 \
+			char *log_msg = (char *)calloc(1, 1024);         \
 			sprintf(log_msg, __VA_ARGS__);                   \
 			fprintf(stderr, "\x1b[33m%s\x1b[0m\n", log_msg); \
 			free(log_msg);                                   \
 		}
 	#define LOGE(...)                                        \
 		{                                                    \
-			char *log_msg = calloc(1, 1024);                 \
+			char *log_msg = (char *)calloc(1, 1024);         \
 			sprintf(log_msg, __VA_ARGS__);                   \
 			fprintf(stderr, "\x1b[31m%s\x1b[0m\n", log_msg); \
 			free(log_msg);                                   \

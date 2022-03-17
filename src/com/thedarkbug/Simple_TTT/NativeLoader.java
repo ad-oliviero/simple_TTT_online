@@ -13,7 +13,8 @@ public class NativeLoader extends android.app.NativeActivity {
     public static Thread tid[] = new Thread[4];
     public static Boolean game_running = true;
     static {
-        System.loadLibrary("Simple_TTT");
+        // System.loadLibrary("c++_shared");
+        // System.loadLibrary("Simple_TTT");
     }
 
     public void showKeyboard() {
