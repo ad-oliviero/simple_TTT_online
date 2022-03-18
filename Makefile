@@ -66,6 +66,8 @@ all: $(OBJS)
 	$(ANDROID_SDK_PATH)/build-tools/$(SDK_VER).0.0/aapt package -f -M $(SRC_DIR)/AndroidManifest.xml -S res -A assets -I $(ANDROID_SDK_PATH)/platforms/android-$(SDK_VER)/android.jar -F $(BUILD_DIR)/$(TARGET).unsigned.apk dex
 	$(ANDROID_SDK_PATH)/build-tools/$(SDK_VER).0.0/aapt add $(BUILD_DIR)/$(TARGET).unsigned.apk $(ANDROID_NDK_PATH)/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a/libc++_shared.so
 	$(ANDROID_SDK_PATH)/build-tools/$(SDK_VER).0.0/aapt add $(BUILD_DIR)/$(TARGET).unsigned.apk $(LIB_DIR)/libimgui.so
+	cp $(ANDROID_NDK_PATH)/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a/libc++_shared.so $(LIB_DIR)
+	$(ANDROID_SDK_PATH)/build-tools/$(SDK_VER).0.0/aapt add $(BUILD_DIR)/$(TARGET).unsigned.apk $(LIB_DIR)/libc++_shared.so
 	$(ANDROID_SDK_PATH)/build-tools/$(SDK_VER).0.0/aapt add $(BUILD_DIR)/$(TARGET).unsigned.apk $(LIB_DIR)/lib$(TARGET).so
 	@echo You can generate a keystore with: keytool -genkeypair -validity 1000 -dname "CN=seth,O=Android,C=ES" -keystore $(TARGET).keystore -storepass '$(ANDROID_KPASS)' -keypass '$(ANDROID_KPASS)' -alias $(TARGET)Key -keyalg RSA -deststoretype pkcs12
 	$(JAVA_HOME)/jarsigner -keystore $(TARGET).keystore -storepass whatever -keypass whatever -signedjar $(BUILD_DIR)/$(TARGET).signed.apk $(BUILD_DIR)/$(TARGET).unsigned.apk $(TARGET)Key # generic keystore, will be distributed with a private one

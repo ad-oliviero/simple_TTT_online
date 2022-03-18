@@ -5,9 +5,9 @@
 	#include "../lib/imgui/backends/imgui_impl_android.h"
 #else
 	#include "../lib/imgui/backends/imgui_impl_glfw.h"
-	#include "../lib/imgui/backends/imgui_impl_opengl3.h"
 	#include <GLFW/glfw3.h>
 #endif
+#include "../lib/imgui/backends/imgui_impl_opengl3.h"
 #include "../lib/raylib/src/raylib.h"
 #include "include/bot.h"
 #include "include/client.h"
@@ -196,11 +196,11 @@ int main() {
 #ifndef ANDROID
 	GLFWwindow *window = (GLFWwindow *)GetWindowHandle();
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init("#version 330");
 #else
 	ImGui_ImplAndroid_Init(app->window);
 #endif
-	ImGuiIO imgui_io = ImGui::GetIO();
+	ImGui_ImplOpenGL3_Init((const char *)"#version 330");
+	// ImGuiIO imgui_io = ImGui::GetIO();
 
 	init_game(data, server);
 	main_window(data);

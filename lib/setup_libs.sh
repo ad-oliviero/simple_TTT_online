@@ -81,7 +81,7 @@ for f in *.cpp; do
 	$CC $f -c -o $f.o -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wa,--noexecstack -Wformat -Werror=format-security -no-canonical-prefixes -DPLATFORM_ANDROID
 done
 # $CC backends/imgui_impl_android.cpp -I. -c -o imgui_impl_android.cpp.o -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wa,--noexecstack -Wformat -Werror=format-security -no-canonical-prefixes -DPLATFORM_ANDROID
-$CC -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wformat -Werror=format-security -no-canonical-prefixes -DPLATFORM_ANDROID -shared -fPIC *.o -o libimgui.so
+$CC -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -Wall -Wformat -Werror=format-security -no-canonical-prefixes -DPLATFORM_ANDROID -shared -fPIC *.o backends/imgui_impl_opengl3.cpp -o libimgui.so
 # $ANDROID_TOOLCHAIN/bin/llvm-ar rcs ../armeabi-v7a/libimgui.a *.o
 mv libimgui.so ../armeabi-v7a
 # fi

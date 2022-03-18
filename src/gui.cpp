@@ -1,12 +1,12 @@
 #define RAYLIB_NUKLEAR_IMPLEMENTATION
 #include "include/gui.h"
+#include "../lib/imgui/backends/imgui_impl_android.h"
+#include "../lib/imgui/imgui.h"
 #ifdef ANDROID
-	#include "../lib/imgui/imgui.h"
-	#include "../lib/imgui/backends/imgui_impl_android.h"
 #else
-	#include "../lib/imgui/backends/imgui_impl_glfw.h"
-	#include "../lib/imgui/backends/imgui_impl_opengl3.h"
+// #include "../lib/imgui/backends/imgui_impl_glfw.h"
 #endif
+#include "../lib/imgui/backends/imgui_impl_opengl3.h"
 #include "../lib/raylib/src/raylib.h"
 #include "../lib/raylib/src/rlgl.h"
 #include "include/client.h"
@@ -182,17 +182,18 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 			game_mode	 = -1;
 		}
 		BeginDrawing();
+		ClearBackground(BG_COLOR);
 #ifdef ANDROID
+		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplAndroid_NewFrame();
 #else
-		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
+		ImGui_ImplOpenGL3_NewFrame();
 #endif
 		ImGui::NewFrame();
-		ClearBackground(RAYWHITE);
 
-		ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
-		ImGui::SetNextWindowSize(ImVec2(SCR_WIDTH, SCR_HEIGHT), 1);
+		ImGui::SetNextWindowPos(ImVec2(-1.0f, -1.0f));
+		ImGui::SetNextWindowSize(ImVec2(SCR_WIDTH + 1, SCR_HEIGHT + 1), 1);
 		ImGui::Begin("Game mode selection", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
 		// draw title
@@ -256,9 +257,10 @@ int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data) {
 		ImGui::End();
 
 		ImGui::Render();
-#ifndef ANDROID
+		// #ifndef ANDROID
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-#endif
+		// #endif
+		ImGui_ImplRaylib_Render(ImGui::GetDrawData());
 		EndDrawing();
 	}
 	return game_mode;
