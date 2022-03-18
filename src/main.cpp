@@ -156,7 +156,7 @@ void main_window(struct client_data *data, GLFWwindow *window) {
 			ImGui::SetNextWindowPos(ImVec2(SCR_WIDTH / 5, SCR_HEIGHT / 3));
 			ImGui::SetNextWindowSize(ImVec2(SCR_WIDTH / 5 * 3, SCR_HEIGHT / 6), 1);
 			ImGui::Begin(data->winner == 3 ? "Draw..." : (data->winner == 1 ? TextFormat("%s (X) WON!", data->users[0]) : TextFormat("%s (0) WON!", data->users[1])), NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-			if (ImGui::Button("Restart")) data->ready = true;
+			if (ImGui::Button("Restart", ImVec2((SCR_WIDTH / 5 * 3) - 15, (SCR_HEIGHT / 6) - 35))) data->ready = true;
 			ImGui::End();
 		}
 		grid();
