@@ -137,7 +137,6 @@ void ImGui_ImplRaylib_Render(ImDrawData *draw_data) {
 				int rectH  = (int)(pcmd->ClipRect.w - rectY);
 				BeginScissorMode(rectX, rectY, rectW, rectH);
 				{
-					unsigned int *ti = (unsigned int *)pcmd->TextureId;
 					for (unsigned int i = 0; i <= (pcmd->ElemCount - 3); i += 3) {
 						rlPushMatrix();
 						rlBegin(RL_TRIANGLES);

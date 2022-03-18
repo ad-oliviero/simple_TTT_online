@@ -132,7 +132,7 @@ void init_game(struct client_data *data, struct server_data *server) {
 	}
 }
 
-void main_window(struct client_data *data, GLFWwindow *window) {
+void main_window(struct client_data *data) {
 	// main window
 	initHitBox();
 	SetWindowTitle(TextFormat("Simple TTT - %s", data->username));
@@ -203,7 +203,7 @@ int main() {
 	ImGuiIO imgui_io = ImGui::GetIO();
 
 	init_game(data, server);
-	main_window(data, window);
+	main_window(data);
 	// end of the program
 	game_running = 0;
 	CloseWindow();
