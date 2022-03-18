@@ -11,4 +11,4 @@ set_target_properties(imgui PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/../
 
 add_executable(Simple_TTT main.cpp gui.cpp server.cpp client.cpp bot.cpp shapes.cpp gameplay.cpp)
 
-target_link_libraries(Simple_TTT raylib imgui)
+target_link_libraries(Simple_TTT raylib GL imgui)

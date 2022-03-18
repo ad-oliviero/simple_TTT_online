@@ -6,6 +6,7 @@
 #else
 	#include "../lib/imgui/backends/imgui_impl_glfw.h"
 	#include "../lib/imgui/backends/imgui_impl_opengl3.h"
+	#include <GLFW/glfw3.h>
 #endif
 #include "../lib/raylib/src/raylib.h"
 #include "include/bot.h"
@@ -131,24 +132,42 @@ void init_game(struct client_data *data, struct server_data *server) {
 	}
 }
 
-void main_window(struct client_data *data) {
+void main_window(struct client_data *data, GLFWwindow *window) {
 	// main window
 	initHitBox();
 	SetWindowTitle(TextFormat("Simple TTT - %s", data->username));
 	while (!WindowShouldClose() && game_running) {
-		if (data->is_game_over == 1)
-			end_client_game(data);
-		place(data);
 		BeginDrawing();
 		ClearBackground(BG_COLOR);
-		grid();
+#ifdef ANDROID
+		ImGui_ImplAndroid_NewFrame();
+#else
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+#endif
+		ImGui::NewFrame();
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++) {
 				int cur[2] = {i, j};
 				shape(cur, data->game_grid[i][j]);
 			}
 		matchInfo(data);
+		if (data->is_game_over) {
+			ImGui::SetNextWindowPos(ImVec2(SCR_WIDTH / 5, SCR_HEIGHT / 3));
+			ImGui::SetNextWindowSize(ImVec2(SCR_WIDTH / 5 * 3, SCR_HEIGHT / 6), 1);
+			ImGui::Begin(data->winner == 3 ? "Draw..." : (data->winner == 1 ? TextFormat("%s (X) WON!", data->users[0]) : TextFormat("%s (0) WON!", data->users[1])), NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+			if (ImGui::Button("Restart")) data->ready = true;
+			ImGui::End();
+		}
+		grid();
+		ImGui::Render();
+		ImGui_ImplRaylib_Render(ImGui::GetDrawData());
+#ifndef ANDROID
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+#endif
 		EndDrawing();
+
+		place(data);
 	}
 }
 
@@ -184,7 +203,7 @@ int main() {
 	ImGuiIO imgui_io = ImGui::GetIO();
 
 	init_game(data, server);
-	main_window(data);
+	main_window(data, window);
 	// end of the program
 	game_running = 0;
 	CloseWindow();

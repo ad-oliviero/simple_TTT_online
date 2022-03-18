@@ -14,7 +14,7 @@ public class NativeLoader extends android.app.NativeActivity {
     public static Boolean game_running = true;
     static {
         // System.loadLibrary("c++_shared");
-        // System.loadLibrary("Simple_TTT");
+        System.loadLibrary("Simple_TTT");
     }
 
     public void showKeyboard() {
