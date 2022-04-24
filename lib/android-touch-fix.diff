@@ -1,4 +1,5 @@
 diff --git a/src/rcore.c b/src/rcore.c
+<<<<<<< HEAD
 index 58c8c4ce..641f6512 100644
 --- a/src/rcore.c
 +++ b/src/rcore.c
@@ -11,6 +12,11 @@ index 58c8c4ce..641f6512 100644
  #endif
  #if defined(__APPLE__)
      // NOTE: Returned handle is: (objc_object *)
+=======
+index 58c8c4ce..ced0fe20 100644
+--- a/src/rcore.c
++++ b/src/rcore.c
+>>>>>>> parent of 64986ce (Improved android keyboard input)
 @@ -3714,7 +3714,7 @@ bool IsMouseButtonUp(int button)
  int GetMouseX(void)
  {
