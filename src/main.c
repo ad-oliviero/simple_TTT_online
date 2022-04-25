@@ -1,13 +1,5 @@
 
 #include "include/main.h"
-#ifdef ANDROID
-	#include "../lib/imgui/imgui.h"
-	#include "../lib/imgui/backends/imgui_impl_android.h"
-#else
-	#include "../lib/imgui/backends/imgui_impl_glfw.h"
-	#include <GLFW/glfw3.h>
-#endif
-#include "../lib/imgui/backends/imgui_impl_opengl3.h"
 #include "../lib/raylib/src/raylib.h"
 #include "include/bot.h"
 #include "include/client.h"
@@ -15,13 +7,13 @@
 #include "include/gui.h"
 #include "include/server.h"
 #include "include/shapes.h"
+#include <pthread.h>
 #if defined(__linux__) || defined(__EMSCRIPTEN__)
 	#include <arpa/inet.h>
 	#include <netdb.h>
 #elif _WIN32
 // #include <winsock2.h>
 #endif
-#include <pthread.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,7 +22,6 @@
 
 #ifdef ANDROID
 	#include <jni.h>
-	#include <android_native_app_glue.h>
 struct android_app *app;
 #endif
 
@@ -56,7 +47,7 @@ char *get_ip_addr(int id) {
 			LOGE("Failed to get external ip");
 			return NULL;
 		}
-		ip = (char *)calloc(1, 48);
+		ip = calloc(1, 48);
 		fgets(ip, 48, ip_fp);
 		pclose(ip_fp);
 		// for some reason, on android a \n gets added
@@ -72,14 +63,14 @@ char *get_ip_addr(int id) {
 			LOGE("Failed to get external ip");
 			return NULL;
 		}
-		ip = (char *)calloc(1, 48);
+		ip = calloc(1, 48);
 		fgets(ip, 48, ip_fp);
 		pclose(ip_fp);
 	}
 	return ip;
 }
 
-void init_game(struct client_data *data, struct server_data *server) {
+void init_game(struct client_data *data, struct server_data *server, struct nk_context *ctx) {
 #ifdef ANDROID
 	SCR_WIDTH  = GetScreenWidth();
 	SCR_HEIGHT = GetScreenHeight();
@@ -88,9 +79,9 @@ void init_game(struct client_data *data, struct server_data *server) {
 	data->click_position[0] = -1;
 	data->click_position[1] = -1;
 	data->uid				= -1;
-	data->local_ip			= (char *)calloc(1, 128);
+	data->local_ip			= calloc(1, 128);
 	server->PORT			= 5555;
-	data->game_mode			= join_window(server->IP_ADDRESS, &server->PORT, data); //, ctx);
+	data->game_mode			= join_window(server->IP_ADDRESS, &server->PORT, data, ctx);
 	/*
 	 * 0 = single player
 	 * 1 = join online
@@ -98,6 +89,7 @@ void init_game(struct client_data *data, struct server_data *server) {
 	 */
 	if (data->game_mode < 0) {
 		CloseWindow();
+		UnloadNuklear(ctx);
 		exit(0);
 	}
 #ifdef ANDROID
@@ -132,42 +124,24 @@ void init_game(struct client_data *data, struct server_data *server) {
 	}
 }
 
-void main_window(struct client_data *data) {
+void main_window(struct client_data *data, struct nk_context *ctx) {
 	// main window
 	initHitBox();
 	SetWindowTitle(TextFormat("Simple TTT - %s", data->username));
 	while (!WindowShouldClose() && game_running) {
+		UpdateNuklear(ctx);
+		if (data->is_game_over == 1)
+			end_client_game(data, ctx);
+		place(data);
 		BeginDrawing();
 		ClearBackground(BG_COLOR);
-#ifdef ANDROID
-		ImGui_ImplAndroid_NewFrame();
-#else
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-#endif
-		ImGui::NewFrame();
-		for (int i = 0; i < 3; i++)
-			for (int j = 0; j < 3; j++) {
-				int cur[2] = {i, j};
-				shape(cur, data->game_grid[i][j]);
-			}
-		matchInfo(data);
-		if (data->is_game_over) {
-			ImGui::SetNextWindowPos(ImVec2(SCR_WIDTH / 5, SCR_HEIGHT / 3));
-			ImGui::SetNextWindowSize(ImVec2(SCR_WIDTH / 5 * 3, SCR_HEIGHT / 6), 1);
-			ImGui::Begin(data->winner == 3 ? "Draw..." : (data->winner == 1 ? TextFormat("%s (X) WON!", data->users[0]) : TextFormat("%s (0) WON!", data->users[1])), NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-			if (ImGui::Button("Restart", ImVec2((SCR_WIDTH / 5 * 3) - 15, (SCR_HEIGHT / 6) - 35))) data->ready = true;
-			ImGui::End();
-		}
 		grid();
-		ImGui::Render();
-		ImGui_ImplRaylib_Render(ImGui::GetDrawData());
-#ifndef ANDROID
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-#endif
+		for (int i = 0; i < 3; i++)
+			for (int j = 0; j < 3; j++)
+				shape((int[2]){i, j}, data->game_grid[i][j]);
+		matchInfo(data);
+		DrawNuklear(ctx);
 		EndDrawing();
-
-		place(data);
 	}
 }
 
@@ -183,30 +157,20 @@ int main() {
 #ifdef ANDROID
 	app = GetAndroidApp();
 #endif
-
-	struct client_data *data   = (struct client_data *)calloc(1, sizeof(struct client_data));
-	struct server_data *server = (struct server_data *)calloc(1, sizeof(struct server_data));
+	struct nk_context *ctx	   = NULL;
+	struct client_data *data   = calloc(1, sizeof(struct client_data));
+	struct server_data *server = calloc(1, sizeof(struct server_data));
 	SetTraceLogLevel(LOG_NONE);
+	ctx = InitNuklear(STTT_TEXT_SIZE);
 	SetConfigFlags(FLAG_MSAA_4X_HINT);
 	InitWindow(SCR_WIDTH, SCR_HEIGHT, "Game Mode Selection");
 	SetTargetFPS(GetMonitorRefreshRate(0));
-
-	// init imgui
-	ImGui::CreateContext();
-#ifndef ANDROID
-	GLFWwindow *window = (GLFWwindow *)GetWindowHandle();
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-#else
-	ImGui_ImplAndroid_Init(app->window);
-#endif
-	ImGui_ImplOpenGL3_Init((const char *)"#version 330");
-	// ImGuiIO imgui_io = ImGui::GetIO();
-
-	init_game(data, server);
-	main_window(data);
+	init_game(data, server, ctx);
+	main_window(data, ctx);
 	// end of the program
 	game_running = 0;
 	CloseWindow();
+	UnloadNuklear(ctx);
 	close(data->sockfd);
 	return 0;
 }

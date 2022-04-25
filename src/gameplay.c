@@ -1,14 +1,17 @@
-#ifdef ANDROID
-	#include "../lib/imgui/imgui.h"
-	#include "../lib/imgui/backends/imgui_impl_android.h"
-#else
-	#include "../lib/imgui/backends/imgui_impl_glfw.h"
-	#include "../lib/imgui/backends/imgui_impl_opengl3.h"
-#endif
+#include "../lib/raylib-nuklear/include/raylib-nuklear.h"
+#include "../lib/raylib/src/raylib.h"
 #include "include/gui.h"
 #include "include/main.h"
 #include <stdio.h>
 #include <unistd.h>
+
+void end_client_game(struct client_data *data, struct nk_context *ctx) {
+	if (nk_begin(ctx, data->winner == 3 ? "Draw..." : (data->winner == 1 ? TextFormat("%s (X) WON!", data->users[0]) : TextFormat("%s (0) WON!", data->users[1])), (struct nk_rect){SCR_WIDTH / 5, SCR_HEIGHT / 3, SCR_WIDTH / 5 * 3, SCR_HEIGHT / 6}, NK_WINDOW_NO_SCROLLBAR | NK_WINDOW_CLOSABLE)) {
+		nk_layout_row_dynamic(ctx, SCR_HEIGHT / 10, 1);
+		if (nk_button_label(ctx, "Restart")) data->ready = true;
+	}
+	nk_end(ctx);
+}
 
 // check if someone wins, returns 0 if no one wins, 1 if player 1 (X) wins, 2 if player 2 (O) wins, 3 if it's a draw
 int checkwinner(struct client_data *data) {

@@ -1,14 +1,7 @@
 #ifndef __GUI_H__
 #define __GUI_H__
 
-#ifdef ANDROID
-	#include "../../lib/imgui/imgui.h"
-	#include "../../lib/imgui/backends/imgui_impl_android.h"
-#else
-	#include "../../lib/imgui/backends/imgui_impl_glfw.h"
-	#include "../../lib/imgui/backends/imgui_impl_opengl3.h"
-#endif
-#include "../../lib/raylib/src/raylib.h"
+#include "../../lib/raylib-nuklear/include/raylib-nuklear.h"
 #include "main.h"
 
 extern Color BG_COLOR;
@@ -16,9 +9,7 @@ extern Color FG_COLOR;
 
 void initHitBox();
 void grid();
-void ImGui_ImplRaylib_LoadDefaultFontAtlas();
-void ImGui_ImplRaylib_Render(ImDrawData *draw_data);
-int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data);
+int join_window(char *IP_ADDRESS, int *PORT, struct client_data *data, struct nk_context *ctx);
 void matchInfo(struct client_data *data);
 
 #ifdef ANDROID

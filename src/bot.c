@@ -10,14 +10,14 @@
 
 extern int game_running;
 
-void *bot_main(void *) {
-	struct client_data data = (struct client_data){};
+void *bot_main() {
+	struct client_data data = (struct client_data){0};
 	pthread_t tid[3];
 	data.click_position[0] = -1;
 	data.click_position[1] = -1;
 	data.uid			   = -1;
 	sprintf(data.username, "CPU");
-	while (client_connect((char *)"127.0.0.1", 5555, &data.sockfd))
+	while (client_connect("127.0.0.1", 5555, &data.sockfd))
 		;
 	pthread_create(&tid[0], 0, client_comm, &data);
 	pthread_create(&tid[1], 0, bot_ai, &data);

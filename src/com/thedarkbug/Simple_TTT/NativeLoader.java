@@ -13,7 +13,6 @@ public class NativeLoader extends android.app.NativeActivity {
     public static Thread tid[] = new Thread[4];
     public static Boolean game_running = true;
     static {
-        // System.loadLibrary("c++_shared");
         System.loadLibrary("Simple_TTT");
     }
 
@@ -32,6 +31,11 @@ public class NativeLoader extends android.app.NativeActivity {
                 new Instrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);
             }
         }).start();
+    }
+
+    public boolean getKeyboardState() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
+        return imm.isActive();
     }
 
     public void serverMain() throws IOException {
